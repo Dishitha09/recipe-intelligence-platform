@@ -1,0 +1,21 @@
+# Virtual Environment
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+
+# Environment variables
+.env
+
+# Data folders
+data/raw/
+data/processed/
+data/rejected/
+data/review/
+
+# VS Code
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/
