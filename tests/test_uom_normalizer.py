@@ -1,64 +1,108 @@
-from services.enrichment.uom.uom_normalizer import normalize
+from services.enrichment.uom.uom_normalizer import UOMNormalizer
 
 
-
-print(
-
-normalize(
-
-2,
-
-"cup",
-
-"rice"
-
-)
-
-)
-
+uom=UOMNormalizer()
 
 
 print(
 
-normalize(
+uom.normalize(
 
-1,
+"paneer",
 
-"liter",
+"1",
 
-"milk"
-
-)
+"cup"
 
 )
 
+)
 
 
 print(
 
-normalize(
+uom.normalize(
 
-3,
+"milk",
 
-"tbsp",
+"1",
 
-"oil"
-
-)
+"cup"
 
 )
 
+)
 
 
 print(
 
-normalize(
+uom.normalize(
 
-500,
+"rice",
 
-"g",
+"1/4",
 
-"whole_wheat_flour"
+"cup"
+
+)
+
+)
+
+
+print(
+
+uom.normalize(
+
+"oil",
+
+"1",
+
+"tbsp"
+
+)
+
+)
+
+
+print(
+
+uom.normalize(
+
+"salt",
+
+"1",
+
+"pinch"
+
+)
+
+)
+
+
+print(
+
+uom.normalize(
+
+"butter",
+
+"250",
+
+"g"
+
+)
+
+)
+
+
+print(
+
+uom.normalize(
+
+"xyz",
+
+"1",
+
+"cup"
 
 )
 

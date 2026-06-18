@@ -1,102 +1,406 @@
-from services.enrichment.uom.ingredient_type import is_liquid
+from fractions import Fraction
 
-from services.enrichment.uom.density_table import DENSITY_TABLE
+from services.enrichment.uom.density_table import DENSITY
 
 
+LIQUIDS = {
 
-UNIT_MAP = {
+    "milk",
 
-    "cup":240,
+    "water",
 
-    "cups":240,
+    "oil",
 
-    "tbsp":15,
+    "ghee",
 
-    "tablespoon":15,
+    "coconut milk",
 
-    "tsp":5,
+    "buttermilk",
 
-    "teaspoon":5,
+    "cream",
 
-    "ml":1,
-
-    "liter":1000,
-
-    "litre":1000,
-
-    "l":1000,
-
-    "bowl":250,
-
-    "g":1,
-
-    "gram":1,
-
-    "grams":1,
-
-    "kg":1000
+    "curd drink"
 
 }
 
 
+class UOMNormalizer:
 
 
-def normalize(quantity, unit, ingredient):
+    def __init__(self):
 
 
-    ingredient = ingredient.lower()
+        self.volume_units = {
 
-    unit = unit.lower()
+            "cup":240,
 
+            "tbsp":15,
 
-    if is_liquid(ingredient):
+            "tablespoon":15,
 
+            "tsp":5,
 
-        if unit in UNIT_MAP:
+            "teaspoon":5,
 
-            return (
+            "glass":250,
 
-                quantity * UNIT_MAP[unit],
+            "katori":150,
 
-                "ml"
+            "bowl":300
 
-            )
-
-
-        return quantity, unit
-
+        }
 
 
-    if unit in ["g","gram","grams"]:
+        self.weight_units = {
 
-        return quantity,"g"
+            "g":1,
+
+            "gm":1,
+
+            "gram":1,
+
+            "grams":1,
+
+            "kg":1000,
+
+            "mg":0.001
+
+        }
 
 
-    if unit=="kg":
 
-        return quantity*1000,"g"
-
-
-    if unit in UNIT_MAP:
+    def parse_quantity(self,value):
 
 
-        ml = quantity*UNIT_MAP[unit]
+        value=str(value).strip()
 
 
-        density = DENSITY_TABLE.get(
+        try:
 
-            ingredient,
+            return float(value)
 
-            1
+
+        except:
+
+
+            try:
+
+                return float(Fraction(value))
+
+
+            except:
+
+                return None
+
+
+
+    def normalize(
+
+
+        self,
+
+        ingredient_name,
+
+        quantity_str,
+
+        unit_str
+
+    ):
+
+
+        ingredient=ingredient_name.lower().strip()
+
+        unit=unit_str.lower().strip()
+
+
+        quantity=self.parse_quantity(
+
+            quantity_str
 
         )
 
 
-        grams = ml*density
+        if quantity is None:
 
 
-        return round(grams,2),"g"
+            return {
 
 
+                "ingredient_name":ingredient_name,
 
-    return quantity,unit
+                "quantity":None,
+
+                "unit":unit_str,
+
+                "canonical_quantity":None,
+
+                "canonical_unit":None,
+
+                "conversion_method":"unknown",
+
+                "confidence_score":0.0
+
+            }
+
+
+        # weight passthrough
+
+        if unit in self.weight_units:
+
+
+            grams=quantity*self.weight_units[unit]
+
+
+            return {
+
+
+                "ingredient_name":ingredient_name,
+
+                "quantity":quantity,
+
+                "unit":unit,
+
+
+                "canonical_quantity":round(
+
+                    grams,
+
+                    2
+
+                ),
+
+
+                "canonical_unit":"g",
+
+
+                "conversion_method":
+
+                "weight_passthrough",
+
+
+                "confidence_score":1.0
+
+            }
+
+
+        # pinch
+
+        if unit=="pinch":
+
+
+            return {
+
+
+                "ingredient_name":ingredient_name,
+
+                "quantity":quantity,
+
+                "unit":"pinch",
+
+
+                "canonical_quantity":0.3*quantity,
+
+
+                "canonical_unit":"g",
+
+
+                "conversion_method":"indian_unit",
+
+
+                "confidence_score":0.8
+
+            }
+
+
+        # handful
+
+        if unit=="handful":
+
+
+            return {
+
+
+                "ingredient_name":ingredient_name,
+
+                "quantity":quantity,
+
+                "unit":"handful",
+
+
+                "canonical_quantity":30*quantity,
+
+
+                "canonical_unit":"g",
+
+
+                "conversion_method":"indian_unit",
+
+
+                "confidence_score":0.7
+
+            }
+
+
+        # liquids
+
+        if ingredient in LIQUIDS:
+
+
+            if unit in self.volume_units:
+
+
+                ml=quantity*self.volume_units[unit]
+
+
+                return {
+
+
+                    "ingredient_name":ingredient_name,
+
+                    "quantity":quantity,
+
+                    "unit":unit,
+
+
+                    "canonical_quantity":
+
+                    round(ml,2),
+
+
+                    "canonical_unit":"ml",
+
+
+                    "conversion_method":
+
+                    "volume_standard",
+
+
+                    "confidence_score":1.0
+
+                }
+
+
+        # solids
+
+        if ingredient in DENSITY:
+
+
+            if unit=="cup":
+
+
+                grams=quantity*DENSITY[ingredient]
+
+
+            elif unit=="katori":
+
+
+                grams=(
+
+                    quantity
+
+                    *
+
+                    DENSITY[ingredient]
+
+                    *
+
+                    (150/240)
+
+                )
+
+
+            elif unit=="bowl":
+
+
+                grams=(
+
+                    quantity
+
+                    *
+
+                    DENSITY[ingredient]
+
+                    *
+
+                    (300/240)
+
+                )
+
+
+            else:
+
+
+                return {
+
+
+                    "ingredient_name":ingredient_name,
+
+                    "quantity":quantity,
+
+                    "unit":unit,
+
+
+                    "canonical_quantity":None,
+
+
+                    "canonical_unit":None,
+
+
+                    "conversion_method":"unknown",
+
+
+                    "confidence_score":0.0
+
+                }
+
+
+            return {
+
+
+                "ingredient_name":ingredient_name,
+
+                "quantity":quantity,
+
+                "unit":unit,
+
+
+                "canonical_quantity":
+
+                round(grams,2),
+
+
+                "canonical_unit":"g",
+
+
+                "conversion_method":
+
+                "density_lookup",
+
+
+                "confidence_score":0.95
+
+            }
+
+
+        return {
+
+
+            "ingredient_name":ingredient_name,
+
+            "quantity":quantity,
+
+            "unit":unit,
+
+
+            "canonical_quantity":None,
+
+
+            "canonical_unit":None,
+
+
+            "conversion_method":"unknown",
+
+
+            "confidence_score":0.0
+
+        }

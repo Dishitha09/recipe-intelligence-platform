@@ -1,21 +1,26 @@
-# Virtual Environment
-.venv/
-
 # Python
 __pycache__/
 *.pyc
+*.pyo
 
-# Environment variables
+# Virtual Environment
+.venv/
+
+# Environment files
 .env
-
-# Data folders
-data/raw/
-data/processed/
-data/rejected/
-data/review/
 
 # VS Code
 .vscode/
 
-# Jupyter
-.ipynb_checkpoints/
+# Data
+data/raw/
+data/processed/
+data/review/
+data/rejected/
+
+# Large datasets
+data/datasets/**/raw/*
+data/datasets/**/processed/*
+
+# Logs
+*.log
