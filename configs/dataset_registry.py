@@ -1,13 +1,30 @@
-DATASETS=[
+DATASETS = {
 
-"recipe_nlg",
+    "indian":{
 
-"food_com",
+        "folder":"data/datasets/indian/raw"
 
-"indian_food",
+    },
 
-"regional_recipes",
 
-"kaggle_recipes"
+    "regional":{
 
-]
+        "folder":"data/datasets/regional/raw"
+
+    },
+
+
+    "recipe_nlg":{
+
+        "folder":"data/datasets/recipe_nlg/raw"
+
+    },
+
+
+    "food_com":{
+
+        "folder":"data/datasets/food_com/raw"
+
+    }
+
+}

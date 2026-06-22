@@ -4,16 +4,28 @@ import pandas as pd
 class DatasetLoader:
 
 
-    def __init__(self,file_path):
+    def __init__(self, file_path):
 
-        self.file_path=file_path
+        self.file_path = file_path
+
 
 
     def load(self):
 
 
-        return pd.read_csv(
+        if self.file_path.endswith(".csv"):
 
-            self.file_path
+
+            return pd.read_csv(
+
+                self.file_path
+
+            )
+
+
+
+        raise Exception(
+
+            "Unsupported Dataset Format"
 
         )

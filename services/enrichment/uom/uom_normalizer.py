@@ -32,47 +32,52 @@ class UOMNormalizer:
 
         self.volume_units = {
 
-            "cup":240,
+            "cup": 240,
 
-            "tbsp":15,
+            "cups": 240,
 
-            "tablespoon":15,
+            "tbsp": 15,
 
-            "tsp":5,
+            "tablespoon": 15,
 
-            "teaspoon":5,
+            "tablespoons": 15,
 
-            "glass":250,
+            "tsp": 5,
 
-            "katori":150,
+            "teaspoon": 5,
 
-            "bowl":300
+            "teaspoons": 5,
+
+            "glass": 250,
+
+            "katori": 150,
+
+            "bowl": 300
 
         }
 
 
         self.weight_units = {
 
-            "g":1,
+            "g": 1,
 
-            "gm":1,
+            "gm": 1,
 
-            "gram":1,
+            "gram": 1,
 
-            "grams":1,
+            "grams": 1,
 
-            "kg":1000,
+            "kg": 1000,
 
-            "mg":0.001
+            "mg": 0.001
 
         }
 
 
+    def parse_quantity(self, value):
 
-    def parse_quantity(self,value):
 
-
-        value=str(value).strip()
+        value = str(value).strip()
 
 
         try:
@@ -93,9 +98,7 @@ class UOMNormalizer:
                 return None
 
 
-
     def normalize(
-
 
         self,
 
@@ -108,12 +111,27 @@ class UOMNormalizer:
     ):
 
 
-        ingredient=ingredient_name.lower().strip()
+        ingredient = str(
 
-        unit=unit_str.lower().strip()
+            ingredient_name
+
+        ).lower().strip()
 
 
-        quantity=self.parse_quantity(
+        if unit_str is None:
+
+            unit = ""
+
+        else:
+
+            unit = str(
+
+                unit_str
+
+            ).lower().strip()
+
+
+        quantity = self.parse_quantity(
 
             quantity_str
 
@@ -125,43 +143,41 @@ class UOMNormalizer:
 
             return {
 
+                "ingredient_name": ingredient_name,
 
-                "ingredient_name":ingredient_name,
+                "quantity": None,
 
-                "quantity":None,
+                "unit": unit,
 
-                "unit":unit_str,
+                "canonical_quantity": None,
 
-                "canonical_quantity":None,
+                "canonical_unit": None,
 
-                "canonical_unit":None,
+                "conversion_method": "unknown",
 
-                "conversion_method":"unknown",
-
-                "confidence_score":0.0
+                "confidence_score": 0.0
 
             }
 
 
-        # weight passthrough
+        # WEIGHT
+
 
         if unit in self.weight_units:
 
 
-            grams=quantity*self.weight_units[unit]
+            grams = quantity * self.weight_units[unit]
 
 
             return {
 
+                "ingredient_name": ingredient_name,
 
-                "ingredient_name":ingredient_name,
+                "quantity": quantity,
 
-                "quantity":quantity,
+                "unit": unit,
 
-                "unit":unit,
-
-
-                "canonical_quantity":round(
+                "canonical_quantity": round(
 
                     grams,
 
@@ -169,79 +185,85 @@ class UOMNormalizer:
 
                 ),
 
-
-                "canonical_unit":"g",
-
+                "canonical_unit": "g",
 
                 "conversion_method":
 
-                "weight_passthrough",
+                    "weight_passthrough",
 
-
-                "confidence_score":1.0
+                "confidence_score": 1.0
 
             }
 
 
-        # pinch
+        # PINCH
 
-        if unit=="pinch":
+
+        if unit == "pinch":
 
 
             return {
 
+                "ingredient_name": ingredient_name,
 
-                "ingredient_name":ingredient_name,
+                "quantity": quantity,
 
-                "quantity":quantity,
+                "unit": "pinch",
 
-                "unit":"pinch",
+                "canonical_quantity":
 
+                    0.3 * quantity,
 
-                "canonical_quantity":0.3*quantity,
+                "canonical_unit":
 
+                    "g",
 
-                "canonical_unit":"g",
+                "conversion_method":
 
+                    "indian_unit",
 
-                "conversion_method":"indian_unit",
+                "confidence_score":
 
-
-                "confidence_score":0.8
+                    0.8
 
             }
 
 
-        # handful
+        # HANDFUL
 
-        if unit=="handful":
+
+        if unit == "handful":
 
 
             return {
 
+                "ingredient_name": ingredient_name,
 
-                "ingredient_name":ingredient_name,
+                "quantity": quantity,
 
-                "quantity":quantity,
+                "unit": "handful",
 
-                "unit":"handful",
+                "canonical_quantity":
 
+                    30 * quantity,
 
-                "canonical_quantity":30*quantity,
+                "canonical_unit":
 
+                    "g",
 
-                "canonical_unit":"g",
+                "conversion_method":
 
+                    "indian_unit",
 
-                "conversion_method":"indian_unit",
+                "confidence_score":
 
-
-                "confidence_score":0.7
+                    0.7
 
             }
 
 
-        # liquids
+        # LIQUIDS
+
 
         if ingredient in LIQUIDS:
 
@@ -249,70 +271,76 @@ class UOMNormalizer:
             if unit in self.volume_units:
 
 
-                ml=quantity*self.volume_units[unit]
+                ml = (
 
+                    quantity *
 
-                return {
-
-
-                    "ingredient_name":ingredient_name,
-
-                    "quantity":quantity,
-
-                    "unit":unit,
-
-
-                    "canonical_quantity":
-
-                    round(ml,2),
-
-
-                    "canonical_unit":"ml",
-
-
-                    "conversion_method":
-
-                    "volume_standard",
-
-
-                    "confidence_score":1.0
-
-                }
-
-
-        # solids
-
-        if ingredient in DENSITY:
-
-
-            if unit=="cup":
-
-
-                grams=quantity*DENSITY[ingredient]
-
-
-            elif unit=="katori":
-
-
-                grams=(
-
-                    quantity
-
-                    *
-
-                    DENSITY[ingredient]
-
-                    *
-
-                    (150/240)
+                    self.volume_units[unit]
 
                 )
 
 
-            elif unit=="bowl":
+                return {
+
+                    "ingredient_name":
+
+                        ingredient_name,
+
+                    "quantity":
+
+                        quantity,
+
+                    "unit":
+
+                        unit,
+
+                    "canonical_quantity":
+
+                        round(
+
+                            ml,
+
+                            2
+
+                        ),
+
+                    "canonical_unit":
+
+                        "ml",
+
+                    "conversion_method":
+
+                        "volume_standard",
+
+                    "confidence_score":
+
+                        1.0
+
+                }
 
 
-                grams=(
+        # SOLIDS
+
+
+        if ingredient in DENSITY:
+
+
+            if unit in ["cup", "cups"]:
+
+
+                grams = (
+
+                    quantity *
+
+                    DENSITY[ingredient]
+
+                )
+
+
+            elif unit == "katori":
+
+
+                grams = (
 
                     quantity
 
@@ -322,7 +350,25 @@ class UOMNormalizer:
 
                     *
 
-                    (300/240)
+                    (150 / 240)
+
+                )
+
+
+            elif unit == "bowl":
+
+
+                grams = (
+
+                    quantity
+
+                    *
+
+                    DENSITY[ingredient]
+
+                    *
+
+                    (300 / 240)
 
                 )
 
@@ -332,75 +378,104 @@ class UOMNormalizer:
 
                 return {
 
+                    "ingredient_name":
 
-                    "ingredient_name":ingredient_name,
+                        ingredient_name,
 
-                    "quantity":quantity,
+                    "quantity":
 
-                    "unit":unit,
+                        quantity,
 
+                    "unit":
 
-                    "canonical_quantity":None,
+                        unit,
 
+                    "canonical_quantity":
 
-                    "canonical_unit":None,
+                        None,
 
+                    "canonical_unit":
 
-                    "conversion_method":"unknown",
+                        None,
 
+                    "conversion_method":
 
-                    "confidence_score":0.0
+                        "unknown",
+
+                    "confidence_score":
+
+                        0.0
 
                 }
 
 
             return {
 
+                "ingredient_name":
 
-                "ingredient_name":ingredient_name,
+                    ingredient_name,
 
-                "quantity":quantity,
+                "quantity":
 
-                "unit":unit,
+                    quantity,
 
+                "unit":
+
+                    unit,
 
                 "canonical_quantity":
 
-                round(grams,2),
+                    round(
 
+                        grams,
 
-                "canonical_unit":"g",
+                        2
 
+                    ),
+
+                "canonical_unit":
+
+                    "g",
 
                 "conversion_method":
 
-                "density_lookup",
+                    "density_lookup",
 
+                "confidence_score":
 
-                "confidence_score":0.95
+                    0.95
 
             }
 
 
         return {
 
+            "ingredient_name":
 
-            "ingredient_name":ingredient_name,
+                ingredient_name,
 
-            "quantity":quantity,
+            "quantity":
 
-            "unit":unit,
+                quantity,
 
+            "unit":
 
-            "canonical_quantity":None,
+                unit,
 
+            "canonical_quantity":
 
-            "canonical_unit":None,
+                None,
 
+            "canonical_unit":
 
-            "conversion_method":"unknown",
+                None,
 
+            "conversion_method":
 
-            "confidence_score":0.0
+                "unknown",
+
+            "confidence_score":
+
+                0.0
 
         }

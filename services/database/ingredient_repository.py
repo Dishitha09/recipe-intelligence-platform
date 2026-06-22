@@ -18,7 +18,7 @@ class IngredientRepository:
         with engine.begin() as conn:
 
 
-            result=conn.execute(
+            result = conn.execute(
 
                 text("""
 
@@ -32,14 +32,14 @@ class IngredientRepository:
 
                 {
 
-                    "name":canonical_name
+                    "name": canonical_name
 
                 }
 
             )
 
 
-            row=result.fetchone()
+            row = result.fetchone()
 
 
             if row:

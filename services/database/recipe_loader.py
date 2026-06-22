@@ -1,14 +1,11 @@
 from sqlalchemy import text
 
 from services.database.connection import engine
-
 from services.database.ingredient_repository import IngredientRepository
-
 from services.enrichment.ingredient_resolution.ingredient_resolver import IngredientResolver
 
 
 class RecipeLoader:
-
 
     def __init__(self):
 
@@ -19,9 +16,7 @@ class RecipeLoader:
 
     def insert_recipe(self, recipe):
 
-
         with engine.begin() as conn:
-
 
             result = conn.execute(
 
@@ -85,9 +80,7 @@ class RecipeLoader:
 
             )
 
-
             recipe_id = result.scalar()
-
 
             return recipe_id
 
@@ -98,16 +91,15 @@ class RecipeLoader:
 
         recipe_id,
 
-        ingredients
+        ingredients,
+
+        uom_normalizer
 
     ):
 
-
         with engine.begin() as conn:
 
-
             for ing in ingredients:
-
 
                 resolved = self.resolver.resolve(
 
@@ -130,11 +122,13 @@ class RecipeLoader:
                 )
 
 
-                print(
+                normalized = uom_normalizer.normalize(
 
-                    canonical_name,
+                    ingredient_name=canonical_name,
 
-                    ingredient_id
+                    quantity_str=str(ing.quantity),
+
+                    unit_str=ing.unit
 
                 )
 
@@ -155,6 +149,10 @@ class RecipeLoader:
 
                     unit,
 
+                    canonical_quantity,
+
+                    canonical_unit,
+
                     preparation
 
                     )
@@ -170,6 +168,10 @@ class RecipeLoader:
                     :quantity,
 
                     :unit,
+
+                    :canonical_quantity,
+
+                    :canonical_unit,
 
                     :preparation
 
@@ -187,9 +189,32 @@ class RecipeLoader:
 
                         "unit": ing.unit,
 
-                        "preparation": ing.preparation
+                        "canonical_quantity":
+
+                            normalized["canonical_quantity"],
+
+                        "canonical_unit":
+
+                            normalized["canonical_unit"],
+
+                        "preparation":
+
+                            ing.preparation
 
                     }
+
+                )
+
+
+                print(
+
+                    canonical_name,
+
+                    "->",
+
+                    normalized["canonical_quantity"],
+
+                    normalized["canonical_unit"]
 
                 )
 

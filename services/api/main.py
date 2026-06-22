@@ -1,83 +1,35 @@
 from fastapi import FastAPI
-
 from pydantic import BaseModel
 
-from services.rag.recipe_chat import RecipeChat
-
-from services.rag.prompt_builder import PromptBuilder
-
-from services.rag.llm_service import LLMService
-
+from services.rag.recipe_rag import RecipeRAG
 
 app = FastAPI(
-
-    title="Recipe Intelligence Platform",
-
-    version="1.0"
-
+    title="Recipe Intelligence API"
 )
 
-
-chat = RecipeChat()
-
-builder = PromptBuilder()
-
-llm = LLMService()
+rag = RecipeRAG()
 
 
-
-class ChatRequest(BaseModel):
-
-    question:str
-
+class QueryRequest(BaseModel):
+    question: str
 
 
 @app.get("/")
-
 def home():
 
     return {
-
-        "message":"Recipe Intelligence Platform API"
-
+        "message": "Recipe Intelligence API Running"
     }
 
 
+@app.post("/ask")
+def ask_recipe(request: QueryRequest):
 
-@app.post("/chat")
-
-def ask_chat(data:ChatRequest):
-
-
-    recipes = chat.ask(
-
-        data.question
-
+    answer = rag.answer(
+        request.question
     )
-
-
-    prompt = builder.build(
-
-        data.question,
-
-        recipes
-
-    )
-
-
-    answer = llm.generate(
-
-        prompt
-
-    )
-
 
     return {
-
-        "question":data.question,
-
-        "recipes":recipes,
-
-        "answer":answer
-
+        "question": request.question,
+        "answer": answer
     }

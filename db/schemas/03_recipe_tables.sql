@@ -56,3 +56,14 @@ CREATE TABLE IF NOT EXISTS recipe_ingredients (
 
     preparation TEXT
 );
+CREATE TABLE IF NOT EXISTS recipe_steps (
+
+    recipe_step_id SERIAL PRIMARY KEY,
+
+    recipe_id INT REFERENCES recipes(recipe_id),
+
+    step_number INT,
+
+    instruction TEXT
+
+);

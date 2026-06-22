@@ -1,57 +1,69 @@
+import pandas as pd
+
 from services.preprocessing.schema_models import (
-
-Recipe,
-
-Ingredient
-
+    Recipe,
+    Ingredient
 )
 
 from services.database.recipe_loader import RecipeLoader
 
 
-
-recipe=Recipe(
-
-title="Masala Dosa",
-
-description="South Indian Breakfast",
-
-cuisine="South Indian",
-
-source_type="csv",
-
-source_url=None,
-
-language="english",
-
-
-ingredients=[
-
-Ingredient(
-
-ingredient_name="Rice",
-
-quantity=408,
-
-unit="g"
-
-)
-
-]
-
+df = pd.read_csv(
+    "data/datasets/indian/raw/csv/indian_recipes.csv"
 )
 
 
-
-loader=RecipeLoader()
-
-
-recipe_id=loader.insert_recipe(
-
-recipe
-
-)
+loader = RecipeLoader()
 
 
+for _, row in df.iterrows():
 
-print(recipe_id)
+    recipe = Recipe(
+
+        title=row["title"],
+
+        description=None,
+
+        cuisine=row["cuisine"],
+
+        state=row["state"],
+
+        source_type="dataset",
+
+        source_url=None,
+
+        language="english",
+
+        ingredients=[
+
+            Ingredient(
+
+                ingredient_name="Unknown",
+
+                quantity=None,
+
+                unit=None
+
+            )
+
+        ]
+
+    )
+
+
+    recipe_id = loader.insert_recipe(
+
+        recipe
+
+    )
+
+
+    print(
+
+        "Inserted:",
+
+        recipe_id,
+
+        recipe.title
+
+    )
