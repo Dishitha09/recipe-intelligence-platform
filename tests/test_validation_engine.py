@@ -1,45 +1,38 @@
-from services.preprocessing.schema_models import (
+from services.models.recipe import Recipe
 
-    Recipe,
+from services.models.recipe import Ingredient
 
-    Ingredient
+from services.validation.validation_engine import (
+
+    ValidationEngine
 
 )
-
-from services.validation.validation_engine import ValidationEngine
-
 
 
 recipe = Recipe(
 
     title="Masala Dosa",
 
+    description="South Indian breakfast",
+
     cuisine="South Indian",
 
-    source_type="csv",
+    source_type="web",
+
+    source_url="https://example.com",
+
+    language="english",
+
 
     ingredients=[
 
-
         Ingredient(
 
-            ingredient_name="Rice",
+            ingredient_name="rice",
 
-            quantity=408,
+            quantity=2,
 
-            unit="g"
-
-        ),
-
-
-
-        Ingredient(
-
-            ingredient_name="Oil",
-
-            quantity=15,
-
-            unit="ml"
+            unit="cup"
 
         )
 
@@ -48,13 +41,12 @@ recipe = Recipe(
 )
 
 
-
 engine = ValidationEngine()
 
 
-
-result = engine.validate(recipe)
-
+results = engine.validate(recipe)
 
 
-print(result)
+for r in results:
+
+    print(r)

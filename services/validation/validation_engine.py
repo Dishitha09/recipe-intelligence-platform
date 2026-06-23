@@ -1,100 +1,51 @@
-from services.validation.rules import *
+from services.validation.validation_rules import (
 
+    validate_title,
+
+    validate_source,
+
+    validate_ingredients,
+
+    validate_units
+
+)
 
 
 class ValidationEngine:
 
 
-    def validate(self, recipe):
+    def validate(
+
+        self,
+
+        recipe
+
+    ):
 
 
-        errors=[]
+        results = []
 
 
-        if not check_title(recipe):
+        checks = [
 
-            errors.append("Missing Title")
+            validate_title,
 
+            validate_source,
 
-        if not check_ingredients(recipe):
+            validate_ingredients,
 
-            errors.append("No Ingredients")
+            validate_units
 
-
-        if not check_source(recipe):
-
-            errors.append("Missing Source Type")
+        ]
 
 
-
-        for ing in recipe.ingredients:
-
-
-            if not check_positive_quantity(ing):
-
-                errors.append(
-
-                    f"Invalid Quantity : {ing.ingredient_name}"
-
-                )
+        for check in checks:
 
 
-
-            if ing.unit:
-
-
-                if not check_unit(ing.unit):
+            result = check(recipe)
 
 
-                    errors.append(
-
-                        f"Invalid Unit : {ing.unit}"
-
-                    )
+            results.append(result)
 
 
-
-            if not check_ingredient_name(
-
-
-                ing.ingredient_name
-
-
-            ):
-
-
-                errors.append(
-
-
-                    "Ingredient Name Missing"
-
-
-                )
-
-
-
-
-        if len(errors)==0:
-
-
-            return {
-
-                "status":"ACCEPTED",
-
-                "errors":[]
-
-            }
-
-
-
-
-        return {
-
-
-            "status":"REVIEW",
-
-
-            "errors":errors
-
-
-        }
+        return results
