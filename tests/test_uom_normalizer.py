@@ -1,109 +1,51 @@
 from services.enrichment.uom.uom_normalizer import UOMNormalizer
 
 
-uom=UOMNormalizer()
+def test_density_conversion_for_solid_cup_to_grams():
+    uom = UOMNormalizer()
+
+    result = uom.normalize("flour", "1", "cup")
+
+    assert result["canonical_quantity"] == 120
+    assert result["canonical_unit"] == "g"
+    assert result["conversion_method"] == "density_lookup"
+    assert result["conversion_factor"] == 120
 
 
-print(
+def test_volume_conversion_for_liquid_cup_to_ml():
+    uom = UOMNormalizer()
 
-uom.normalize(
+    result = uom.normalize("milk", "1", "cup")
 
-"paneer",
-
-"1",
-
-"cup"
-
-)
-
-)
+    assert result["canonical_quantity"] == 240
+    assert result["canonical_unit"] == "ml"
+    assert result["conversion_method"] == "volume_standard"
 
 
-print(
+def test_imperial_weight_alias_converts_to_grams():
+    uom = UOMNormalizer()
 
-uom.normalize(
+    result = uom.normalize("paneer", "2", "oz")
 
-"milk",
-
-"1",
-
-"cup"
-
-)
-
-)
+    assert result["canonical_quantity"] == 56.7
+    assert result["canonical_unit"] == "g"
 
 
-print(
+def test_colloquial_units_are_estimated_and_flagged():
+    uom = UOMNormalizer()
 
-uom.normalize(
+    result = uom.normalize("spinach", "1", "handful")
 
-"rice",
-
-"1/4",
-
-"cup"
-
-)
-
-)
+    assert result["canonical_quantity"] == 30
+    assert result["canonical_unit"] == "g"
+    assert "colloquial_unit" in result["enrichment_flags"]
 
 
-print(
+def test_unknown_units_are_flagged_without_crashing():
+    uom = UOMNormalizer()
 
-uom.normalize(
+    result = uom.normalize("xyz", "1", "ladle")
 
-"oil",
-
-"1",
-
-"tbsp"
-
-)
-
-)
-
-
-print(
-
-uom.normalize(
-
-"salt",
-
-"1",
-
-"pinch"
-
-)
-
-)
-
-
-print(
-
-uom.normalize(
-
-"butter",
-
-"250",
-
-"g"
-
-)
-
-)
-
-
-print(
-
-uom.normalize(
-
-"xyz",
-
-"1",
-
-"cup"
-
-)
-
-)
+    assert result["canonical_quantity"] is None
+    assert result["canonical_unit"] is None
+    assert "unit_unresolved" in result["enrichment_flags"]

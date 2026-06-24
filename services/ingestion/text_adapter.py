@@ -4,11 +4,23 @@ import os
 
 
 class TextAdapter(SourceAdapter):
+    source_type = "text"
 
 
-    def __init__(self, file_path):
+    def __init__(self, file_path, source_id="text.default", config=None):
 
         self.file_path = file_path
+        self.raw_records = []
+
+        super().__init__(source_id=source_id, config=config)
+
+
+    def validate_config(self):
+
+        super().validate_config()
+
+        if not self.file_path:
+            raise ValueError("file_path is required")
 
 
 
@@ -35,14 +47,41 @@ class TextAdapter(SourceAdapter):
         ) as f:
 
 
-            return f.read()
+            text = f.read()
+
+        title = next(
+            (
+                line.strip()
+                for line in text.splitlines()
+                if line.strip()
+            ),
+            None
+        )
+
+        self.raw_records = [
+            self.build_raw_record(
+                {
+                    "title": title,
+                    "raw_text": text,
+                    "source_url": None,
+                },
+                metadata={
+                    "filename": os.path.basename(self.file_path),
+                    "raw_path": self.file_path,
+                }
+            )
+        ]
+
+        return self.raw_records
 
 
 
     def transform(self):
 
 
-        text = self.extract()
+        records = self.raw_records or self.extract()
+
+        text = records[0].raw_content["raw_text"]
 
 
         return {
@@ -76,4 +115,4 @@ class TextAdapter(SourceAdapter):
     def load(self):
 
 
-        return self.transform()
+        return self.raw_records or self.extract()

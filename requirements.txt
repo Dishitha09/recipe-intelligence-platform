@@ -38,4 +38,6 @@ python-dotenv
 
 pytest
 
+pyyaml
+
 rich

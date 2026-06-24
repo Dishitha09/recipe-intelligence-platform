@@ -1,4 +1,7 @@
-from services.enrichment.ingredient_resolution.alias_resolver import resolve_alias
+from services.enrichment.ingredient_resolution.alias_resolver import (
+    normalize_ingredient_name,
+    resolve_alias_match,
+)
 
 from services.enrichment.ingredient_resolution.embedding_resolver import EmbeddingResolver
 
@@ -7,37 +10,208 @@ from services.enrichment.ingredient_resolution.embedding_resolver import Embeddi
 class IngredientResolver:
 
 
-    def __init__(self):
+    def __init__(
+        self,
+        embedding_resolver=None,
+        llm_resolver=None,
+        enable_llm=False,
+        ingredient_repository=None,
+        use_database=True,
+    ):
 
-        self.embedding_resolver = EmbeddingResolver()
+        self.embedding_resolver = embedding_resolver
+        self.llm_resolver = llm_resolver
+        self.enable_llm = enable_llm
+        self.ingredient_repository = ingredient_repository
+        self.use_database = use_database
 
 
     def resolve(self, ingredient_name):
 
+        normalized_name = normalize_ingredient_name(ingredient_name)
 
-        alias_result = resolve_alias(ingredient_name)
+        if not normalized_name:
+            return self._unresolved_result(
+                ingredient_name,
+                normalized_name
+            )
 
+        database_alias_result = self._resolve_database_exact(
+            ingredient_name,
+            normalized_name
+        )
+
+        if database_alias_result:
+            return database_alias_result
+
+        alias_result = resolve_alias_match(ingredient_name)
 
         if alias_result:
 
-            return {
-
-                "canonical_name": alias_result,
-
-                "method":"alias"
-
-            }
+            return alias_result
 
 
-        embedding_result = self.embedding_resolver.resolve(
-            ingredient_name
+        try:
+            embedding_result = self._resolve_database_vector(
+                ingredient_name,
+                normalized_name,
+            ) or self._resolve_embedding(
+                ingredient_name
+            )
+        except RuntimeError as exc:
+            embedding_result = self._unresolved_result(
+                ingredient_name,
+                normalized_name,
+            )
+            embedding_result["enrichment_flags"].append(
+                "embedding_resolver_unavailable"
+            )
+            embedding_result["error"] = str(exc)
+
+        if embedding_result["canonical_name"]:
+            return embedding_result
+
+        if self.enable_llm and self.llm_resolver is not None:
+            llm_result = self._resolve_llm(
+                ingredient_name,
+                normalized_name
+            )
+
+            if llm_result["canonical_name"]:
+                return llm_result
+
+        return self._unresolved_result(
+            ingredient_name,
+            normalized_name,
+            confidence_score=embedding_result.get(
+                "confidence_score",
+                0.0
+            )
         )
 
+    def _resolve_embedding(self, ingredient_name):
+        if self.embedding_resolver is None:
+            self.embedding_resolver = EmbeddingResolver()
+
+        if hasattr(self.embedding_resolver, "resolve_match"):
+            return self.embedding_resolver.resolve_match(ingredient_name)
+
+        canonical_name = self.embedding_resolver.resolve(ingredient_name)
+
+        if canonical_name is None:
+            return self._unresolved_result(ingredient_name)
 
         return {
-
-            "canonical_name": embedding_result,
-
-            "method":"embedding"
-
+            "raw_name": ingredient_name,
+            "normalized_name": normalize_ingredient_name(ingredient_name),
+            "canonical_name": canonical_name,
+            "method": "embedding",
+            "tier": "vector_similarity",
+            "confidence_score": 1.0,
+            "enrichment_flags": [],
         }
+
+    def _resolve_database_exact(self, ingredient_name, normalized_name):
+        if not self.use_database:
+            return None
+
+        try:
+            match = self._get_repository().resolve_exact(ingredient_name)
+        except Exception:
+            return None
+
+        if match is None:
+            return None
+
+        return {
+            "raw_name": ingredient_name,
+            "normalized_name": normalized_name,
+            "canonical_name": match["canonical_name"],
+            "master_ingredient_id": match["ingredient_id"],
+            "method": "database_alias",
+            "tier": "exact_alias",
+            "confidence_score": 1.0,
+            "enrichment_flags": [],
+        }
+
+    def _resolve_database_vector(self, ingredient_name, normalized_name):
+        if not self.use_database:
+            return None
+
+        if self.embedding_resolver is None:
+            self.embedding_resolver = EmbeddingResolver()
+
+        if not hasattr(self.embedding_resolver, "embed_text"):
+            return None
+
+        query_embedding = self.embedding_resolver.embed_text(ingredient_name)
+
+        try:
+            match = self._get_repository().search_by_embedding(
+                query_embedding,
+                threshold=self.embedding_resolver.threshold,
+            )
+        except Exception:
+            return None
+
+        if match is None:
+            return None
+
+        return {
+            "raw_name": ingredient_name,
+            "normalized_name": normalized_name,
+            "canonical_name": match["canonical_name"],
+            "master_ingredient_id": match["ingredient_id"],
+            "method": "database_embedding",
+            "tier": "vector_similarity",
+            "confidence_score": match["confidence_score"],
+            "enrichment_flags": [],
+        }
+
+    def _resolve_llm(self, ingredient_name, normalized_name):
+        canonical_name = self.llm_resolver.resolve(ingredient_name)
+
+        if not canonical_name:
+            return self._unresolved_result(
+                ingredient_name,
+                normalized_name
+            )
+
+        return {
+            "raw_name": ingredient_name,
+            "normalized_name": normalized_name,
+            "canonical_name": canonical_name,
+            "method": "llm",
+            "tier": "llm_escalation",
+            "confidence_score": 0.6,
+            "enrichment_flags": ["llm_review_required"],
+        }
+
+    def _unresolved_result(
+        self,
+        ingredient_name,
+        normalized_name=None,
+        confidence_score=0.0,
+    ):
+        if normalized_name is None:
+            normalized_name = normalize_ingredient_name(ingredient_name)
+
+        return {
+            "raw_name": ingredient_name,
+            "normalized_name": normalized_name,
+            "canonical_name": None,
+            "method": "unresolved",
+            "tier": "unresolved",
+            "confidence_score": round(confidence_score, 4),
+            "enrichment_flags": ["unresolved_ingredient"],
+        }
+
+    def _get_repository(self):
+        if self.ingredient_repository is None:
+            from services.database.ingredient_repository import (
+                IngredientRepository,
+            )
+
+            self.ingredient_repository = IngredientRepository()
+
+        return self.ingredient_repository

@@ -1,76 +1,115 @@
-from sentence_transformers import SentenceTransformer
-
-from sklearn.metrics.pairwise import cosine_similarity
-
 import numpy as np
+
+from services.enrichment.ingredient_resolution.alias_resolver import (
+    normalize_ingredient_name,
+)
 
 
 class EmbeddingResolver:
 
+    DEFAULT_MASTER_INGREDIENTS = [
+        "whole_wheat_flour",
+        "chickpea",
+        "gram_flour",
+        "paneer",
+        "rice",
+        "tomato",
+        "onion",
+        "potato",
+        "cauliflower_florets",
+        "oil",
+        "clarified_butter",
+    ]
 
-    def __init__(self):
-
-        self.model = SentenceTransformer(
-
-            "sentence-transformers/all-MiniLM-L6-v2"
-
+    def __init__(
+        self,
+        model=None,
+        master_ingredients=None,
+        threshold=0.88,
+        model_name="sentence-transformers/all-MiniLM-L6-v2",
+    ):
+        self.model = model or self._load_model(model_name)
+        self.threshold = threshold
+        self.master_ingredients = master_ingredients or list(
+            self.DEFAULT_MASTER_INGREDIENTS
         )
+        self.master_embeddings = self.model.encode(self.master_ingredients)
 
+    def _load_model(self, model_name):
+        try:
+            from sentence_transformers import SentenceTransformer
+        except ImportError as exc:
+            raise RuntimeError(
+                "sentence-transformers is required for embedding resolution. "
+                "Inject a model in tests or install project dependencies."
+            ) from exc
 
-        self.master_ingredients = [
+        return SentenceTransformer(model_name)
 
-            "whole_wheat_flour",
+    def _cosine_similarity(self, query_embedding):
+        query = np.asarray(query_embedding, dtype=float)
+        candidates = np.asarray(self.master_embeddings, dtype=float)
 
-            "chickpea",
+        if query.ndim == 1:
+            query = query.reshape(1, -1)
 
-            "gram_flour",
+        query_norm = np.linalg.norm(query, axis=1, keepdims=True)
+        candidate_norm = np.linalg.norm(candidates, axis=1, keepdims=True)
+        denominator = query_norm * candidate_norm.T
 
-            "paneer",
+        with np.errstate(divide="ignore", invalid="ignore"):
+            scores = np.divide(
+                query @ candidates.T,
+                denominator,
+                out=np.zeros((query.shape[0], candidates.shape[0])),
+                where=denominator != 0,
+            )
 
-            "rice",
+        return scores
 
-            "tomato",
+    def resolve_match(self, ingredient):
+        normalized_name = normalize_ingredient_name(ingredient)
 
-            "onion",
+        if not normalized_name:
+            return {
+                "raw_name": ingredient,
+                "normalized_name": normalized_name,
+                "canonical_name": None,
+                "method": "unresolved",
+                "tier": "unresolved",
+                "confidence_score": 0.0,
+                "enrichment_flags": ["unresolved_ingredient"],
+            }
 
-            "potatoes",
+        query_embedding = self.embed_text(normalized_name)
+        similarity = self._cosine_similarity(query_embedding)
+        idx = int(np.argmax(similarity))
+        score = float(similarity[0][idx])
 
-            "cauliflower florets",
+        if score < self.threshold:
+            return {
+                "raw_name": ingredient,
+                "normalized_name": normalized_name,
+                "canonical_name": None,
+                "method": "unresolved",
+                "tier": "unresolved",
+                "confidence_score": round(score, 4),
+                "enrichment_flags": ["unresolved_ingredient"],
+            }
 
-            "oil",
-
-            "ghee"
-
-        ]
-
-
-        self.master_embeddings = self.model.encode(
-
-            self.master_ingredients
-
-        )
-
+        return {
+            "raw_name": ingredient,
+            "normalized_name": normalized_name,
+            "canonical_name": self.master_ingredients[idx],
+            "method": "embedding",
+            "tier": "vector_similarity",
+            "confidence_score": round(score, 4),
+            "enrichment_flags": [],
+        }
 
     def resolve(self, ingredient):
+        return self.resolve_match(ingredient)["canonical_name"]
 
-
-        query_embedding = self.model.encode(
-
-            [ingredient]
-
-        )
-
-
-        similarity = cosine_similarity(
-
-            query_embedding,
-
-            self.master_embeddings
-
-        )
-
-
-        idx = np.argmax(similarity)
-
-
-        return self.master_ingredients[idx]
+    def embed_text(self, ingredient):
+        normalized_name = normalize_ingredient_name(ingredient)
+        return self.model.encode([normalized_name])

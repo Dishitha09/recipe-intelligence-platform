@@ -29,12 +29,36 @@ CREATE TABLE IF NOT EXISTS ingredient_aliases (
 );
 
 
+CREATE UNIQUE INDEX IF NOT EXISTS idx_ingredient_aliases_alias_lower
+ON ingredient_aliases (LOWER(alias_name));
 
-CREATE TABLE IF NOT EXISTS ingredient_embeddings (
 
-    embedding_id SERIAL PRIMARY KEY,
+CREATE INDEX IF NOT EXISTS idx_ingredient_aliases_ingredient_id
+ON ingredient_aliases (ingredient_id);
 
-    ingredient_id INT REFERENCES master_ingredients(ingredient_id),
 
-    embedding VECTOR(1024)
-);
+
+CREATE INDEX IF NOT EXISTS idx_master_ingredients_canonical_name
+ON master_ingredients (canonical_name);
+
+
+DO $$
+BEGIN
+    IF to_regtype('vector') IS NOT NULL THEN
+        CREATE TABLE IF NOT EXISTS ingredient_embeddings (
+
+            embedding_id SERIAL PRIMARY KEY,
+
+            ingredient_id INT REFERENCES master_ingredients(ingredient_id),
+
+            embedding VECTOR(384)
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_ingredient_embeddings_ivfflat
+        ON ingredient_embeddings
+        USING ivfflat (embedding vector_cosine_ops)
+        WITH (lists = 100);
+    ELSE
+        RAISE NOTICE 'Skipping ingredient_embeddings because pgvector is unavailable.';
+    END IF;
+END $$;

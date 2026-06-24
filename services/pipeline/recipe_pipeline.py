@@ -1,9 +1,8 @@
 from services.ingestion.csv_adapter import CSVAdapter
 
-from services.preprocessing.schema_models import (
-    Recipe,
-    Ingredient
-)
+from services.enrichment.recipe_enricher import RecipeEnricher
+
+from services.preprocessing.schema_coercer import SchemaCoercer
 
 from services.validation.validation_engine import ValidationEngine
 
@@ -12,11 +11,17 @@ from services.database.recipe_loader import RecipeLoader
 
 class RecipePipeline:
 
-    def __init__(self):
+    def __init__(self, loader=None, enricher=None):
 
         self.validator = ValidationEngine()
 
-        self.loader = RecipeLoader()
+        self.loader = loader
+
+        self.enricher = enricher or RecipeEnricher()
+
+        self.schema_coercer = SchemaCoercer.from_mapping_file(
+            "configs/source_field_mappings.json"
+        )
 
 
     def run_csv_pipeline(self, file_path):
@@ -24,86 +29,109 @@ class RecipePipeline:
 
         adapter = CSVAdapter(file_path)
 
-        adapter.extract()
+        raw_records = adapter.extract()
 
-        rows = adapter.transform()
+        summary = {
+            "coerced": 0,
+            "enriched": 0,
+            "accepted": 0,
+            "review": 0,
+            "loaded": 0,
+            "rejected": 0,
+            "dead_letter": [],
+            "review_queue": [],
+            "validation_errors": [],
+        }
 
+        for raw_record in raw_records:
 
-        for row in rows:
+            coercion_result = self.schema_coercer.coerce(raw_record)
 
+            if coercion_result.status != "accepted":
+                summary["dead_letter"].append(
+                    coercion_result.dead_letter
+                )
+                continue
 
-            recipe = Recipe(
+            summary["coerced"] += 1
+            recipe = coercion_result.recipe
+            recipe = self.enricher.enrich_recipe(recipe)
+            summary["enriched"] += 1
 
-                title=row["title"],
+            validation_report = self.validator.validate(recipe)
 
-                cuisine=row["cuisine"],
-
-                description=None,
-
-                source_type="csv",
-
-                source_url=None,
-
-                language="english",
-
-                ingredients=[
-
-                    Ingredient(
-
-                        ingredient_name=row["ingredient"],
-
-                        quantity=100,
-
-                        unit="g"
-
+            if validation_report.status == "REJECTED":
+                summary["rejected"] += 1
+                summary["dead_letter"].append(
+                    self.validator.dead_letter_payload(
+                        recipe,
+                        validation_report,
                     )
+                )
+                summary["validation_errors"].append(
+                    {
+                        "record_id": raw_record.record_id,
+                        "status": validation_report.status,
+                        "errors": [
+                            result.model_dump()
+                            for result in validation_report
+                            if not result.passed
+                        ],
+                    }
+                )
+                continue
 
-                ],
+            if validation_report.status == "REVIEW":
+                summary["review"] += 1
+                summary["review_queue"].append(
+                    {
+                        "record_id": raw_record.record_id,
+                        "recipe": recipe.model_dump(),
+                        "validation_report": validation_report.model_dump(),
+                    }
+                )
+                continue
 
-                steps=[]
+            summary["accepted"] += 1
+
+            loader = self._get_loader()
+
+            recipe_id = loader.insert_recipe(
+
+                recipe
 
             )
 
 
-            result = self.validator.validate(recipe)
+            loader.insert_ingredients(
+
+                recipe_id,
+
+                recipe.ingredients
+
+            )
 
 
-            if result["status"] == "ACCEPTED":
+            loader.insert_steps(
 
+                recipe_id,
 
-                recipe_id = self.loader.insert_recipe(
+                recipe.steps
 
-                    recipe
+            )
 
-                )
+            summary["loaded"] += 1
 
+            print(
 
-                self.loader.insert_ingredients(
+                f"Inserted Recipe ID : {recipe_id}"
 
-                    recipe_id,
+            )
 
-                    recipe.ingredients
+        return summary
 
-                )
+    def _get_loader(self):
+        if self.loader is None:
+            self.loader = RecipeLoader()
 
-
-                self.loader.insert_steps(
-
-                    recipe_id,
-
-                    recipe.steps
-
-                )
-
-
-                print(
-
-                    f"Inserted Recipe ID : {recipe_id}"
-
-                )
-
-
-            else:
-
-
-                print(result)
+        return self.loader

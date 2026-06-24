@@ -13,7 +13,7 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 engine = create_engine(
     DATABASE_URL,
-    echo=True
+    echo=os.getenv("SQLALCHEMY_ECHO", "false").lower() == "true"
 )
 
 

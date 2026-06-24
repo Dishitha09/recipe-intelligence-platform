@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from typing import List, Optional
+from pydantic import BaseModel, Field
+from typing import Any, Dict, List, Optional
 
 
 class RecipeStep(BaseModel):
@@ -18,6 +18,30 @@ class Ingredient(BaseModel):
     unit: Optional[str] = None
 
     preparation: Optional[str] = None
+
+    canonical_name: Optional[str] = None
+
+    master_ingredient_id: Optional[int] = None
+
+    resolution_method: Optional[str] = None
+
+    resolution_tier: Optional[str] = None
+
+    resolution_confidence: Optional[float] = None
+
+    canonical_quantity: Optional[float] = None
+
+    canonical_unit: Optional[str] = None
+
+    conversion_method: Optional[str] = None
+
+    conversion_factor: Optional[float] = None
+
+    uom_confidence_score: Optional[float] = None
+
+    enrichment_flags: List[str] = Field(default_factory=list)
+
+    allergen_flags: List[str] = Field(default_factory=list)
 
 
 class Recipe(BaseModel):
@@ -69,3 +93,5 @@ class Recipe(BaseModel):
     source_type: str
 
     source_url: Optional[str] = None
+
+    metadata: Optional[Dict[str, Any]] = None

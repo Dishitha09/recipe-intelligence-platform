@@ -7,11 +7,23 @@ import os
 
 
 class DatasetAdapter(SourceAdapter):
+    source_type = "dataset"
 
 
-    def __init__(self,file_path):
+    def __init__(self,file_path, source_id="dataset.default", config=None):
 
         self.file_path=file_path
+        self.raw_records = []
+
+        super().__init__(source_id=source_id, config=config)
+
+
+    def validate_config(self):
+
+        super().validate_config()
+
+        if not self.file_path:
+            raise ValueError("file_path is required")
 
 
 
@@ -28,27 +40,45 @@ class DatasetAdapter(SourceAdapter):
             )
 
 
-        return pd.read_csv(
+        df = pd.read_csv(
 
             self.file_path
 
         )
+
+        self.raw_records = []
+
+        for row_number, row in enumerate(
+            df.to_dict(orient="records"),
+            start=1
+        ):
+            self.raw_records.append(
+                self.build_raw_record(
+                    dict(row),
+                    metadata={
+                        "file_path": self.file_path,
+                        "row_number": row_number,
+                    }
+                )
+            )
+
+        return self.raw_records
 
 
 
     def transform(self):
 
 
-        df=self.extract()
+        records=self.raw_records or self.extract()
 
 
-        records=[]
+        transformed=[]
 
 
-        for _,row in df.iterrows():
+        for record in records:
 
 
-            records.append(
+            transformed.append(
 
                 {
 
@@ -56,7 +86,7 @@ class DatasetAdapter(SourceAdapter):
 
                     "source_url":None,
 
-                    "raw_text":str(row.to_dict()),
+                    "raw_text":str(record.raw_content),
 
                     "metadata":{},
 
@@ -67,11 +97,11 @@ class DatasetAdapter(SourceAdapter):
             )
 
 
-        return records
+        return transformed
 
 
 
     def load(self):
 
 
-        return self.transform()
+        return self.raw_records or self.extract()

@@ -1,8 +1,11 @@
+import json
+
 from sqlalchemy import text
 
 from services.database.connection import engine
 from services.database.ingredient_repository import IngredientRepository
 from services.enrichment.ingredient_resolution.ingredient_resolver import IngredientResolver
+from services.enrichment.uom.uom_normalizer import UOMNormalizer
 
 
 class RecipeLoader:
@@ -11,7 +14,7 @@ class RecipeLoader:
 
         self.repo = IngredientRepository()
 
-        self.resolver = IngredientResolver()
+        self.resolver = None
 
 
     def insert_recipe(self, recipe):
@@ -93,26 +96,23 @@ class RecipeLoader:
 
         ingredients,
 
-        uom_normalizer
+        uom_normalizer=None
 
     ):
+
+        uom_normalizer = uom_normalizer or UOMNormalizer()
 
         with engine.begin() as conn:
 
             for ing in ingredients:
 
-                resolved = self.resolver.resolve(
+                canonical_name = ing.canonical_name
 
-                    ing.ingredient_name
-
-                )
-
-
-                canonical_name = resolved[
-
-                    "canonical_name"
-
-                ]
+                if canonical_name is None:
+                    resolved = self._get_resolver().resolve(
+                        ing.ingredient_name
+                    )
+                    canonical_name = resolved["canonical_name"]
 
 
                 ingredient_id = self.repo.get_ingredient_id(
@@ -122,15 +122,17 @@ class RecipeLoader:
                 )
 
 
-                normalized = uom_normalizer.normalize(
-
-                    ingredient_name=canonical_name,
-
-                    quantity_str=str(ing.quantity),
-
-                    unit_str=ing.unit
-
-                )
+                if ing.canonical_unit is not None:
+                    normalized = {
+                        "canonical_quantity": ing.canonical_quantity,
+                        "canonical_unit": ing.canonical_unit,
+                    }
+                else:
+                    normalized = uom_normalizer.normalize(
+                        ingredient_name=canonical_name or ing.ingredient_name,
+                        quantity_str=str(ing.quantity),
+                        unit_str=ing.unit
+                    )
 
 
                 conn.execute(
@@ -153,6 +155,22 @@ class RecipeLoader:
 
                     canonical_unit,
 
+                    canonical_name,
+
+                    resolution_method,
+
+                    resolution_tier,
+
+                    resolution_confidence,
+
+                    conversion_method,
+
+                    conversion_factor,
+
+                    uom_confidence_score,
+
+                    enrichment_flags,
+
                     preparation
 
                     )
@@ -172,6 +190,22 @@ class RecipeLoader:
                     :canonical_quantity,
 
                     :canonical_unit,
+
+                    :canonical_name,
+
+                    :resolution_method,
+
+                    :resolution_tier,
+
+                    :resolution_confidence,
+
+                    :conversion_method,
+
+                    :conversion_factor,
+
+                    :uom_confidence_score,
+
+                    CAST(:enrichment_flags AS jsonb),
 
                     :preparation
 
@@ -196,6 +230,24 @@ class RecipeLoader:
                         "canonical_unit":
 
                             normalized["canonical_unit"],
+
+                        "canonical_name": canonical_name,
+
+                        "resolution_method": ing.resolution_method,
+
+                        "resolution_tier": ing.resolution_tier,
+
+                        "resolution_confidence": ing.resolution_confidence,
+
+                        "conversion_method": ing.conversion_method,
+
+                        "conversion_factor": ing.conversion_factor,
+
+                        "uom_confidence_score": ing.uom_confidence_score,
+
+                        "enrichment_flags": json.dumps(
+                            ing.enrichment_flags
+                        ),
 
                         "preparation":
 
@@ -277,3 +329,9 @@ class RecipeLoader:
                     }
 
                 )
+
+    def _get_resolver(self):
+        if self.resolver is None:
+            self.resolver = IngredientResolver()
+
+        return self.resolver

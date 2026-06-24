@@ -1,0 +1,126 @@
+{
+  "mappings": [
+    {
+      "source_id": "csv.default",
+      "source_type": "csv",
+      "fields": {
+        "title": ["title", "name"],
+        "description": ["description", "desc"],
+        "cuisine": ["cuisine"],
+        "state": ["state"],
+        "region": ["region"],
+        "language": ["language"],
+        "source_url": ["source_url", "url"],
+        "ingredients": ["ingredients", "ingredient"],
+        "steps": ["steps", "instructions", "directions"]
+      },
+      "defaults": {
+        "language": "english",
+        "source_type": "csv"
+      }
+    },
+    {
+      "source_id": "dataset.default",
+      "source_type": "dataset",
+      "fields": {
+        "title": ["title", "name"],
+        "description": ["description", "desc"],
+        "cuisine": ["cuisine"],
+        "state": ["state"],
+        "region": ["region"],
+        "language": ["language"],
+        "source_url": ["source_url", "url"],
+        "ingredients": ["ingredients", "ingredient"],
+        "steps": ["steps", "instructions", "directions"]
+      },
+      "defaults": {
+        "language": "english",
+        "source_type": "dataset"
+      }
+    },
+    {
+      "source_id": "text.default",
+      "source_type": "text",
+      "fields": {
+        "title": ["title", "name"],
+        "description": ["description"],
+        "source_url": ["source_url", "url"],
+        "raw_text": ["raw_text", "text"]
+      },
+      "defaults": {
+        "language": "english",
+        "source_type": "text"
+      }
+    },
+    {
+      "source_id": "web.default",
+      "source_type": "web",
+      "fields": {
+        "title": ["title", "name"],
+        "description": ["description"],
+        "source_url": ["source_url", "url"],
+        "raw_text": ["raw_text", "text"]
+      },
+      "defaults": {
+        "language": "english",
+        "source_type": "web"
+      }
+    },
+    {
+      "source_id": "pdf.default",
+      "source_type": "pdf",
+      "fields": {
+        "title": ["title", "name"],
+        "description": ["description"],
+        "source_url": ["source_url", "url"],
+        "raw_text": ["raw_text", "text"]
+      },
+      "defaults": {
+        "language": "english",
+        "source_type": "pdf"
+      }
+    },
+    {
+      "source_id": "youtube.default",
+      "source_type": "youtube",
+      "fields": {
+        "title": ["title", "name"],
+        "description": ["description"],
+        "source_url": ["source_url", "url"],
+        "raw_text": ["raw_text", "text"]
+      },
+      "defaults": {
+        "language": "english",
+        "source_type": "youtube"
+      }
+    },
+    {
+      "source_id": "audio.default",
+      "source_type": "audio",
+      "fields": {
+        "title": ["title", "name"],
+        "description": ["description"],
+        "source_url": ["source_url", "url"],
+        "raw_text": ["raw_text", "text"]
+      },
+      "defaults": {
+        "language": "english",
+        "source_type": "audio"
+      }
+    },
+    {
+      "source_id": "image.default",
+      "source_type": "image",
+      "fields": {
+        "title": ["title", "name"],
+        "description": ["description"],
+        "source_url": ["source_url", "url"],
+        "raw_text": ["raw_text", "text"]
+      },
+      "defaults": {
+        "language": "english",
+        "source_type": "image"
+      }
+    }
+  ]
+}

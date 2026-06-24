@@ -1,0 +1,15 @@
+{
+  "checks": {
+    "V01": {"enabled": true},
+    "V02": {"enabled": true},
+    "V03": {"enabled": true},
+    "V04": {"enabled": true},
+    "V05": {"enabled": true},
+    "V06": {"enabled": true},
+    "V07": {"enabled": true},
+    "V08": {"enabled": true},
+    "V09": {"enabled": true},
+    "V10": {"enabled": true},
+    "V11": {"enabled": true}
+  }
+}
