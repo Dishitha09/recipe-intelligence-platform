@@ -6,9 +6,9 @@ from services.enrichment.embedding_generator import EmbeddingGenerator
 
 class RecipeEmbeddingLoader:
 
-    def __init__(self):
+    def __init__(self, generator=None):
 
-        self.generator = EmbeddingGenerator()
+        self.generator = generator or EmbeddingGenerator()
 
 
     def load_embeddings(self):
@@ -81,7 +81,7 @@ class RecipeEmbeddingLoader:
 
                     :recipe_id,
 
-                    :embedding
+                    CAST(:embedding AS vector)
 
                     )
 
@@ -93,7 +93,7 @@ class RecipeEmbeddingLoader:
 
                         "recipe_id": recipe_id,
 
-                        "embedding": embedding
+                        "embedding": self._vector_literal(embedding)
 
                     }
 
@@ -109,3 +109,53 @@ class RecipeEmbeddingLoader:
                     title
 
                 )
+
+    def insert_embedding(self, recipe_id, embedding):
+
+        with engine.begin() as conn:
+
+            conn.execute(
+
+                text("""
+
+                INSERT INTO recipe_embeddings
+
+                (
+
+                recipe_id,
+
+                embedding
+
+                )
+
+                VALUES
+
+                (
+
+                :recipe_id,
+
+                CAST(:embedding AS vector)
+
+                )
+
+                """),
+
+                {
+
+                    "recipe_id": recipe_id,
+
+                    "embedding": self._vector_literal(embedding)
+
+                }
+
+            )
+
+    def _vector_literal(self, embedding):
+
+        values = embedding[0] if hasattr(embedding, "__len__") and len(embedding) == 1 else embedding
+
+        if hasattr(values, "tolist"):
+
+            values = values.tolist()
+
+        return "[" + ",".join(str(float(value)) for value in values) + "]"

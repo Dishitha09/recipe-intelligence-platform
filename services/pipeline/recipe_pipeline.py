@@ -7,17 +7,26 @@ from services.preprocessing.schema_coercer import SchemaCoercer
 from services.validation.validation_engine import ValidationEngine
 
 from services.database.recipe_loader import RecipeLoader
+from services.database.validation_repository import ValidationRepository
 
 
 class RecipePipeline:
 
-    def __init__(self, loader=None, enricher=None):
+    def __init__(
+        self,
+        loader=None,
+        enricher=None,
+        validation_repository=None,
+        persist_validation=True,
+    ):
 
         self.validator = ValidationEngine()
 
         self.loader = loader
 
         self.enricher = enricher or RecipeEnricher()
+        self.validation_repository = validation_repository
+        self.persist_validation = persist_validation
 
         self.schema_coercer = SchemaCoercer.from_mapping_file(
             "configs/source_field_mappings.json"
@@ -41,6 +50,7 @@ class RecipePipeline:
             "dead_letter": [],
             "review_queue": [],
             "validation_errors": [],
+            "validation_reports": [],
         }
 
         for raw_record in raw_records:
@@ -50,6 +60,15 @@ class RecipePipeline:
             if coercion_result.status != "accepted":
                 summary["dead_letter"].append(
                     coercion_result.dead_letter
+                )
+                self._save_dead_letter(
+                    source_type=raw_record.source_type,
+                    record_id=raw_record.record_id,
+                    raw_payload=coercion_result.dead_letter,
+                    error_message=coercion_result.dead_letter.get(
+                        "error",
+                        "Schema coercion failed",
+                    ),
                 )
                 continue
 
@@ -62,12 +81,11 @@ class RecipePipeline:
 
             if validation_report.status == "REJECTED":
                 summary["rejected"] += 1
-                summary["dead_letter"].append(
-                    self.validator.dead_letter_payload(
-                        recipe,
-                        validation_report,
-                    )
+                dead_letter_payload = self.validator.dead_letter_payload(
+                    recipe,
+                    validation_report,
                 )
+                summary["dead_letter"].append(dead_letter_payload)
                 summary["validation_errors"].append(
                     {
                         "record_id": raw_record.record_id,
@@ -78,6 +96,15 @@ class RecipePipeline:
                             if not result.passed
                         ],
                     }
+                )
+                self._save_dead_letter(
+                    source_type=raw_record.source_type,
+                    record_id=raw_record.record_id,
+                    raw_payload=dead_letter_payload,
+                    error_message="Validation rejected recipe",
+                    validation_report=validation_report.model_dump(
+                        mode="json"
+                    ),
                 )
                 continue
 
@@ -90,6 +117,13 @@ class RecipePipeline:
                         "validation_report": validation_report.model_dump(),
                     }
                 )
+                review_id = self._save_review(
+                    raw_record.record_id,
+                    recipe,
+                    validation_report,
+                )
+                if review_id is not None:
+                    summary["review_queue"][-1]["review_id"] = review_id
                 continue
 
             summary["accepted"] += 1
@@ -101,6 +135,13 @@ class RecipePipeline:
                 recipe
 
             )
+
+            validation_id = self._save_validation_report(
+                recipe_id,
+                validation_report,
+            )
+            if validation_id is not None:
+                summary["validation_reports"].append(validation_id)
 
 
             loader.insert_ingredients(
@@ -135,3 +176,53 @@ class RecipePipeline:
             self.loader = RecipeLoader()
 
         return self.loader
+
+    def _get_validation_repository(self):
+        if not self.persist_validation:
+            return None
+
+        if self.validation_repository is None:
+            self.validation_repository = ValidationRepository()
+
+        return self.validation_repository
+
+    def _save_validation_report(self, recipe_id, validation_report):
+        repository = self._get_validation_repository()
+
+        if repository is None:
+            return None
+
+        return repository.save_report(recipe_id, validation_report)
+
+    def _save_review(self, record_id, recipe, validation_report):
+        repository = self._get_validation_repository()
+
+        if repository is None:
+            return None
+
+        return repository.save_review(
+            record_id,
+            recipe,
+            validation_report,
+        )
+
+    def _save_dead_letter(
+        self,
+        source_type,
+        record_id,
+        raw_payload,
+        error_message,
+        validation_report=None,
+    ):
+        repository = self._get_validation_repository()
+
+        if repository is None:
+            return None
+
+        return repository.save_dead_letter(
+            source_type=source_type,
+            record_id=record_id,
+            raw_payload=raw_payload,
+            error_message=error_message,
+            validation_report=validation_report,
+        )

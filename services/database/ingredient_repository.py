@@ -310,6 +310,10 @@ class IngredientRepository:
 
     def _vector_literal(self, embedding):
 
+        if isinstance(embedding, str):
+
+            return embedding
+
         values = embedding[0] if hasattr(embedding, "__len__") and len(embedding) == 1 else embedding
 
         if hasattr(values, "tolist"):
