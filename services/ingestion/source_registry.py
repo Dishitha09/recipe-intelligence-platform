@@ -8,6 +8,7 @@ from services.ingestion.csv_adapter import CSVAdapter
 from services.ingestion.dataset_adapter import DatasetAdapter
 from services.ingestion.image_adapter import ImageAdapter
 from services.ingestion.pdf_adapter import PDFAdapter
+from services.ingestion.scrapy_adapter import ScrapyAdapter
 from services.ingestion.source_adapter import SourceAdapter
 from services.ingestion.text_adapter import TextAdapter
 from services.ingestion.web_adapter import WebAdapter
@@ -20,6 +21,7 @@ ADAPTER_CLASSES: Dict[str, Type[SourceAdapter]] = {
     "dataset": DatasetAdapter,
     "image": ImageAdapter,
     "pdf": PDFAdapter,
+    "scrapy": ScrapyAdapter,
     "text": TextAdapter,
     "web": WebAdapter,
     "youtube": YouTubeAdapter,

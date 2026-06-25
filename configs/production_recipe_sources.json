@@ -1,0 +1,316 @@
+{
+  "pipeline": {
+    "target_recipe_count": 5000,
+    "default_user_agent": "ShopConnect-RecipeBot/1.0",
+    "dedup_strategy": "content_hash_and_source_url",
+    "quality_gate": "validation_engine",
+    "notes": "External sources are disabled by default. Enable only after confirming robots.txt, credentials, and local file availability."
+  },
+  "sources": [
+    {
+      "source_id": "generated_indian_recipes_100",
+      "source_type": "csv",
+      "adapter": "csv",
+      "location": "data/datasets/generated/indian_recipes_100.csv",
+      "enabled": true,
+      "config": {
+        "priority": 0,
+        "source_group": "local_scale_fixture",
+        "expected_volume": 100,
+        "quality": "high",
+        "latency": "local",
+        "purpose": "Repeatable 100 recipe scale smoke test"
+      }
+    },
+    {
+      "source_id": "kaggle_indian_food_101",
+      "source_type": "csv",
+      "adapter": "csv",
+      "location": "data/datasets/indian/raw/kaggle_indian_food_101.csv",
+      "enabled": false,
+      "config": {
+        "priority": 1,
+        "source_group": "structured_dataset",
+        "expected_volume": 400,
+        "quality": "high",
+        "source_url": "https://www.kaggle.com/datasets/ihelon/indian-food-101",
+        "idempotency": "file_hash_and_row_hash",
+        "notes": "Download manually or through Kaggle credentials, then place CSV at location."
+      }
+    },
+    {
+      "source_id": "ifct_food_composition_table",
+      "source_type": "csv",
+      "adapter": "csv",
+      "location": "data/datasets/ifct/ifct_food_composition_table.csv",
+      "enabled": false,
+      "config": {
+        "priority": 1,
+        "source_group": "structured_dataset",
+        "expected_volume": 2000,
+        "quality": "official",
+        "source_url": "https://www.icmr.gov.in/",
+        "use_case": "master_ingredient_catalogue_and_nutrition_enrichment",
+        "idempotency": "ifct_version_and_file_hash"
+      }
+    },
+    {
+      "source_id": "times_food_recipes",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://timesofindia.indiatimes.com/life-style/food-news/recipes",
+      "enabled": false,
+      "config": {
+        "priority": 2,
+        "source_group": "structured_html",
+        "expected_volume": 1500,
+        "quality": "high",
+        "parser": "schema_org_recipe_json_ld",
+        "crawl_delay_seconds": 3,
+        "max_depth": 3,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "scrapy_indianhealthyrecipes",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://www.indianhealthyrecipes.com/",
+      "enabled": false,
+      "config": {
+        "priority": 2,
+        "source_group": "web_crawl",
+        "expected_volume": 1200,
+        "quality": "medium",
+        "parser": "schema_org_recipe_json_ld",
+        "crawl_delay_seconds": 3,
+        "max_depth": 3,
+        "concurrent_requests": 8,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "indian_express_food",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://indianexpress.com/section/lifestyle/food-wine/",
+      "enabled": false,
+      "config": {
+        "priority": 2,
+        "source_group": "structured_html",
+        "expected_volume": 800,
+        "quality": "high",
+        "parser": "schema_org_recipe_json_ld",
+        "crawl_delay_seconds": 5,
+        "max_depth": 2,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "sanjeev_kapoor_web",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://www.sanjeevkapoor.com/recipes",
+      "enabled": false,
+      "config": {
+        "priority": 2,
+        "source_group": "structured_html",
+        "expected_volume": 600,
+        "quality": "chef_verified",
+        "parser": "schema_org_recipe_json_ld_with_images",
+        "crawl_delay_seconds": 3,
+        "max_depth": 3,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "ndtv_food_recipes",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://food.ndtv.com/recipes",
+      "enabled": false,
+      "config": {
+        "priority": 3,
+        "source_group": "structured_html",
+        "expected_volume": 500,
+        "quality": "high",
+        "parser": "schema_org_recipe_json_ld",
+        "crawl_delay_seconds": 5,
+        "max_depth": 2,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "bigbasket_recipes",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://www.bigbasket.com/cookbook/recipes/",
+      "enabled": false,
+      "config": {
+        "priority": 3,
+        "source_group": "structured_html",
+        "expected_volume": 300,
+        "quality": "medium",
+        "parser": "html_recipe_heuristics",
+        "crawl_delay_seconds": 5,
+        "max_depth": 2,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "regional_tamil_blogs",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://www.arusuvai.com/",
+      "enabled": false,
+      "config": {
+        "priority": 3,
+        "source_group": "regional_blog",
+        "expected_volume": 300,
+        "quality": "medium",
+        "languages": ["ta", "en"],
+        "parser": "custom_regional_html",
+        "crawl_delay_seconds": 5,
+        "dedup": "blog_id_and_url_slug",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "regional_telugu_blogs",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://www.andhra-recipes.com/",
+      "enabled": false,
+      "config": {
+        "priority": 3,
+        "source_group": "regional_blog",
+        "expected_volume": 300,
+        "quality": "medium",
+        "languages": ["te", "en"],
+        "parser": "custom_regional_html",
+        "crawl_delay_seconds": 5,
+        "dedup": "blog_id_and_url_slug",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "regional_kannada_blogs",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://www.mysorerecipe.com/",
+      "enabled": false,
+      "config": {
+        "priority": 3,
+        "source_group": "regional_blog",
+        "expected_volume": 300,
+        "quality": "medium",
+        "languages": ["kn", "en"],
+        "parser": "custom_regional_html",
+        "crawl_delay_seconds": 5,
+        "dedup": "blog_id_and_url_slug",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "youtube_sanjeev_kapoor",
+      "source_type": "youtube",
+      "adapter": "youtube",
+      "location": "sanjeev-kapoor-channel-placeholder",
+      "enabled": false,
+      "config": {
+        "priority": 4,
+        "source_group": "video_transcript",
+        "expected_volume": 300,
+        "quality": "medium",
+        "channel_url": "https://www.youtube.com/c/sanjeevkapoor",
+        "languages": ["en", "hi"],
+        "extraction": "youtube_transcript_api_with_whisper_fallback",
+        "idempotency": "youtube_video_id_and_transcript_hash"
+      }
+    },
+    {
+      "source_id": "youtube_ranveer_brar",
+      "source_type": "youtube",
+      "adapter": "youtube",
+      "location": "ranveer-brar-channel-placeholder",
+      "enabled": false,
+      "config": {
+        "priority": 4,
+        "source_group": "video_transcript",
+        "expected_volume": 200,
+        "quality": "medium",
+        "channel_url": "https://www.youtube.com/user/BraaiMaster",
+        "languages": ["en", "hi"],
+        "extraction": "youtube_transcript_api_with_whisper_fallback",
+        "idempotency": "youtube_video_id_and_transcript_hash"
+      }
+    },
+    {
+      "source_id": "state_agriculture_pdf_guides",
+      "source_type": "pdf",
+      "adapter": "pdf",
+      "location": "data/datasets/pdfs/state_agriculture_recipe_guides.pdf",
+      "enabled": false,
+      "config": {
+        "priority": 5,
+        "source_group": "pdf_ocr",
+        "expected_volume": 100,
+        "quality": "authoritative",
+        "extraction": "pdf_text_or_tesseract_ocr",
+        "idempotency": "file_hash_and_page_number"
+      }
+    },
+    {
+      "source_id": "scanned_indian_cookbooks",
+      "source_type": "pdf",
+      "adapter": "pdf",
+      "location": "data/datasets/pdfs/scanned_indian_cookbooks.pdf",
+      "enabled": false,
+      "config": {
+        "priority": 5,
+        "source_group": "pdf_ocr",
+        "expected_volume": 300,
+        "quality": "medium",
+        "extraction": "pdf_text_or_tesseract_ocr",
+        "idempotency": "file_hash_and_page_number"
+      }
+    },
+    {
+      "source_id": "recipe_card_images",
+      "source_type": "image",
+      "adapter": "image",
+      "location": "data/datasets/images/recipe_cards",
+      "enabled": false,
+      "config": {
+        "priority": 6,
+        "source_group": "image_ocr",
+        "expected_volume": 200,
+        "quality": "low_medium",
+        "extraction": "tesseract_ocr",
+        "idempotency": "image_sha256"
+      }
+    },
+    {
+      "source_id": "fatsecret_india",
+      "source_type": "web",
+      "adapter": "web",
+      "location": "https://platform.fatsecret.com/api/",
+      "enabled": false,
+      "config": {
+        "priority": 6,
+        "source_group": "api",
+        "expected_volume": 500,
+        "quality": "medium",
+        "auth_required": true,
+        "rate_limit_per_second": 10,
+        "idempotency": "provider_recipe_id_and_updated_at"
+      }
+    }
+  ]
+}

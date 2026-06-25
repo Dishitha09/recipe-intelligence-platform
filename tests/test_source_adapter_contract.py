@@ -16,6 +16,7 @@ from services.ingestion.source_registry import (
 )
 from services.ingestion.text_adapter import TextAdapter
 from services.ingestion.web_adapter import WebAdapter
+from services.ingestion.scrapy_adapter import ScrapyAdapter
 from services.ingestion.youtube_adapter import YouTubeAdapter
 
 
@@ -56,6 +57,7 @@ def test_all_source_types_are_registered_and_implement_contract():
         "dataset",
         "image",
         "pdf",
+        "scrapy",
         "text",
         "web",
         "youtube",
@@ -74,6 +76,7 @@ def test_all_file_and_url_adapters_validate_required_config():
         (DatasetAdapter, ""),
         (ImageAdapter, ""),
         (PDFAdapter, ""),
+        (ScrapyAdapter, ""),
         (TextAdapter, ""),
         (WebAdapter, ""),
         (YouTubeAdapter, ""),
