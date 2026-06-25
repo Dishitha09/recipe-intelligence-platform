@@ -41,6 +41,12 @@ class ScrapyAdapter(SourceAdapter):
             "TELNETCONSOLE_ENABLED": False,
         }
 
+        if self.config.get("max_items") is not None:
+            settings["CLOSESPIDER_ITEMCOUNT"] = int(self.config["max_items"])
+
+        if self.config.get("max_pages") is not None:
+            settings["CLOSESPIDER_PAGECOUNT"] = int(self.config["max_pages"])
+
         start_urls = [self.url]
         parsed = urlparse(self.url)
         allowed_domains = self.config.get(

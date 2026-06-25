@@ -15,6 +15,7 @@ class IngredientResolver:
         embedding_resolver=None,
         llm_resolver=None,
         enable_llm=False,
+        enable_embedding=True,
         ingredient_repository=None,
         use_database=True,
     ):
@@ -22,6 +23,7 @@ class IngredientResolver:
         self.embedding_resolver = embedding_resolver
         self.llm_resolver = llm_resolver
         self.enable_llm = enable_llm
+        self.enable_embedding = enable_embedding
         self.ingredient_repository = ingredient_repository
         self.use_database = use_database
 
@@ -51,22 +53,31 @@ class IngredientResolver:
             return alias_result
 
 
-        try:
-            embedding_result = self._resolve_database_vector(
-                ingredient_name,
-                normalized_name,
-            ) or self._resolve_embedding(
-                ingredient_name
-            )
-        except RuntimeError as exc:
+        if self.enable_embedding:
+            try:
+                embedding_result = self._resolve_database_vector(
+                    ingredient_name,
+                    normalized_name,
+                ) or self._resolve_embedding(
+                    ingredient_name
+                )
+            except RuntimeError as exc:
+                embedding_result = self._unresolved_result(
+                    ingredient_name,
+                    normalized_name,
+                )
+                embedding_result["enrichment_flags"].append(
+                    "embedding_resolver_unavailable"
+                )
+                embedding_result["error"] = str(exc)
+        else:
             embedding_result = self._unresolved_result(
                 ingredient_name,
                 normalized_name,
             )
             embedding_result["enrichment_flags"].append(
-                "embedding_resolver_unavailable"
+                "embedding_disabled"
             )
-            embedding_result["error"] = str(exc)
 
         if embedding_result["canonical_name"]:
             return embedding_result
@@ -80,14 +91,7 @@ class IngredientResolver:
             if llm_result["canonical_name"]:
                 return llm_result
 
-        return self._unresolved_result(
-            ingredient_name,
-            normalized_name,
-            confidence_score=embedding_result.get(
-                "confidence_score",
-                0.0
-            )
-        )
+        return embedding_result
 
     def _resolve_embedding(self, ingredient_name):
         if self.embedding_resolver is None:

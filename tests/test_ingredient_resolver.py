@@ -127,6 +127,32 @@ def test_ingredient_resolver_uses_embedding_fallback():
     assert result == embedding_result
 
 
+def test_ingredient_resolver_can_disable_embedding_fallback():
+    embedding_resolver = FakeEmbeddingResolver(
+        {
+            "raw_name": "unknown ingredient",
+            "normalized_name": "unknown ingredient",
+            "canonical_name": "should_not_be_used",
+            "method": "embedding",
+            "tier": "vector_similarity",
+            "confidence_score": 0.99,
+            "enrichment_flags": [],
+        }
+    )
+    resolver = IngredientResolver(
+        embedding_resolver=embedding_resolver,
+        enable_embedding=False,
+        use_database=False,
+    )
+
+    result = resolver.resolve("unknown ingredient")
+
+    assert result["canonical_name"] is None
+    assert result["method"] == "unresolved"
+    assert "embedding_disabled" in result["enrichment_flags"]
+    assert embedding_resolver.calls == []
+
+
 def test_ingredient_resolver_flags_unresolved_ingredients():
     resolver = IngredientResolver(
         embedding_resolver=FakeEmbeddingResolver(

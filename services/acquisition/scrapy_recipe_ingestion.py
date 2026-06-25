@@ -38,6 +38,23 @@ def main():
         action="store_true",
         help="Run ingestion after scraping.",
     )
+    parser.add_argument(
+        "--allow-disabled",
+        action="store_true",
+        help="Allow a disabled source to run for a one-off controlled crawl.",
+    )
+    parser.add_argument(
+        "--max-items",
+        type=int,
+        default=None,
+        help="Stop the crawl after this many scraped recipe items.",
+    )
+    parser.add_argument(
+        "--max-pages",
+        type=int,
+        default=None,
+        help="Stop the crawl after this many downloaded pages.",
+    )
     args = parser.parse_args()
 
     registry = SourceRegistry(config_path=str(args.config))
@@ -49,8 +66,14 @@ def main():
     if source is None:
         raise ValueError(f"Source ID {args.source_id} not found in config")
 
-    if not source.enabled:
+    if not source.enabled and not args.allow_disabled:
         raise ValueError(f"Source {args.source_id} is disabled in config")
+
+    if args.max_items is not None:
+        source.config["max_items"] = args.max_items
+
+    if args.max_pages is not None:
+        source.config["max_pages"] = args.max_pages
 
     adapter = registry.build_adapter(source)
     raw_records = adapter.extract()

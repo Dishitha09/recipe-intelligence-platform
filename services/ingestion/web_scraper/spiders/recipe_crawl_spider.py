@@ -1,4 +1,5 @@
 import scrapy
+from urllib.parse import urlparse
 
 from services.ingestion.web_scraper.parsers.schema_org_recipe_parser import (
     parse_schema_org_recipe,
@@ -26,6 +27,9 @@ class RecipeCrawlSpider(scrapy.Spider):
             yield recipe
 
         for href in response.css("a::attr(href)").getall():
+            if not self._should_follow(href):
+                continue
+
             yield response.follow(href, callback=self.parse)
 
     def _parse_html_recipe(self, response):
@@ -63,3 +67,33 @@ class RecipeCrawlSpider(scrapy.Spider):
         if not selector:
             return None
         return selector.get().strip()
+
+    @staticmethod
+    def _should_follow(href):
+        if not href:
+            return False
+
+        href = href.strip()
+
+        if not href or href.startswith("#"):
+            return False
+
+        parsed = urlparse(href)
+
+        if parsed.scheme and parsed.scheme not in {"http", "https"}:
+            return False
+
+        if parsed.path.lower().endswith(
+            (
+                ".jpg",
+                ".jpeg",
+                ".png",
+                ".gif",
+                ".webp",
+                ".pdf",
+                ".zip",
+            )
+        ):
+            return False
+
+        return True
