@@ -83,7 +83,14 @@ def main():
         with args.output_csv.open("w", encoding="utf-8", newline="") as handle:
             import csv
 
-            fieldnames = ["title", "description", "source_url", "ingredients", "steps"]
+            fieldnames = [
+                "title",
+                "description",
+                "source_url",
+                "ingredients",
+                "steps",
+                "image",
+            ]
             writer = csv.DictWriter(handle, fieldnames=fieldnames)
             writer.writeheader()
 
@@ -96,6 +103,7 @@ def main():
                         "source_url": content.get("source_url", ""),
                         "ingredients": " | ".join(content.get("ingredients", [])),
                         "steps": " | ".join(content.get("steps", [])),
+                        "image": content.get("image", ""),
                     }
                 )
 
@@ -115,7 +123,14 @@ def main():
             with chunk_path.open("w", encoding="utf-8", newline="") as handle:
                 import csv
 
-                fieldnames = ["title", "description", "source_url", "ingredients", "steps"]
+                fieldnames = [
+                    "title",
+                    "description",
+                    "source_url",
+                    "ingredients",
+                    "steps",
+                    "image",
+                ]
                 writer = csv.DictWriter(handle, fieldnames=fieldnames)
                 writer.writeheader()
 
@@ -128,6 +143,7 @@ def main():
                             "source_url": content.get("source_url", ""),
                             "ingredients": " | ".join(content.get("ingredients", [])),
                             "steps": " | ".join(content.get("steps", [])),
+                            "image": content.get("image", ""),
                         }
                     )
 

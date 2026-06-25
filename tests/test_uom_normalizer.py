@@ -49,3 +49,24 @@ def test_unknown_units_are_flagged_without_crashing():
     assert result["canonical_quantity"] is None
     assert result["canonical_unit"] is None
     assert "unit_unresolved" in result["enrichment_flags"]
+
+
+def test_missing_unit_with_quantity_is_inferred_as_count():
+    uom = UOMNormalizer()
+
+    result = uom.normalize("green chili", "2", None)
+
+    assert result["canonical_quantity"] == 2
+    assert result["canonical_unit"] == "count"
+    assert result["conversion_method"] == "count_inferred"
+
+
+def test_solid_volume_without_density_passes_through_without_conflict():
+    uom = UOMNormalizer()
+
+    result = uom.normalize("unknown spice", "1", "tsp")
+
+    assert result["canonical_quantity"] == 1
+    assert result["canonical_unit"] == "tsp"
+    assert result["conversion_method"] == "volume_passthrough_without_density"
+    assert "uom_conflict" not in result["enrichment_flags"]

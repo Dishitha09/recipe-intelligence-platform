@@ -17,9 +17,13 @@ DENSITY = {
     "poha": 90,
     "oats": 80,
     "cashews": 130,
+    "coconut": 85,
+    "onion": 160,
     "almonds": 140,
     "peas": 145,
+    "peanut": 146,
     "semolina": 167,
+    "tomato": 180,
     "rava": 167,
     "maida": 125
 

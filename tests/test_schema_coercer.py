@@ -84,6 +84,25 @@ def test_schema_coercer_preserves_unmapped_fields_without_data_loss():
     }
 
 
+def test_schema_coercer_promotes_image_to_metadata_images():
+    raw_record = RawRecord(
+        source_id="csv.default",
+        source_type="csv",
+        _raw_content={
+            "title": "Tomato Rice",
+            "ingredient": "1 cup rice",
+            "image": "https://example.com/tomato-rice.jpg",
+        },
+    )
+    coercer = SchemaCoercer.from_mapping_file(MAPPING_FILE)
+
+    recipe_data = coercer.coerce_to_dict(raw_record)
+
+    assert recipe_data["metadata"]["images"] == [
+        "https://example.com/tomato-rice.jpg"
+    ]
+
+
 def test_schema_coercer_is_idempotent_for_same_raw_record():
     raw_record = CSVAdapter(
         "sample_recipes.csv",

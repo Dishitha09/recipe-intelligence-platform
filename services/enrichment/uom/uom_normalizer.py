@@ -83,6 +83,18 @@ class UOMNormalizer:
             "cloves",
             "slice",
             "slices",
+            "inch",
+            "inches",
+            "leaf",
+            "leaves",
+            "portion",
+            "portions",
+            "root",
+            "roots",
+            "sprig",
+            "sprigs",
+            "strand",
+            "strands",
         }
         self.colloquial_units = {
             "pinch": ("g", 0.3, 0.8),
@@ -160,6 +172,18 @@ class UOMNormalizer:
                 flags=["quantity_missing"],
             )
 
+        if raw_unit == "":
+            return self._result(
+                ingredient_name,
+                quantity,
+                raw_unit,
+                quantity,
+                "count",
+                "count_inferred",
+                0.8,
+                conversion_factor=1.0,
+            )
+
         if raw_unit in self.weight_units:
             canonical_unit, factor = self.weight_units[raw_unit]
             return self._result(
@@ -235,12 +259,12 @@ class UOMNormalizer:
                 ingredient_name,
                 quantity,
                 normalized_volume_unit,
-                round(ml, 2),
-                "ml",
-                "volume_without_density",
-                0.55,
-                conversion_factor=ml_factor,
-                flags=["density_missing", "uom_conflict"],
+                quantity,
+                normalized_volume_unit,
+                "volume_passthrough_without_density",
+                0.75,
+                conversion_factor=1.0,
+                flags=["density_missing"],
             )
 
         return self._result(

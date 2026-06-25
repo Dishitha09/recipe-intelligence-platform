@@ -122,6 +122,10 @@ class SchemaCoercer:
                 if key not in mapped_source_keys
             },
         }
+        images = self._coerce_images(raw_content)
+
+        if images:
+            recipe_data["metadata"]["images"] = images
 
         return self._canonicalize(recipe_data)
 
@@ -278,6 +282,16 @@ class SchemaCoercer:
                 selected.append(line)
 
         return selected
+
+    def _coerce_images(self, raw_content):
+        value = (
+            raw_content.get("images")
+            or raw_content.get("image")
+            or raw_content.get("image_url")
+            or raw_content.get("photo")
+        )
+
+        return self._as_list(value)
 
     def _canonicalize(self, recipe_data):
         canonical = {
