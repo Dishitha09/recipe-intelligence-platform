@@ -574,6 +574,15 @@ ORDER BY run_id DESC
 LIMIT 10;
 ```
 
+Inspect recipe instructions with recipe context in pgAdmin:
+
+```sql
+SELECT recipe_id, title, source_url, step_number, instruction
+FROM recipe_instruction_details
+ORDER BY recipe_id, step_number
+LIMIT 100;
+```
+
 The loader is idempotent: rerunning the same source updates existing recipes
 by `source_url_hash` or `content_hash` instead of creating duplicates.
 

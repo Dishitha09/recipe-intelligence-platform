@@ -1,6 +1,7 @@
 DROP VIEW IF EXISTS recipe_with_instructions;
 DROP VIEW IF EXISTS recipe_state_target_coverage;
 DROP VIEW IF EXISTS indian_state_reference;
+DROP VIEW IF EXISTS recipe_instruction_details;
 DROP VIEW IF EXISTS recipe_instructions;
 
 
@@ -57,6 +58,22 @@ SELECT
     step_number,
     instruction
 FROM recipe_steps;
+
+
+CREATE OR REPLACE VIEW recipe_instruction_details AS
+SELECT
+    rs.recipe_step_id AS instruction_id,
+    r.recipe_id,
+    r.title,
+    r.state,
+    r.region,
+    r.source_type,
+    r.source_url,
+    rs.step_number,
+    rs.instruction
+FROM recipe_steps rs
+JOIN recipes r
+    ON r.recipe_id = rs.recipe_id;
 
 
 DROP VIEW IF EXISTS recipe_state_coverage;
