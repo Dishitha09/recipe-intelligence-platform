@@ -1,6 +1,7 @@
 DROP VIEW IF EXISTS recipe_with_instructions;
 DROP VIEW IF EXISTS recipe_state_target_coverage;
 DROP VIEW IF EXISTS indian_state_reference;
+DROP VIEW IF EXISTS recipe_instructions;
 
 
 CREATE OR REPLACE VIEW recipe_with_instructions AS
@@ -13,9 +14,14 @@ SELECT
     r.region,
     r.state_confidence,
     r.state_method,
+    r.prep_time_minutes,
+    r.cook_time_minutes,
+    r.servings,
     r.source_type,
     r.source_url,
     r.language,
+    r.created_at,
+    r.updated_at,
     COUNT(rs.recipe_id) AS step_count,
     STRING_AGG(
         rs.step_number::text || '. ' || rs.instruction,
@@ -34,9 +40,23 @@ GROUP BY
     r.region,
     r.state_confidence,
     r.state_method,
+    r.prep_time_minutes,
+    r.cook_time_minutes,
+    r.servings,
     r.source_type,
     r.source_url,
-    r.language;
+    r.language,
+    r.created_at,
+    r.updated_at;
+
+
+CREATE OR REPLACE VIEW recipe_instructions AS
+SELECT
+    recipe_step_id AS instruction_id,
+    recipe_id,
+    step_number,
+    instruction
+FROM recipe_steps;
 
 
 DROP VIEW IF EXISTS recipe_state_coverage;

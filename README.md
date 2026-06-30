@@ -393,6 +393,34 @@ GET /
 
 Health Check
 
+GET /recipes
+
+Paginated recipe listing with search, state, region, source, and language filters.
+
+GET /recipes/{recipe_id}
+
+Recipe detail with ingredients, instructions, ratings, and source transparency.
+
+POST /search
+
+Advanced recipe search with optional rating filter.
+
+GET /regions
+
+State-wise and region-wise recipe coverage for the 10,000 recipe target.
+
+GET /recipes/{recipe_id}/reviews
+
+Ratings and reviews for one recipe.
+
+POST /recipes/{recipe_id}/reviews
+
+Idempotent review creation/update with automatic rating summary refresh.
+
+GET /trending
+
+Trending recipe list using stored or computed scores.
+
 POST /ask
 
 Recipe Question Answering
@@ -439,7 +467,7 @@ Implemented
 
 ✓ Gemini Integration
 
-✓ FastAPI Skeleton
+✓ FastAPI recipe listing/search/detail/review API
 
 Planned
 
@@ -525,12 +553,20 @@ Run a controlled live scrape into PostgreSQL:
 python -m services.acquisition.scrapy_recipe_ingestion --source-id scrapy_indianhealthyrecipes --allow-disabled --max-items 100 --max-pages 250 --ingest
 ```
 
+Refresh fuller instructions from real source pages when a site exposes short
+recipe-card steps and longer article/photo-guide steps:
+
+```bash
+python -m services.acquisition.backfill_full_instructions --source-domain indianhealthyrecipes.com
+```
+
 Verify ingestion counts in PostgreSQL:
 
 ```sql
 SELECT count(*) FROM recipes;
 SELECT count(*) FROM recipe_ingredients;
 SELECT count(*) FROM recipe_steps;
+SELECT count(*) FROM recipe_instructions;
 SELECT status, count(*) FROM validation_reports GROUP BY status;
 SELECT run_id, source_id, status, records_found, records_loaded
 FROM ingestion_runs

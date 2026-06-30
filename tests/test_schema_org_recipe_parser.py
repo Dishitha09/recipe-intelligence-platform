@@ -59,6 +59,7 @@ def test_parse_schema_org_recipe_extracts_json_ld_recipe():
             "Add tomato masala.",
         ],
         "image": "https://example.com/tomato-rice.jpg",
+        "instruction_source": "schema_org",
     }
 
 
@@ -119,4 +120,56 @@ def test_parse_schema_org_recipe_flattens_howto_sections():
         "Soak rice and dal.",
         "Grind into batter.",
         "Spread on hot tawa.",
+    ]
+
+
+def test_parse_schema_org_recipe_prefers_full_article_instructions():
+    response = make_response(
+        """
+        <html>
+          <head>
+            <script type="application/ld+json">
+            {
+              "@context": "https://schema.org",
+              "@type": "Recipe",
+              "name": "Pea Shoots",
+              "recipeIngredient": ["200 g pea shoots", "1 tbsp oil"],
+              "recipeInstructions": [
+                {"@type": "HowToStep", "text": "Cook garlic and pea shoots."},
+                {"@type": "HowToStep", "text": "Serve."}
+              ]
+            }
+            </script>
+          </head>
+          <body>
+            <h2>How to prepare them?</h2>
+            <p>Rinse the pea shoots two to three times and drain completely.</p>
+            <h2>How to stir fry pea shoots</h2>
+            <p>1. Pour oil to a wok and add garlic and green chili.</p>
+            <p>2. Let the garlic and chili cook on a low heat until aromatic.</p>
+            <p>3. Add the pea shoots and sprinkle salt.</p>
+            <p>4. Increase the flame to high and stir fry just for a minute.</p>
+            <p>Remove to a serving plate immediately and serve.</p>
+            <p>Here are some dishes that go well with this pea shoots stir fry.</p>
+            <h2>Recipe Card</h2>
+            <h3>Method</h3>
+            <ol>
+              <li>Cook garlic and pea shoots.</li>
+              <li>Serve.</li>
+            </ol>
+          </body>
+        </html>
+        """
+    )
+
+    recipe = parse_schema_org_recipe(response)
+
+    assert recipe["instruction_source"] == "html_article"
+    assert recipe["steps"] == [
+        "Rinse the pea shoots two to three times and drain completely.",
+        "Pour oil to a wok and add garlic and green chili.",
+        "Let the garlic and chili cook on a low heat until aromatic.",
+        "Add the pea shoots and sprinkle salt.",
+        "Increase the flame to high and stir fry just for a minute. "
+        "Remove to a serving plate immediately and serve.",
     ]
