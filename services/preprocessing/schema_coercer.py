@@ -158,7 +158,7 @@ class SchemaCoercer:
         return None, None
 
     def _coerce_ingredients(self, value, raw_content):
-        ingredient_values = self._as_list(value)
+        ingredient_values = self._as_list(value, split_commas=True)
 
         if not ingredient_values and raw_content.get("raw_text"):
             ingredient_values = self._extract_section_lines(
@@ -197,7 +197,7 @@ class SchemaCoercer:
         return parsed.model_dump()
 
     def _coerce_steps(self, value, raw_content):
-        step_values = self._as_list(value)
+        step_values = self._as_list(value, split_commas=False)
 
         if not step_values and raw_content.get("raw_text"):
             step_values = self._extract_section_lines(
@@ -226,7 +226,7 @@ class SchemaCoercer:
 
         return steps
 
-    def _as_list(self, value):
+    def _as_list(self, value, split_commas=True):
         if value is None:
             return []
 
@@ -251,9 +251,14 @@ class SchemaCoercer:
                 except json.JSONDecodeError:
                     pass
 
+            delimiter_pattern = r"\||\n"
+
+            if split_commas and "|" not in stripped and "\n" not in stripped:
+                delimiter_pattern = r"\||,|\n"
+
             return [
                 item.strip()
-                for item in re.split(r"\||,|\n", stripped)
+                for item in re.split(delimiter_pattern, stripped)
                 if item.strip()
             ]
 

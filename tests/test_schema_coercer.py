@@ -133,6 +133,34 @@ def test_schema_coercer_parses_text_recipe_sections():
     assert recipe_data["steps"][0]["instruction"] == "Soak rice overnight."
 
 
+def test_schema_coercer_preserves_commas_inside_step_text():
+    raw_record = RawRecord(
+        source_id="scrapy_indianhealthyrecipes",
+        source_type="web",
+        _raw_content={
+            "title": "Coconut Oats",
+            "ingredients": "1 cup oats | 1 tsp mustard",
+            "steps": (
+                "Heat oil. | Add mustard, cumin, urad dal and peanuts. | "
+                "Fry until golden."
+            ),
+            "source_url": "https://example.com/coconut-oats",
+        },
+    )
+    coercer = SchemaCoercer.from_mapping_file(MAPPING_FILE)
+
+    recipe_data = coercer.coerce_to_dict(raw_record)
+
+    assert [
+        step["instruction"]
+        for step in recipe_data["steps"]
+    ] == [
+        "Heat oil.",
+        "Add mustard, cumin, urad dal and peanuts.",
+        "Fry until golden.",
+    ]
+
+
 def test_schema_coercer_routes_invalid_records_to_dead_letter():
     raw_record = RawRecord(
         source_id="csv.default",
