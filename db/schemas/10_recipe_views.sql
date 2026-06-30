@@ -1,6 +1,7 @@
 DROP VIEW IF EXISTS recipe_with_instructions;
 DROP VIEW IF EXISTS recipe_state_target_coverage;
 DROP VIEW IF EXISTS indian_state_reference;
+DROP VIEW IF EXISTS recipe_instruction_summary;
 DROP VIEW IF EXISTS recipe_instruction_details;
 DROP VIEW IF EXISTS recipe_instructions;
 
@@ -28,7 +29,17 @@ SELECT
         rs.step_number::text || '. ' || rs.instruction,
         E'\n'
         ORDER BY rs.step_number
-    ) AS instructions
+    ) AS instructions,
+    REGEXP_REPLACE(
+        STRING_AGG(
+            rs.step_number::text || '. ' || rs.instruction,
+            ' '
+            ORDER BY rs.step_number
+        ),
+        '\s+',
+        ' ',
+        'g'
+    ) AS instructions_one_line
 FROM recipes r
 LEFT JOIN recipe_steps rs
     ON rs.recipe_id = r.recipe_id
@@ -74,6 +85,37 @@ SELECT
 FROM recipe_steps rs
 JOIN recipes r
     ON r.recipe_id = rs.recipe_id;
+
+
+CREATE OR REPLACE VIEW recipe_instruction_summary AS
+SELECT
+    r.recipe_id,
+    r.title,
+    r.state,
+    r.region,
+    r.source_type,
+    r.source_url,
+    COUNT(rs.recipe_step_id) AS step_count,
+    REGEXP_REPLACE(
+        STRING_AGG(
+            rs.step_number::text || '. ' || rs.instruction,
+            ' '
+            ORDER BY rs.step_number
+        ),
+        '\s+',
+        ' ',
+        'g'
+    ) AS instructions
+FROM recipes r
+LEFT JOIN recipe_steps rs
+    ON rs.recipe_id = r.recipe_id
+GROUP BY
+    r.recipe_id,
+    r.title,
+    r.state,
+    r.region,
+    r.source_type,
+    r.source_url;
 
 
 DROP VIEW IF EXISTS recipe_state_coverage;

@@ -583,6 +583,15 @@ ORDER BY recipe_id, step_number
 LIMIT 100;
 ```
 
+Inspect one row per recipe with instructions in one cell:
+
+```sql
+SELECT recipe_id, title, step_count, instructions
+FROM recipe_instruction_summary
+ORDER BY recipe_id
+LIMIT 100;
+```
+
 The loader is idempotent: rerunning the same source updates existing recipes
 by `source_url_hash` or `content_hash` instead of creating duplicates.
 
