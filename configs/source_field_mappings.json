@@ -53,12 +53,30 @@
       }
     },
     {
+      "source_id": "scrapy_indianhealthyrecipes",
+      "source_type": "web",
+      "fields": {
+        "title": ["title", "name"],
+        "description": ["description"],
+        "source_url": ["source_url", "url"],
+        "ingredients": ["ingredients", "ingredient", "recipeIngredient"],
+        "steps": ["steps", "instructions", "directions", "recipeInstructions"],
+        "raw_text": ["raw_text", "text"]
+      },
+      "defaults": {
+        "language": "english",
+        "source_type": "web"
+      }
+    },
+    {
       "source_id": "web.default",
       "source_type": "web",
       "fields": {
         "title": ["title", "name"],
         "description": ["description"],
         "source_url": ["source_url", "url"],
+        "ingredients": ["ingredients", "ingredient", "recipeIngredient"],
+        "steps": ["steps", "instructions", "directions", "recipeInstructions"],
         "raw_text": ["raw_text", "text"]
       },
       "defaults": {
@@ -73,6 +91,8 @@
         "title": ["title", "name"],
         "description": ["description"],
         "source_url": ["source_url", "url"],
+        "ingredients": ["ingredients", "ingredient", "recipeIngredient"],
+        "steps": ["steps", "instructions", "directions", "recipeInstructions"],
         "raw_text": ["raw_text", "text"]
       },
       "defaults": {
@@ -87,6 +107,8 @@
         "title": ["title", "name"],
         "description": ["description"],
         "source_url": ["source_url", "url"],
+        "ingredients": ["ingredients", "ingredient", "recipeIngredient"],
+        "steps": ["steps", "instructions", "directions", "recipeInstructions"],
         "raw_text": ["raw_text", "text"]
       },
       "defaults": {
@@ -101,6 +123,8 @@
         "title": ["title", "name"],
         "description": ["description"],
         "source_url": ["source_url", "url"],
+        "ingredients": ["ingredients", "ingredient", "recipeIngredient"],
+        "steps": ["steps", "instructions", "directions", "recipeInstructions"],
         "raw_text": ["raw_text", "text"]
       },
       "defaults": {
@@ -115,6 +139,8 @@
         "title": ["title", "name"],
         "description": ["description"],
         "source_url": ["source_url", "url"],
+        "ingredients": ["ingredients", "ingredient", "recipeIngredient"],
+        "steps": ["steps", "instructions", "directions", "recipeInstructions"],
         "raw_text": ["raw_text", "text"]
       },
       "defaults": {

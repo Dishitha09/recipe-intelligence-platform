@@ -76,3 +76,47 @@ def test_parse_schema_org_recipe_returns_none_without_recipe_schema():
     )
 
     assert parse_schema_org_recipe(response) is None
+
+
+def test_parse_schema_org_recipe_flattens_howto_sections():
+    response = make_response(
+        """
+        <html>
+          <head>
+            <script type="application/ld+json">
+            {
+              "@context": "https://schema.org",
+              "@type": "Recipe",
+              "name": "Sectioned Dosa",
+              "recipeIngredient": ["200 g rice", "50 g urad dal"],
+              "recipeInstructions": [
+                {
+                  "@type": "HowToSection",
+                  "name": "Batter",
+                  "itemListElement": [
+                    {"@type": "HowToStep", "text": "Soak rice and dal."},
+                    {"@type": "HowToStep", "text": "Grind into batter."}
+                  ]
+                },
+                {
+                  "@type": "HowToSection",
+                  "name": "Cook",
+                  "itemListElement": [
+                    {"@type": "HowToStep", "text": "Spread on hot tawa."}
+                  ]
+                }
+              ]
+            }
+            </script>
+          </head>
+        </html>
+        """
+    )
+
+    recipe = parse_schema_org_recipe(response)
+
+    assert recipe["steps"] == [
+        "Soak rice and dal.",
+        "Grind into batter.",
+        "Spread on hot tawa.",
+    ]

@@ -37,6 +37,10 @@ def cleanup_recipe(recipe_id):
             {"recipe_id": recipe_id},
         )
         conn.execute(
+            text("DELETE FROM recipe_source_tracking WHERE recipe_id=:recipe_id"),
+            {"recipe_id": recipe_id},
+        )
+        conn.execute(
             text("DELETE FROM recipe_steps WHERE recipe_id=:recipe_id"),
             {"recipe_id": recipe_id},
         )
@@ -53,12 +57,13 @@ def cleanup_recipe(recipe_id):
 def test_loader_to_vector_search_flow_returns_inserted_recipe():
     require_database_and_pgvector()
     title = f"Vector Search Integration Recipe {uuid4()}"
+    source_uuid = uuid4()
     recipe = Recipe(
         title=title,
         description="Temporary vector search integration recipe",
         cuisine="Indian",
         source_type="pytest",
-        source_url="https://example.com/vector-search-test",
+        source_url=f"https://example.com/vector-search-test/{source_uuid}",
         language="english",
         ingredients=[
             Ingredient(ingredient_name="rice", quantity=1, unit="cup"),

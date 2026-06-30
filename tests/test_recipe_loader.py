@@ -26,6 +26,10 @@ def cleanup_recipe(recipe_id):
             {"recipe_id": recipe_id},
         )
         conn.execute(
+            text("DELETE FROM recipe_source_tracking WHERE recipe_id=:recipe_id"),
+            {"recipe_id": recipe_id},
+        )
+        conn.execute(
             text("DELETE FROM recipe_steps WHERE recipe_id=:recipe_id"),
             {"recipe_id": recipe_id},
         )
@@ -44,12 +48,13 @@ def cleanup_recipe(recipe_id):
 
 
 def build_enriched_recipe():
+    recipe_uuid = uuid4()
     recipe = Recipe(
-        title=f"Integration Test Recipe {uuid4()}",
+        title=f"Integration Test Recipe {recipe_uuid}",
         description="Temporary recipe for DB integration tests",
         cuisine="Indian",
         source_type="pytest",
-        source_url="https://example.com/integration-test",
+        source_url=f"https://example.com/integration-test/{recipe_uuid}",
         language="english",
         ingredients=[
             Ingredient(
@@ -133,6 +138,73 @@ def test_recipe_loader_persists_recipe_ingredients_steps_and_validation_report()
             cleanup_recipe(recipe_id)
 
 
+def test_recipe_loader_is_idempotent_for_recipe_children_and_reports():
+    require_database()
+    recipe = build_enriched_recipe()
+    report = ValidationEngine().validate(recipe)
+
+    assert report.status == "ACCEPTED"
+
+    loader = RecipeLoader()
+    validation_repo = ValidationRepository()
+    recipe_id = None
+
+    try:
+        recipe_id = loader.insert_recipe(recipe)
+        loader.insert_ingredients(recipe_id, recipe.ingredients)
+        loader.insert_steps(recipe_id, recipe.steps)
+        validation_id = validation_repo.save_report(recipe_id, report)
+
+        duplicate_recipe_id = loader.insert_recipe(recipe)
+        loader.insert_ingredients(duplicate_recipe_id, recipe.ingredients)
+        loader.insert_steps(duplicate_recipe_id, recipe.steps)
+        duplicate_validation_id = validation_repo.save_report(
+            duplicate_recipe_id,
+            report,
+        )
+
+        with engine.connect() as conn:
+            ingredient_count = conn.execute(
+                text(
+                    """
+                    SELECT count(*)
+                    FROM recipe_ingredients
+                    WHERE recipe_id=:recipe_id
+                    """
+                ),
+                {"recipe_id": recipe_id},
+            ).scalar()
+            step_count = conn.execute(
+                text(
+                    """
+                    SELECT count(*)
+                    FROM recipe_steps
+                    WHERE recipe_id=:recipe_id
+                    """
+                ),
+                {"recipe_id": recipe_id},
+            ).scalar()
+            report_count = conn.execute(
+                text(
+                    """
+                    SELECT count(*)
+                    FROM validation_reports
+                    WHERE recipe_id=:recipe_id
+                    """
+                ),
+                {"recipe_id": recipe_id},
+            ).scalar()
+
+        assert duplicate_recipe_id == recipe_id
+        assert duplicate_validation_id == validation_id
+        assert ingredient_count == 2
+        assert step_count == 2
+        assert report_count == 1
+    finally:
+        if recipe_id is not None:
+            cleanup_recipe(recipe_id)
+
+
 def test_validation_repository_persists_review_and_dead_letter_records():
     require_database()
     recipe = build_enriched_recipe().model_copy(
@@ -199,9 +271,20 @@ def test_validation_repository_persists_review_and_dead_letter_records():
                 ),
                 {"dlq_id": dlq_id},
             ).scalar()
+            reason_code = conn.execute(
+                text(
+                    """
+                    SELECT reason_code
+                    FROM dead_letter_queue
+                    WHERE dlq_id=:dlq_id
+                    """
+                ),
+                {"dlq_id": dlq_id},
+            ).scalar()
 
         assert review_status == "PENDING"
         assert dead_letter_message == "integration dead letter"
+        assert reason_code is not None
     finally:
         with engine.begin() as conn:
             conn.execute(

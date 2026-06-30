@@ -3,6 +3,7 @@ import json
 from sqlalchemy import text
 
 from services.database.connection import engine
+from services.database.fingerprints import recipe_fingerprints
 from services.database.ingredient_repository import IngredientRepository
 from services.enrichment.ingredient_resolution.ingredient_resolver import IngredientResolver
 from services.enrichment.uom.uom_normalizer import UOMNormalizer
@@ -18,8 +19,58 @@ class RecipeLoader:
 
 
     def insert_recipe(self, recipe):
+        fingerprints = recipe_fingerprints(recipe)
 
         with engine.begin() as conn:
+            existing_recipe_id = conn.execute(
+                text(
+                    """
+                    SELECT recipe_id
+                    FROM recipes
+                    WHERE
+                        (:content_hash IS NOT NULL AND content_hash = :content_hash)
+                        OR
+                        (:source_url_hash IS NOT NULL AND source_url_hash = :source_url_hash)
+                    ORDER BY recipe_id
+                    LIMIT 1
+                    """
+                ),
+                fingerprints,
+            ).scalar()
+
+            params = {
+                "title": recipe.title,
+                "description": recipe.description,
+                "cuisine": recipe.cuisine,
+                "source_type": recipe.source_type,
+                "source_url": recipe.source_url,
+                "source_url_hash": fingerprints["source_url_hash"],
+                "content_hash": fingerprints["content_hash"],
+                "language": recipe.language,
+            }
+
+            if existing_recipe_id is not None:
+                conn.execute(
+                    text(
+                        """
+                        UPDATE recipes
+                        SET
+                            title = :title,
+                            description = :description,
+                            cuisine = :cuisine,
+                            source_type = :source_type,
+                            source_url = :source_url,
+                            source_url_hash = :source_url_hash,
+                            content_hash = :content_hash,
+                            language = :language,
+                            updated_at = CURRENT_TIMESTAMP
+                        WHERE recipe_id = :recipe_id
+                        """
+                    ),
+                    {**params, "recipe_id": existing_recipe_id},
+                )
+
+                return existing_recipe_id
 
             result = conn.execute(
 
@@ -39,6 +90,10 @@ class RecipeLoader:
 
                 source_url,
 
+                source_url_hash,
+
+                content_hash,
+
                 language
 
                 )
@@ -57,6 +112,10 @@ class RecipeLoader:
 
                 :source_url,
 
+                :source_url_hash,
+
+                :content_hash,
+
                 :language
 
                 )
@@ -65,21 +124,7 @@ class RecipeLoader:
 
                 """),
 
-                {
-
-                    "title": recipe.title,
-
-                    "description": recipe.description,
-
-                    "cuisine": recipe.cuisine,
-
-                    "source_type": recipe.source_type,
-
-                    "source_url": recipe.source_url,
-
-                    "language": recipe.language
-
-                }
+                params
 
             )
 
@@ -103,12 +148,24 @@ class RecipeLoader:
         uom_normalizer = uom_normalizer or UOMNormalizer()
 
         with engine.begin() as conn:
+            conn.execute(
+                text(
+                    """
+                    DELETE FROM recipe_ingredients
+                    WHERE recipe_id = :recipe_id
+                    """
+                ),
+                {"recipe_id": recipe_id},
+            )
 
             for ing in ingredients:
 
                 canonical_name = ing.canonical_name
 
-                if canonical_name is None:
+                if (
+                    canonical_name is None
+                    and ing.resolution_method != "unresolved"
+                ):
                     resolved = self._get_resolver().resolve(
                         ing.ingredient_name
                     )
@@ -258,19 +315,6 @@ class RecipeLoader:
                 )
 
 
-                print(
-
-                    canonical_name,
-
-                    "->",
-
-                    normalized["canonical_quantity"],
-
-                    normalized["canonical_unit"]
-
-                )
-
-
     def insert_steps(
 
         self,
@@ -283,6 +327,15 @@ class RecipeLoader:
 
 
         with engine.begin() as conn:
+            conn.execute(
+                text(
+                    """
+                    DELETE FROM recipe_steps
+                    WHERE recipe_id = :recipe_id
+                    """
+                ),
+                {"recipe_id": recipe_id},
+            )
 
 
             for step in steps:
@@ -329,6 +382,55 @@ class RecipeLoader:
                     }
 
                 )
+
+    def record_source(self, recipe_id, recipe, source_name=None, source_type=None, run_id=None):
+        fingerprints = recipe_fingerprints(recipe)
+
+        with engine.begin() as conn:
+            conn.execute(
+                text(
+                    """
+                    INSERT INTO recipe_source_tracking
+                        (
+                            run_id,
+                            recipe_id,
+                            source_name,
+                            source_url,
+                            source_url_hash,
+                            content_hash,
+                            source_type
+                        )
+                    VALUES
+                        (
+                            :run_id,
+                            :recipe_id,
+                            :source_name,
+                            :source_url,
+                            :source_url_hash,
+                            :content_hash,
+                            :source_type
+                        )
+                    ON CONFLICT (recipe_id, source_name)
+                    WHERE recipe_id IS NOT NULL AND source_name IS NOT NULL
+                    DO UPDATE SET
+                        run_id = EXCLUDED.run_id,
+                        source_url = EXCLUDED.source_url,
+                        source_url_hash = EXCLUDED.source_url_hash,
+                        content_hash = EXCLUDED.content_hash,
+                        source_type = EXCLUDED.source_type,
+                        ingested_at = CURRENT_TIMESTAMP
+                    """
+                ),
+                {
+                    "run_id": run_id,
+                    "recipe_id": recipe_id,
+                    "source_name": source_name,
+                    "source_url": recipe.source_url,
+                    "source_url_hash": fingerprints["source_url_hash"],
+                    "content_hash": fingerprints["content_hash"],
+                    "source_type": source_type or recipe.source_type,
+                },
+            )
 
     def _get_resolver(self):
         if self.resolver is None:

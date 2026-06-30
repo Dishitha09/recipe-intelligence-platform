@@ -114,34 +114,15 @@ def write_dataset(rows, output_path):
 
 def ingest_dataset(output_path, chunk_size):
     pipeline = RecipePipeline()
-    totals = {
-        "coerced": 0,
-        "enriched": 0,
-        "accepted": 0,
-        "review": 0,
-        "loaded": 0,
-        "rejected": 0,
-        "validation_reports": 0,
-    }
+    summary = pipeline.run_csv_pipeline(
+        str(output_path),
+        source_id="generated_indian_recipes_100",
+        source_name=str(output_path),
+    )
 
-    with output_path.open(newline="", encoding="utf-8") as handle:
-        rows = list(csv.DictReader(handle))
-
-    for start in range(0, len(rows), chunk_size):
-        chunk = rows[start:start + chunk_size]
-        chunk_path = output_path.with_name(
-            f"{output_path.stem}_chunk_{start // chunk_size + 1:03d}.csv"
-        )
-        write_dataset(chunk, chunk_path)
-        summary = pipeline.run_csv_pipeline(str(chunk_path))
-
-        for key in totals:
-            value = summary.get(key, 0)
-
-            if isinstance(value, list):
-                value = len(value)
-
-            totals[key] += value
+    totals = {}
+    for key, value in summary.items():
+        totals[key] = len(value) if isinstance(value, list) else value
 
     return totals
 

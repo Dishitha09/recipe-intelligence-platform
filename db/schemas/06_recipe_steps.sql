@@ -1,13 +1,8 @@
-CREATE TABLE IF NOT EXISTS recipe_steps (
+ALTER TABLE recipe_steps
 
-    step_id SERIAL PRIMARY KEY,
+ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 
-    recipe_id INTEGER REFERENCES recipes(recipe_id),
 
-    step_number INTEGER NOT NULL,
+CREATE UNIQUE INDEX IF NOT EXISTS ux_recipe_steps_recipe_step
 
-    instruction TEXT NOT NULL,
-
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-
-);
+ON recipe_steps(recipe_id, step_number);

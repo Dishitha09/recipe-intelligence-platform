@@ -111,45 +111,21 @@ def main():
 
     if args.ingest:
         pipeline = RecipePipeline()
-        totals = {"accepted": 0, "loaded": 0, "rejected": 0, "coerced": 0}
-
-        for start in range(0, len(raw_records), args.chunk_size):
-            chunk = raw_records[start : start + args.chunk_size]
-            chunk_path = args.output_csv.with_name(
-                f"{args.output_csv.stem}_chunk_{start // args.chunk_size + 1:03d}.csv"
-            )
-            chunk_path.parent.mkdir(parents=True, exist_ok=True)
-
-            with chunk_path.open("w", encoding="utf-8", newline="") as handle:
-                import csv
-
-                fieldnames = [
-                    "title",
-                    "description",
-                    "source_url",
-                    "ingredients",
-                    "steps",
-                    "image",
-                ]
-                writer = csv.DictWriter(handle, fieldnames=fieldnames)
-                writer.writeheader()
-
-                for record in chunk:
-                    content = record.raw_content
-                    writer.writerow(
-                        {
-                            "title": content.get("title", ""),
-                            "description": content.get("description", ""),
-                            "source_url": content.get("source_url", ""),
-                            "ingredients": " | ".join(content.get("ingredients", [])),
-                            "steps": " | ".join(content.get("steps", [])),
-                            "image": content.get("image", ""),
-                        }
-                    )
-
-            summary = pipeline.run_csv_pipeline(str(chunk_path))
-            for key in totals:
-                totals[key] += summary.get(key, 0)
+        summary = pipeline.run_records(
+            raw_records,
+            source_id=args.source_id,
+            source_name=source.location,
+            source_type=source.source_type,
+        )
+        totals = {
+            "records_found": summary.get("records_found", 0),
+            "accepted": summary.get("accepted", 0),
+            "loaded": summary.get("loaded", 0),
+            "review": summary.get("review", 0),
+            "rejected": summary.get("rejected", 0),
+            "coerced": summary.get("coerced", 0),
+            "ingestion_run_id": summary.get("ingestion_run_id"),
+        }
 
         print("Ingestion summary:", totals)
 

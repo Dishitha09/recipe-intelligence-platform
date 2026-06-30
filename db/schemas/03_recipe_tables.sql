@@ -18,10 +18,46 @@ CREATE TABLE IF NOT EXISTS recipes (
 
     source_url TEXT,
 
+    source_url_hash CHAR(64),
+
+    content_hash CHAR(64),
+
     language VARCHAR(50),
 
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+
+ALTER TABLE recipes
+
+ADD COLUMN IF NOT EXISTS source_url_hash CHAR(64);
+
+
+ALTER TABLE recipes
+
+ADD COLUMN IF NOT EXISTS content_hash CHAR(64);
+
+
+ALTER TABLE recipes
+
+ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_recipes_source_url_hash
+
+ON recipes(source_url_hash)
+
+WHERE source_url_hash IS NOT NULL;
+
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_recipes_content_hash
+
+ON recipes(content_hash)
+
+WHERE content_hash IS NOT NULL;
 
 
 
@@ -56,6 +92,13 @@ CREATE TABLE IF NOT EXISTS recipe_ingredients (
 
     preparation TEXT
 );
+
+
+CREATE INDEX IF NOT EXISTS ix_recipe_ingredients_recipe_id
+
+ON recipe_ingredients(recipe_id);
+
+
 CREATE TABLE IF NOT EXISTS recipe_steps (
 
     recipe_step_id SERIAL PRIMARY KEY,
@@ -67,3 +110,8 @@ CREATE TABLE IF NOT EXISTS recipe_steps (
     instruction TEXT
 
 );
+
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_recipe_steps_recipe_step
+
+ON recipe_steps(recipe_id, step_number);

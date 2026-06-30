@@ -75,6 +75,31 @@ def test_validation_rejects_critical_schema_failures():
     )
 
 
+def test_validation_allows_single_ingredient_preparations():
+    recipe = build_recipe(
+        ingredients=[
+            Ingredient(
+                ingredient_name="cumin",
+                quantity=1,
+                unit="cup",
+                canonical_name="cumin",
+                resolution_confidence=1.0,
+                canonical_quantity=1,
+                canonical_unit="cup",
+                conversion_method="volume_passthrough_without_density",
+                uom_confidence_score=0.75,
+            )
+        ]
+    )
+
+    report = ValidationEngine().validate(recipe)
+
+    assert not any(
+        result.check_id == "V02" and not result.passed
+        for result in report
+    )
+
+
 def test_validation_routes_high_failures_to_review():
     recipe = build_recipe(
         ingredients=[

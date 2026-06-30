@@ -26,6 +26,7 @@ class IngredientResolver:
         self.enable_embedding = enable_embedding
         self.ingredient_repository = ingredient_repository
         self.use_database = use_database
+        self.embedding_unavailable_error = None
 
 
     def resolve(self, ingredient_name):
@@ -61,7 +62,7 @@ class IngredientResolver:
                 ) or self._resolve_embedding(
                     ingredient_name
                 )
-            except RuntimeError as exc:
+            except Exception as exc:
                 embedding_result = self._unresolved_result(
                     ingredient_name,
                     normalized_name,
@@ -94,13 +95,12 @@ class IngredientResolver:
         return embedding_result
 
     def _resolve_embedding(self, ingredient_name):
-        if self.embedding_resolver is None:
-            self.embedding_resolver = EmbeddingResolver()
+        embedding_resolver = self._get_embedding_resolver()
 
-        if hasattr(self.embedding_resolver, "resolve_match"):
-            return self.embedding_resolver.resolve_match(ingredient_name)
+        if hasattr(embedding_resolver, "resolve_match"):
+            return embedding_resolver.resolve_match(ingredient_name)
 
-        canonical_name = self.embedding_resolver.resolve(ingredient_name)
+        canonical_name = embedding_resolver.resolve(ingredient_name)
 
         if canonical_name is None:
             return self._unresolved_result(ingredient_name)
@@ -142,18 +142,17 @@ class IngredientResolver:
         if not self.use_database:
             return None
 
-        if self.embedding_resolver is None:
-            self.embedding_resolver = EmbeddingResolver()
+        embedding_resolver = self._get_embedding_resolver()
 
-        if not hasattr(self.embedding_resolver, "embed_text"):
+        if not hasattr(embedding_resolver, "embed_text"):
             return None
 
-        query_embedding = self.embedding_resolver.embed_text(ingredient_name)
+        query_embedding = embedding_resolver.embed_text(ingredient_name)
 
         try:
             match = self._get_repository().search_by_embedding(
                 query_embedding,
-                threshold=self.embedding_resolver.threshold,
+                threshold=embedding_resolver.threshold,
             )
         except Exception:
             return None
@@ -219,3 +218,22 @@ class IngredientResolver:
             self.ingredient_repository = IngredientRepository()
 
         return self.ingredient_repository
+
+    def _get_embedding_resolver(self):
+        if self.embedding_unavailable_error is not None:
+            raise RuntimeError(self.embedding_unavailable_error)
+
+        if self.embedding_resolver is not None:
+            return self.embedding_resolver
+
+        try:
+            self.embedding_resolver = EmbeddingResolver()
+        except Exception as exc:
+            self.embedding_unavailable_error = (
+                "Embedding resolver unavailable; install/cache the model or "
+                "disable embedding fallback for offline ingestion. "
+                f"Original error: {exc}"
+            )
+            raise RuntimeError(self.embedding_unavailable_error) from exc
+
+        return self.embedding_resolver

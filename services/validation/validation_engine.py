@@ -172,11 +172,11 @@ class ValidationEngine:
 
     def _v02_ingredient_count_bounds(self, recipe):
         count = len(recipe.ingredients or [])
-        passed = 2 <= count <= 100
+        passed = 1 <= count <= 100
 
         return (
             passed,
-            "Ingredient count in bounds" if passed else "Ingredient count outside 2-100",
+            "Ingredient count in bounds" if passed else "Ingredient count outside 1-100",
             {"ingredient_count": count},
         )
 

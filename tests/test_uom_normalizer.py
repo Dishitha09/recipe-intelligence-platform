@@ -1,4 +1,5 @@
 from services.enrichment.uom.uom_normalizer import UOMNormalizer
+from services.enrichment.uom.ingredient_type import is_liquid
 
 
 def test_density_conversion_for_solid_cup_to_grams():
@@ -70,3 +71,9 @@ def test_solid_volume_without_density_passes_through_without_conflict():
     assert result["canonical_unit"] == "tsp"
     assert result["conversion_method"] == "volume_passthrough_without_density"
     assert "uom_conflict" not in result["enrichment_flags"]
+
+
+def test_common_dairy_liquids_are_classified_as_liquid():
+    assert is_liquid("buttermilk") is True
+    assert is_liquid("cream") is True
+    assert is_liquid("plain yogurt") is True

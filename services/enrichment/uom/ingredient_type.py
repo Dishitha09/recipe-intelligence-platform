@@ -14,7 +14,17 @@ LIQUID_INGREDIENTS = {
 
     "coconut_milk",
 
-    "coconut milk"
+    "coconut milk",
+
+    "buttermilk",
+
+    "cream",
+
+    "yogurt",
+
+    "plain_yogurt",
+
+    "curd",
 
 }
 

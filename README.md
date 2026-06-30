@@ -491,3 +491,73 @@ Build a production-grade Recipe Intelligence Platform capable of:
 * LLM powered recipe assistant
 * API based deployment
 * Future multimodal recipe intelligence
+
+---
+
+## 14. Production Bootstrap
+
+Create a local environment file:
+
+```bash
+cp .env.example .env
+```
+
+For Docker Postgres with pgvector:
+
+```bash
+docker compose up -d postgres
+python -m services.database.init_db
+python -m services.database.seed_master_ingredients
+```
+
+If you are using a local pgAdmin/PostgreSQL database on port `5432`, update
+`DATABASE_URL` in `.env` to match that database before running `init_db`.
+
+Generate and ingest a deterministic 100-recipe fixture:
+
+```bash
+python -m services.acquisition.scaled_recipe_ingestion --count 100 --ingest
+```
+
+Run a controlled live scrape into PostgreSQL:
+
+```bash
+python -m services.acquisition.scrapy_recipe_ingestion --source-id scrapy_indianhealthyrecipes --allow-disabled --max-items 100 --max-pages 250 --ingest
+```
+
+Verify ingestion counts in PostgreSQL:
+
+```sql
+SELECT count(*) FROM recipes;
+SELECT count(*) FROM recipe_ingredients;
+SELECT count(*) FROM recipe_steps;
+SELECT status, count(*) FROM validation_reports GROUP BY status;
+SELECT run_id, source_id, status, records_found, records_loaded
+FROM ingestion_runs
+ORDER BY run_id DESC
+LIMIT 10;
+```
+
+The loader is idempotent: rerunning the same source updates existing recipes
+by `source_url_hash` or `content_hash` instead of creating duplicates.
+
+---
+
+## 15. Production Readiness Checklist
+
+Completed foundations:
+
+* Source abstraction for CSV, web, Scrapy, dataset, PDF, image, audio, text, and YouTube adapters.
+* Canonical schema coercion.
+* Ingredient enrichment and UOM normalization.
+* PostgreSQL persistence for recipes, ingredients, steps, validation reports, review queue, dead-letter queue, source tracking, and ingestion runs.
+* pgvector recipe embeddings and vector-search integration tests.
+* Idempotent recipe loading using source URL and content fingerprints.
+
+Remaining scale work:
+
+* Enable more live sources one by one after robots/access checks.
+* Add domain-specific parsers for Times Food, NDTV, Sanjeev Kapoor, Indian Express, and regional blogs.
+* Run controlled batches to 500, then 1000-5000 accepted recipes.
+* Add Prometheus/Grafana metrics and alerting.
+* Add curator UI/workflow for alias and UOM correction write-back.

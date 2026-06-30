@@ -1,4 +1,5 @@
 from services.enrichment.ingredient_resolution.ingredient_resolver import IngredientResolver
+import services.enrichment.ingredient_resolution.ingredient_resolver as resolver_module
 
 
 class FakeEmbeddingResolver:
@@ -197,3 +198,28 @@ def test_ingredient_resolver_handles_blank_input():
     assert result["method"] == "unresolved"
     assert result["normalized_name"] == ""
     assert "unresolved_ingredient" in result["enrichment_flags"]
+
+
+def test_ingredient_resolver_caches_embedding_unavailable(monkeypatch):
+    calls = []
+
+    class BrokenEmbeddingResolver:
+        def __init__(self):
+            calls.append("load")
+            raise OSError("offline")
+
+    monkeypatch.setattr(
+        resolver_module,
+        "EmbeddingResolver",
+        BrokenEmbeddingResolver,
+    )
+    resolver = IngredientResolver(use_database=False)
+
+    first = resolver.resolve("unknown ingredient one")
+    second = resolver.resolve("unknown ingredient two")
+
+    assert first["canonical_name"] is None
+    assert second["canonical_name"] is None
+    assert "embedding_resolver_unavailable" in first["enrichment_flags"]
+    assert "embedding_resolver_unavailable" in second["enrichment_flags"]
+    assert calls == ["load"]

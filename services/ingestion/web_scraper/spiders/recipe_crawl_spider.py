@@ -35,21 +35,28 @@ class RecipeCrawlSpider(scrapy.Spider):
     def _parse_html_recipe(self, response):
         title = self._extract_text(response.css("h1::text"))
 
-        ingredients = [
-            text.strip()
-            for text in response.css(
-                "div.wprm-recipe-ingredient-group li ::text, ul.ingredients li ::text, li.ingredient ::text"
-            ).getall()
-            if text.strip()
-        ]
+        ingredients = self._extract_list_text(
+            response,
+            (
+                "div.wprm-recipe-ingredient-group li, "
+                "ul.ingredients li, "
+                "li.ingredient, "
+                "[itemprop='recipeIngredient']"
+            ),
+        )
 
-        instructions = [
-            text.strip()
-            for text in response.css(
-                "div.wprm-recipe-instruction-text ::text, div.instructions li ::text, ol.steps li ::text"
-            ).getall()
-            if text.strip()
-        ]
+        instructions = self._extract_list_text(
+            response,
+            (
+                "div.wprm-recipe-instruction-text, "
+                "div.wprm-recipe-instruction-group li, "
+                "div.instructions li, "
+                "ol.steps li, "
+                "ol.recipe-instructions li, "
+                "[itemprop='recipeInstructions'] li, "
+                "[itemprop='recipeInstructions']"
+            ),
+        )
 
         if not title or (not ingredients and not instructions):
             return None
@@ -67,6 +74,22 @@ class RecipeCrawlSpider(scrapy.Spider):
         if not selector:
             return None
         return selector.get().strip()
+
+    @staticmethod
+    def _extract_list_text(response, selector):
+        values = []
+
+        for element in response.css(selector):
+            text = " ".join(
+                item.strip()
+                for item in element.css("::text").getall()
+                if item.strip()
+            )
+
+            if text and text not in values:
+                values.append(text)
+
+        return values
 
     @staticmethod
     def _should_follow(href):

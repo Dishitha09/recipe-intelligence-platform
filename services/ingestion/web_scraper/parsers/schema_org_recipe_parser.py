@@ -80,8 +80,25 @@ def _parse_recipe_instructions(instructions: Any) -> List[str]:
             if isinstance(item, str):
                 parsed.append(item.strip())
             elif isinstance(item, dict):
-                if item.get("@type") == "HowToSection":
-                    parsed.extend(_parse_recipe_instructions(item.get("itemListElement", [])))
+                item_type = item.get("@type")
+                item_types = (
+                    item_type
+                    if isinstance(item_type, list)
+                    else [item_type]
+                )
+
+                if "HowToSection" in item_types:
+                    parsed.extend(
+                        _parse_recipe_instructions(
+                            item.get("itemListElement", [])
+                        )
+                    )
+                elif item.get("itemListElement"):
+                    parsed.extend(
+                        _parse_recipe_instructions(
+                            item.get("itemListElement", [])
+                        )
+                    )
                 else:
                     parsed.append(
                         str(item.get("text") or item.get("name") or "").strip()
