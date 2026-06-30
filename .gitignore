@@ -2,6 +2,11 @@
 __pycache__/
 *.pyc
 *.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
 
 # Virtual Environment
 .venv/
@@ -17,12 +22,20 @@ data/raw/
 data/processed/
 data/review/
 data/rejected/
+data/dead_letter/
+data/review_queue/
+data/staging/
 
 # Large datasets
 data/datasets/**/raw/*
 data/datasets/**/processed/*
 data/datasets/generated/*sample*.csv
 data/datasets/generated/scrapy_crawl_output*.csv
+
+# Local databases
+*.sqlite
+*.sqlite3
+*.db
 
 # Logs
 *.log

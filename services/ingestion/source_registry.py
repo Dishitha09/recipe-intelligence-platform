@@ -1,31 +1,40 @@
+import importlib
 import json
 import os
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Type
-
-from services.ingestion.audio_adapter import AudioAdapter
-from services.ingestion.csv_adapter import CSVAdapter
-from services.ingestion.dataset_adapter import DatasetAdapter
-from services.ingestion.image_adapter import ImageAdapter
-from services.ingestion.pdf_adapter import PDFAdapter
-from services.ingestion.scrapy_adapter import ScrapyAdapter
-from services.ingestion.source_adapter import SourceAdapter
-from services.ingestion.text_adapter import TextAdapter
-from services.ingestion.web_adapter import WebAdapter
-from services.ingestion.youtube_adapter import YouTubeAdapter
+from typing import Any, Dict, List, Optional
 
 
-ADAPTER_CLASSES: Dict[str, Type[SourceAdapter]] = {
-    "audio": AudioAdapter,
-    "csv": CSVAdapter,
-    "dataset": DatasetAdapter,
-    "image": ImageAdapter,
-    "pdf": PDFAdapter,
-    "scrapy": ScrapyAdapter,
-    "text": TextAdapter,
-    "web": WebAdapter,
-    "youtube": YouTubeAdapter,
+ADAPTER_CLASSES = {
+    "audio": "services.ingestion.audio_adapter:AudioAdapter",
+    "csv": "services.ingestion.csv_adapter:CSVAdapter",
+    "dataset": "services.ingestion.dataset_adapter:DatasetAdapter",
+    "image": "services.ingestion.image_adapter:ImageAdapter",
+    "pdf": "services.ingestion.pdf_adapter:PDFAdapter",
+    "scrapy": "services.ingestion.scrapy_adapter:ScrapyAdapter",
+    "text": "services.ingestion.text_adapter:TextAdapter",
+    "web": "services.ingestion.web_adapter:WebAdapter",
+    "youtube": "services.ingestion.youtube_adapter:YouTubeAdapter",
 }
+
+
+def get_adapter_class(adapter_name):
+    adapter_path = ADAPTER_CLASSES.get(adapter_name)
+
+    if adapter_path is None:
+        raise ValueError(f"Unknown adapter: {adapter_name}")
+
+    module_name, class_name = adapter_path.split(":", 1)
+
+    try:
+        module = importlib.import_module(module_name)
+    except ImportError as exc:
+        raise RuntimeError(
+            f"Adapter '{adapter_name}' requires optional dependency or module "
+            f"'{module_name}' that is not available."
+        ) from exc
+
+    return getattr(module, class_name)
 
 
 @dataclass(frozen=True)
@@ -97,10 +106,7 @@ class SourceRegistry:
             self.reload()
 
     def build_adapter(self, source_config):
-        adapter_class = ADAPTER_CLASSES.get(source_config.adapter)
-
-        if adapter_class is None:
-            raise ValueError(f"Unknown adapter: {source_config.adapter}")
+        adapter_class = get_adapter_class(source_config.adapter)
 
         return adapter_class(
             source_config.location,

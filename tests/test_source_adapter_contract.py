@@ -13,10 +13,10 @@ from services.ingestion.source_registry import (
     ADAPTER_CLASSES,
     SourceConfig,
     SourceRegistry,
+    get_adapter_class,
 )
 from services.ingestion.text_adapter import TextAdapter
 from services.ingestion.web_adapter import WebAdapter
-from services.ingestion.scrapy_adapter import ScrapyAdapter
 from services.ingestion.youtube_adapter import YouTubeAdapter
 
 
@@ -65,8 +65,13 @@ def test_all_source_types_are_registered_and_implement_contract():
 
     assert set(ADAPTER_CLASSES.keys()) == expected
 
-    for adapter_class in ADAPTER_CLASSES.values():
+    for adapter_name in expected - {"scrapy"}:
+        adapter_class = get_adapter_class(adapter_name)
         assert issubclass(adapter_class, SourceAdapter)
+
+    assert ADAPTER_CLASSES["scrapy"] == (
+        "services.ingestion.scrapy_adapter:ScrapyAdapter"
+    )
 
 
 def test_all_file_and_url_adapters_validate_required_config():
@@ -76,7 +81,6 @@ def test_all_file_and_url_adapters_validate_required_config():
         (DatasetAdapter, ""),
         (ImageAdapter, ""),
         (PDFAdapter, ""),
-        (ScrapyAdapter, ""),
         (TextAdapter, ""),
         (WebAdapter, ""),
         (YouTubeAdapter, ""),
@@ -90,6 +94,12 @@ def test_all_file_and_url_adapters_validate_required_config():
             raised = True
 
         assert raised is True
+
+
+def test_source_registry_lazy_loads_adapter_classes():
+    adapter_class = get_adapter_class("csv")
+
+    assert adapter_class is CSVAdapter
 
 
 def test_source_registry_isolates_adapter_failures():

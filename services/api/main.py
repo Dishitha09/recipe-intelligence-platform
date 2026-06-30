@@ -1,13 +1,22 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from services.rag.recipe_rag import RecipeRAG
-
 app = FastAPI(
     title="Recipe Intelligence API"
 )
 
-rag = RecipeRAG()
+rag = None
+
+
+def get_rag():
+    global rag
+
+    if rag is None:
+        from services.rag.recipe_rag import RecipeRAG
+
+        rag = RecipeRAG()
+
+    return rag
 
 
 class QueryRequest(BaseModel):
@@ -25,7 +34,7 @@ def home():
 @app.post("/ask")
 def ask_recipe(request: QueryRequest):
 
-    answer = rag.answer(
+    answer = get_rag().answer(
         request.question
     )
 

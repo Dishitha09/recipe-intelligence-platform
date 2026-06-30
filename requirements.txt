@@ -1,43 +1,31 @@
-fastapi
-uvicorn
+fastapi==0.137.1
+uvicorn==0.49.0
 
-pydantic
-pydantic-settings
+pydantic==2.13.4
 
-sqlalchemy
-psycopg2-binary
+SQLAlchemy==2.0.51
+psycopg2-binary==2.9.12
+pgvector==0.4.2
 
-pgvector
+pandas==3.0.3
+numpy==2.4.6
 
-pandas
-numpy
+requests==2.34.2
+beautifulsoup4==4.14.3
+Scrapy==2.16.0
 
-requests
-beautifulsoup4
+sentence-transformers==5.5.1
+google-generativeai==0.8.6
 
-scrapy
+pdfplumber==0.11.9
+pytesseract==0.3.13
+pillow==12.2.0
 
-spacy
-langdetect
+yt-dlp==2026.3.17
+youtube-transcript-api==1.2.4
 
-sentence-transformers
+python-dotenv==1.2.2
+PyYAML==6.0.3
+rich==15.0.0
 
-google-generativeai
-
-pdfplumber
-
-pytesseract
-
-Pillow
-
-yt-dlp
-
-youtube-transcript-api
-
-python-dotenv
-
-pytest
-
-pyyaml
-
-rich
+pytest==9.1.1
