@@ -1,6 +1,6 @@
 {
   "pipeline": {
-    "target_recipe_count": 5000,
+    "target_recipe_count": 10000,
     "default_user_agent": "ShopConnect-RecipeBot/1.0",
     "dedup_strategy": "content_hash_and_source_url",
     "quality_gate": "validation_engine",
@@ -12,14 +12,15 @@
       "source_type": "csv",
       "adapter": "csv",
       "location": "data/datasets/generated/indian_recipes_100.csv",
-      "enabled": true,
+      "enabled": false,
       "config": {
         "priority": 0,
         "source_group": "local_scale_fixture",
         "expected_volume": 100,
         "quality": "high",
         "latency": "local",
-        "purpose": "Repeatable 100 recipe scale smoke test"
+        "purpose": "Repeatable local smoke test only; do not count in production catalogue",
+        "production_excluded": true
       }
     },
     {
@@ -63,7 +64,7 @@
       "config": {
         "priority": 2,
         "source_group": "structured_html",
-        "expected_volume": 1500,
+        "expected_volume": 1700,
         "quality": "high",
         "parser": "schema_org_recipe_json_ld",
         "crawl_delay_seconds": 3,

@@ -33,11 +33,11 @@ def test_production_source_registry_targets_large_scale_volume():
         for source in payload["sources"]
     )
 
-    assert payload["pipeline"]["target_recipe_count"] == 5000
+    assert payload["pipeline"]["target_recipe_count"] == 10000
     assert expected_total >= payload["pipeline"]["target_recipe_count"]
 
 
-def test_only_local_scale_fixture_is_enabled_by_default():
+def test_no_sources_are_enabled_by_default_for_real_only_catalogue():
     payload = load_config()
     enabled_sources = [
         source["source_id"]
@@ -45,4 +45,16 @@ def test_only_local_scale_fixture_is_enabled_by_default():
         if source.get("enabled", True)
     ]
 
-    assert enabled_sources == ["generated_indian_recipes_100"]
+    assert enabled_sources == []
+
+
+def test_local_fixture_is_marked_production_excluded():
+    payload = load_config()
+    fixture = next(
+        source
+        for source in payload["sources"]
+        if source["source_id"] == "generated_indian_recipes_100"
+    )
+
+    assert fixture["enabled"] is False
+    assert fixture["config"]["production_excluded"] is True
