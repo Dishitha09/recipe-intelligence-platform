@@ -1,4 +1,6 @@
 DROP VIEW IF EXISTS recipe_with_instructions;
+DROP VIEW IF EXISTS recipe_state_target_coverage;
+DROP VIEW IF EXISTS indian_state_reference;
 
 
 CREATE OR REPLACE VIEW recipe_with_instructions AS
@@ -56,3 +58,64 @@ FROM recipes
 GROUP BY
     COALESCE(state, 'Unclassified'),
     COALESCE(region, 'Unclassified');
+
+
+CREATE OR REPLACE VIEW indian_state_reference AS
+SELECT *
+FROM (
+    VALUES
+        ('Andhra Pradesh', 'South', 'state'),
+        ('Arunachal Pradesh', 'Northeast', 'state'),
+        ('Assam', 'Northeast', 'state'),
+        ('Bihar', 'East', 'state'),
+        ('Chhattisgarh', 'Central', 'state'),
+        ('Goa', 'West', 'state'),
+        ('Gujarat', 'West', 'state'),
+        ('Haryana', 'North', 'state'),
+        ('Himachal Pradesh', 'North', 'state'),
+        ('Jharkhand', 'East', 'state'),
+        ('Karnataka', 'South', 'state'),
+        ('Kerala', 'South', 'state'),
+        ('Madhya Pradesh', 'Central', 'state'),
+        ('Maharashtra', 'West', 'state'),
+        ('Manipur', 'Northeast', 'state'),
+        ('Meghalaya', 'Northeast', 'state'),
+        ('Mizoram', 'Northeast', 'state'),
+        ('Nagaland', 'Northeast', 'state'),
+        ('Odisha', 'East', 'state'),
+        ('Punjab', 'North', 'state'),
+        ('Rajasthan', 'Northwest', 'state'),
+        ('Sikkim', 'Northeast', 'state'),
+        ('Tamil Nadu', 'South', 'state'),
+        ('Telangana', 'South', 'state'),
+        ('Tripura', 'Northeast', 'state'),
+        ('Uttar Pradesh', 'North', 'state'),
+        ('Uttarakhand', 'North', 'state'),
+        ('West Bengal', 'East', 'state'),
+        ('Delhi', 'North', 'union_territory'),
+        ('Puducherry', 'South', 'union_territory'),
+        ('Chandigarh', 'North', 'union_territory'),
+        ('Lakshadweep', 'Southwest', 'union_territory'),
+        ('Andaman and Nicobar', 'Island', 'union_territory'),
+        ('Dadra and Nagar Haveli and Daman and Diu', 'West', 'union_territory'),
+        ('Ladakh', 'North', 'union_territory'),
+        ('Jammu and Kashmir', 'North', 'union_territory')
+) AS states(state, region, place_type);
+
+
+CREATE OR REPLACE VIEW recipe_state_target_coverage AS
+SELECT
+    ref.state,
+    ref.region,
+    ref.place_type,
+    COALESCE(c.recipe_count, 0) AS recipe_count,
+    COALESCE(c.avg_state_confidence, 0) AS avg_state_confidence,
+    COALESCE(c.distinct_source_urls, 0) AS distinct_source_urls,
+    278 AS target_for_10000,
+    GREATEST(278 - COALESCE(c.recipe_count, 0), 0) AS remaining_for_10000
+FROM indian_state_reference ref
+LEFT JOIN recipe_state_coverage c
+    ON c.state = ref.state
+ORDER BY
+    remaining_for_10000 DESC,
+    ref.state ASC;
