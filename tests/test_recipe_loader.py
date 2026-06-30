@@ -53,6 +53,10 @@ def build_enriched_recipe():
         title=f"Integration Test Recipe {recipe_uuid}",
         description="Temporary recipe for DB integration tests",
         cuisine="Indian",
+        state="Karnataka",
+        region="South",
+        state_confidence=1.0,
+        state_method="provided_state",
         source_type="pytest",
         source_url=f"https://example.com/integration-test/{recipe_uuid}",
         language="english",
@@ -129,10 +133,21 @@ def test_recipe_loader_persists_recipe_ingredients_steps_and_validation_report()
                 ),
                 {"validation_id": validation_id},
             ).scalar()
+            state_row = conn.execute(
+                text(
+                    """
+                    SELECT state, region
+                    FROM recipes
+                    WHERE recipe_id=:recipe_id
+                    """
+                ),
+                {"recipe_id": recipe_id},
+            ).fetchone()
 
         assert ingredient_count == 2
         assert step_count == 2
         assert report_status == "ACCEPTED"
+        assert tuple(state_row) == ("Karnataka", "South")
     finally:
         if recipe_id is not None:
             cleanup_recipe(recipe_id)

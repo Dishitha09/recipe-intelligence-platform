@@ -35,6 +35,8 @@ def test_schema_coercer_outputs_all_canonical_fields_with_unmapped_metadata():
         "cuisine",
         "state",
         "region",
+        "state_confidence",
+        "state_method",
         "language",
         "canonical_recipe_id",
         "duplicate_score",

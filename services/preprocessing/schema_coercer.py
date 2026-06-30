@@ -20,6 +20,8 @@ CANONICAL_FIELDS = [
     "cuisine",
     "state",
     "region",
+    "state_confidence",
+    "state_method",
     "language",
     "canonical_recipe_id",
     "duplicate_score",

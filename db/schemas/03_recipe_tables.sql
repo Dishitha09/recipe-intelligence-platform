@@ -8,6 +8,14 @@ CREATE TABLE IF NOT EXISTS recipes (
 
     cuisine VARCHAR(100),
 
+    state VARCHAR(100),
+
+    region VARCHAR(100),
+
+    state_confidence FLOAT,
+
+    state_method VARCHAR(100),
+
     prep_time_minutes INT,
 
     cook_time_minutes INT,
@@ -44,6 +52,31 @@ ADD COLUMN IF NOT EXISTS content_hash CHAR(64);
 ALTER TABLE recipes
 
 ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
+ALTER TABLE recipes
+
+ADD COLUMN IF NOT EXISTS state VARCHAR(100);
+
+
+ALTER TABLE recipes
+
+ADD COLUMN IF NOT EXISTS region VARCHAR(100);
+
+
+ALTER TABLE recipes
+
+ADD COLUMN IF NOT EXISTS state_confidence FLOAT;
+
+
+ALTER TABLE recipes
+
+ADD COLUMN IF NOT EXISTS state_method VARCHAR(100);
+
+
+CREATE INDEX IF NOT EXISTS ix_recipes_state_region
+
+ON recipes(state, region);
 
 
 CREATE UNIQUE INDEX IF NOT EXISTS ux_recipes_source_url_hash

@@ -1,6 +1,7 @@
 from services.enrichment.ingredient_resolution.ingredient_resolver import (
     IngredientResolver,
 )
+from services.enrichment.state.state_classifier import RecipeStateClassifier
 from services.enrichment.uom.uom_normalizer import UOMNormalizer
 from services.preprocessing.schema_models import Ingredient
 
@@ -11,10 +12,12 @@ class RecipeEnricher:
         ingredient_resolver=None,
         uom_normalizer=None,
         ingredient_repository=None,
+        state_classifier=None,
     ):
         self.ingredient_resolver = ingredient_resolver or IngredientResolver()
         self.uom_normalizer = uom_normalizer or UOMNormalizer()
         self.ingredient_repository = ingredient_repository
+        self.state_classifier = state_classifier or RecipeStateClassifier()
 
     def enrich_recipe(self, recipe):
         enriched_ingredients = [
@@ -23,11 +26,23 @@ class RecipeEnricher:
         ]
         metadata = dict(recipe.metadata or {})
         metadata["enrichment"] = self._summary(enriched_ingredients)
+        state_classification = self.state_classifier.classify(recipe)
+        metadata["state_classification"] = {
+            "state": state_classification.state,
+            "region": state_classification.region,
+            "confidence": state_classification.confidence,
+            "method": state_classification.method,
+            "matched_terms": list(state_classification.matched_terms),
+        }
 
         return recipe.model_copy(
             update={
                 "ingredients": enriched_ingredients,
                 "metadata": metadata,
+                "state": recipe.state or state_classification.state,
+                "region": recipe.region or state_classification.region,
+                "state_confidence": state_classification.confidence,
+                "state_method": state_classification.method,
             }
         )
 

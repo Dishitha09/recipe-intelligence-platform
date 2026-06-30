@@ -72,6 +72,10 @@ class Recipe(BaseModel):
 
     region: Optional[str] = None
 
+    state_confidence: Optional[float] = None
+
+    state_method: Optional[str] = None
+
     language: Optional[str] = None
 
     # Duplicate Detection

@@ -42,6 +42,10 @@ class RecipeLoader:
                 "title": recipe.title,
                 "description": recipe.description,
                 "cuisine": recipe.cuisine,
+                "state": recipe.state,
+                "region": recipe.region,
+                "state_confidence": recipe.state_confidence,
+                "state_method": recipe.state_method,
                 "source_type": recipe.source_type,
                 "source_url": recipe.source_url,
                 "source_url_hash": fingerprints["source_url_hash"],
@@ -58,6 +62,10 @@ class RecipeLoader:
                             title = :title,
                             description = :description,
                             cuisine = :cuisine,
+                            state = :state,
+                            region = :region,
+                            state_confidence = :state_confidence,
+                            state_method = :state_method,
                             source_type = :source_type,
                             source_url = :source_url,
                             source_url_hash = :source_url_hash,
@@ -86,6 +94,14 @@ class RecipeLoader:
 
                 cuisine,
 
+                state,
+
+                region,
+
+                state_confidence,
+
+                state_method,
+
                 source_type,
 
                 source_url,
@@ -107,6 +123,14 @@ class RecipeLoader:
                 :description,
 
                 :cuisine,
+
+                :state,
+
+                :region,
+
+                :state_confidence,
+
+                :state_method,
 
                 :source_type,
 

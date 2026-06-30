@@ -541,6 +541,20 @@ LIMIT 10;
 The loader is idempotent: rerunning the same source updates existing recipes
 by `source_url_hash` or `content_hash` instead of creating duplicates.
 
+Check state-wise coverage:
+
+```bash
+python -m services.acquisition.backfill_state_classification
+python -m services.acquisition.statewise_catalog_report --target-total 10000
+python -m services.acquisition.statewise_collection_plan
+```
+
+```sql
+SELECT state, region, recipe_count, avg_state_confidence
+FROM recipe_state_coverage
+ORDER BY recipe_count DESC;
+```
+
 ---
 
 ## 15. Production Readiness Checklist
