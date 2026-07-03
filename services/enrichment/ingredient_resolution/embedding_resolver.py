@@ -3,6 +3,7 @@ import numpy as np
 from services.enrichment.ingredient_resolution.alias_resolver import (
     normalize_ingredient_name,
 )
+from services.reliability.retry import transient_retry
 
 
 class EmbeddingResolver:
@@ -35,6 +36,7 @@ class EmbeddingResolver:
         )
         self.master_embeddings = self.model.encode(self.master_ingredients)
 
+    @transient_retry
     def _load_model(self, model_name):
         try:
             from sentence_transformers import SentenceTransformer
@@ -110,6 +112,7 @@ class EmbeddingResolver:
     def resolve(self, ingredient):
         return self.resolve_match(ingredient)["canonical_name"]
 
+    @transient_retry
     def embed_text(self, ingredient):
         normalized_name = normalize_ingredient_name(ingredient)
         return self.model.encode([normalized_name])

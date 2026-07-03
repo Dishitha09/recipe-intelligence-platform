@@ -12,6 +12,16 @@ BEGIN
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
         );
+
+        BEGIN
+            CREATE INDEX IF NOT EXISTS idx_recipe_embeddings_hnsw
+            ON recipe_embeddings
+            USING hnsw (embedding vector_cosine_ops)
+            WITH (m = 16, ef_construction = 64);
+        EXCEPTION
+            WHEN undefined_object OR feature_not_supported THEN
+                RAISE NOTICE 'Skipping recipe_embeddings HNSW index because this pgvector version does not support hnsw.';
+        END;
     ELSE
         RAISE NOTICE 'Skipping recipe_embeddings because pgvector is unavailable.';
     END IF;

@@ -7,6 +7,7 @@ from services.database.fingerprints import recipe_fingerprints
 from services.database.ingredient_repository import IngredientRepository
 from services.enrichment.ingredient_resolution.ingredient_resolver import IngredientResolver
 from services.enrichment.uom.uom_normalizer import UOMNormalizer
+from services.reliability.retry import transient_retry
 
 
 class RecipeLoader:
@@ -18,6 +19,7 @@ class RecipeLoader:
         self.resolver = None
 
 
+    @transient_retry
     def insert_recipe(self, recipe):
         fingerprints = recipe_fingerprints(recipe)
 
@@ -157,6 +159,7 @@ class RecipeLoader:
             return recipe_id
 
 
+    @transient_retry
     def insert_ingredients(
 
         self,
@@ -339,6 +342,7 @@ class RecipeLoader:
                 )
 
 
+    @transient_retry
     def insert_steps(
 
         self,
@@ -407,6 +411,7 @@ class RecipeLoader:
 
                 )
 
+    @transient_retry
     def record_source(self, recipe_id, recipe, source_name=None, source_type=None, run_id=None):
         fingerprints = recipe_fingerprints(recipe)
 

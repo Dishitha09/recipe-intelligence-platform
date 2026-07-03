@@ -83,7 +83,7 @@ class IngredientResolver:
         if embedding_result["canonical_name"]:
             return embedding_result
 
-        if self.enable_llm and self.llm_resolver is not None:
+        if self.enable_llm:
             llm_result = self._resolve_llm(
                 ingredient_name,
                 normalized_name
@@ -172,7 +172,17 @@ class IngredientResolver:
         }
 
     def _resolve_llm(self, ingredient_name, normalized_name):
-        canonical_name = self.llm_resolver.resolve(ingredient_name)
+        llm_resolver = self._get_llm_resolver()
+
+        if hasattr(llm_resolver, "resolve_match"):
+            match = llm_resolver.resolve_match(ingredient_name)
+            canonical_name = match.canonical_name
+            confidence_score = match.confidence_score
+            explanation = match.explanation
+        else:
+            canonical_name = llm_resolver.resolve(ingredient_name)
+            confidence_score = 0.6
+            explanation = ""
 
         if not canonical_name:
             return self._unresolved_result(
@@ -186,8 +196,26 @@ class IngredientResolver:
             "canonical_name": canonical_name,
             "method": "llm",
             "tier": "llm_escalation",
-            "confidence_score": 0.6,
+            "confidence_score": confidence_score,
             "enrichment_flags": ["llm_review_required"],
+            "llm_metadata": {
+                "explanation": explanation,
+                "llm_calls_made": getattr(
+                    llm_resolver,
+                    "llm_calls_made",
+                    None,
+                ),
+                "llm_calls_succeeded": getattr(
+                    llm_resolver,
+                    "llm_calls_succeeded",
+                    None,
+                ),
+                "llm_cost_usd": getattr(
+                    llm_resolver,
+                    "llm_cost_usd",
+                    None,
+                ),
+            },
         }
 
     def _unresolved_result(
@@ -237,3 +265,18 @@ class IngredientResolver:
             raise RuntimeError(self.embedding_unavailable_error) from exc
 
         return self.embedding_resolver
+
+    def _get_llm_resolver(self):
+        if self.llm_resolver is None:
+            from services.enrichment.ingredient_resolution.llm_resolver import (
+                LLMResolver,
+            )
+
+            candidate_names = []
+
+            if hasattr(self.embedding_resolver, "master_ingredients"):
+                candidate_names = self.embedding_resolver.master_ingredients
+
+            self.llm_resolver = LLMResolver(candidate_names=candidate_names)
+
+        return self.llm_resolver

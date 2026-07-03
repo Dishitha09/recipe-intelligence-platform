@@ -187,3 +187,36 @@ def test_source_registry_hot_reloads_json_config():
         assert len(registry.configs) == 2
     finally:
         os.remove(config_path)
+
+
+def test_source_registry_loads_yaml_config_and_polling_watcher():
+    payload = """
+sources:
+  - source_id: csv.yaml
+    source_type: csv
+    adapter: csv
+    location: sample_recipes.csv
+"""
+
+    with tempfile.NamedTemporaryFile(
+        "w",
+        suffix=".yaml",
+        delete=False,
+        encoding="utf-8",
+    ) as file:
+        file.write(payload)
+        config_path = file.name
+
+    try:
+        registry = SourceRegistry(config_path=config_path)
+
+        assert len(registry.configs) == 1
+        assert registry.configs[0].source_id == "csv.yaml"
+
+        watcher = registry._start_polling_watcher(interval_seconds=0.01)
+        watcher.stop_event.set()
+        watcher.join(timeout=1)
+
+        assert not watcher.is_alive()
+    finally:
+        os.remove(config_path)

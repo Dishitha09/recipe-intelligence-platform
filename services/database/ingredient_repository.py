@@ -4,6 +4,7 @@ from services.database.connection import engine
 from services.enrichment.ingredient_resolution.alias_resolver import (
     normalize_ingredient_name,
 )
+from services.reliability.retry import transient_retry
 
 
 class IngredientRepository:
@@ -171,6 +172,7 @@ class IngredientRepository:
 
             return None
 
+    @transient_retry
     def upsert_master_ingredient(
 
         self,
@@ -217,6 +219,7 @@ class IngredientRepository:
 
             return result.scalar()
 
+    @transient_retry
     def upsert_alias(
 
         self,
@@ -259,6 +262,39 @@ class IngredientRepository:
 
             )
 
+    @transient_retry
+    def write_back_alias(
+        self,
+        canonical_name,
+        alias_name,
+        language=None,
+        source="curator",
+    ):
+        if not canonical_name or not alias_name:
+            raise ValueError("canonical_name and alias_name are required")
+
+        canonical_name = normalize_ingredient_name(canonical_name).replace(
+            " ",
+            "_",
+        )
+        alias_name = normalize_ingredient_name(alias_name)
+
+        ingredient_id = self.upsert_master_ingredient(canonical_name)
+        self.upsert_alias(
+            ingredient_id=ingredient_id,
+            alias_name=alias_name,
+            language=language,
+            source=source,
+        )
+
+        return {
+            "ingredient_id": ingredient_id,
+            "canonical_name": canonical_name,
+            "alias_name": alias_name,
+            "source": source,
+        }
+
+    @transient_retry
     def upsert_embedding(
 
         self,

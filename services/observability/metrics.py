@@ -63,10 +63,66 @@ class PipelineMetricsRepository:
                 WHERE ended_at IS NOT NULL
                 """,
             )
+            p99_latency_seconds = self._scalar(
+                conn,
+                """
+                SELECT COALESCE(
+                    percentile_cont(0.99)
+                    WITHIN GROUP (
+                        ORDER BY EXTRACT(EPOCH FROM (ended_at - started_at))
+                    ),
+                    0
+                )
+                FROM ingestion_runs
+                WHERE ended_at IS NOT NULL
+                """,
+            )
+            records_found = self._scalar(
+                conn,
+                """
+                SELECT COALESCE(SUM(records_found), 0)
+                FROM ingestion_runs
+                """,
+            )
+            records_coerced = self._scalar(
+                conn,
+                """
+                SELECT COALESCE(SUM(records_coerced), 0)
+                FROM ingestion_runs
+                """,
+            )
+            llm_calls_total = self._scalar(
+                conn,
+                """
+                SELECT COALESCE(
+                    SUM(
+                        CASE
+                            WHEN summary ? 'llm_calls_made'
+                            THEN (summary->>'llm_calls_made')::numeric
+                            ELSE 0
+                        END
+                    ),
+                    0
+                )
+                FROM ingestion_runs
+                """,
+            )
+            completed_runs = self._scalar(
+                conn,
+                """
+                SELECT count(*)
+                FROM ingestion_runs
+                WHERE status = 'COMPLETED'
+                """,
+            )
 
         return {
             "records_ingested_total": recipes_total,
             "recipe_ingredients_total": ingredients_total,
+            "preprocessing_pass_rate": self._rate(
+                records_coerced,
+                records_found,
+            ),
             "validation_acceptance_rate": self._rate(
                 accepted_reports,
                 validation_reports,
@@ -82,6 +138,11 @@ class PipelineMetricsRepository:
             ),
             "scraper_failed_runs_total": failed_runs,
             "pipeline_e2e_latency_seconds_avg": float(avg_latency_seconds or 0),
+            "pipeline_e2e_latency_p99": float(p99_latency_seconds or 0),
+            "llm_calls_per_batch": self._rate(
+                llm_calls_total,
+                completed_runs,
+            ),
         }
 
     def _scalar(self, conn, sql):

@@ -1,5 +1,6 @@
 from services.enrichment.ingredient_resolution.ingredient_resolver import IngredientResolver
 import services.enrichment.ingredient_resolution.ingredient_resolver as resolver_module
+from types import SimpleNamespace
 
 
 class FakeEmbeddingResolver:
@@ -33,6 +34,27 @@ class FakeVectorResolver:
 
     def embed_text(self, ingredient_name):
         return [[0.1, 0.2]]
+
+
+class FakeLLMResolver:
+    def __init__(self, canonical_name):
+        self.canonical_name = canonical_name
+        self.llm_calls_made = 0
+        self.llm_calls_succeeded = 0
+        self.llm_cost_usd = 0.001
+
+    def resolve_match(self, ingredient_name):
+        self.llm_calls_made += 1
+        self.llm_calls_succeeded += 1
+
+        return SimpleNamespace(
+            raw_name=ingredient_name,
+            normalized_name=ingredient_name,
+            canonical_name=self.canonical_name,
+            confidence_score=0.74,
+            review_required=True,
+            explanation="model escalation",
+        )
 
 
 def test_ingredient_resolver_uses_alias_before_embedding():
@@ -198,6 +220,32 @@ def test_ingredient_resolver_handles_blank_input():
     assert result["method"] == "unresolved"
     assert result["normalized_name"] == ""
     assert "unresolved_ingredient" in result["enrichment_flags"]
+
+
+def test_ingredient_resolver_escalates_to_llm_after_embedding_miss():
+    embedding_result = {
+        "raw_name": "amchoor powder",
+        "normalized_name": "amchoor powder",
+        "canonical_name": None,
+        "method": "unresolved",
+        "tier": "unresolved",
+        "confidence_score": 0.31,
+        "enrichment_flags": ["unresolved_ingredient"],
+    }
+    resolver = IngredientResolver(
+        embedding_resolver=FakeEmbeddingResolver(embedding_result),
+        llm_resolver=FakeLLMResolver("dry_mango_powder"),
+        enable_llm=True,
+        use_database=False,
+    )
+
+    result = resolver.resolve("amchoor powder")
+
+    assert result["canonical_name"] == "dry_mango_powder"
+    assert result["method"] == "llm"
+    assert result["tier"] == "llm_escalation"
+    assert result["confidence_score"] == 0.74
+    assert result["llm_metadata"]["llm_calls_made"] == 1
 
 
 def test_ingredient_resolver_caches_embedding_unavailable(monkeypatch):

@@ -1,6 +1,8 @@
 import importlib
 import json
 import os
+import threading
+import time
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
@@ -98,12 +100,61 @@ class SourceRegistry:
 
     def refresh_if_changed(self):
         if not self.config_path:
-            return
+            return False
 
         current_mtime = os.path.getmtime(self.config_path)
 
         if self._last_mtime is None or current_mtime > self._last_mtime:
             self.reload()
+            return True
+
+        return False
+
+    def start_hot_reload_watcher(self, interval_seconds=5):
+        if not self.config_path:
+            raise ValueError("config_path is required for hot reload watching")
+
+        try:
+            return self._start_watchdog_observer()
+        except ImportError:
+            return self._start_polling_watcher(interval_seconds)
+
+    def _start_watchdog_observer(self):
+        from watchdog.events import FileSystemEventHandler
+        from watchdog.observers import Observer
+
+        registry = self
+        watched_path = os.path.abspath(self.config_path)
+
+        class ReloadHandler(FileSystemEventHandler):
+            def on_modified(self, event):
+                if os.path.abspath(event.src_path) == watched_path:
+                    registry.reload()
+
+        observer = Observer()
+        observer.schedule(
+            ReloadHandler(),
+            os.path.dirname(watched_path) or ".",
+            recursive=False,
+        )
+        observer.daemon = True
+        observer.start()
+
+        return observer
+
+    def _start_polling_watcher(self, interval_seconds):
+        stop_event = threading.Event()
+
+        def poll():
+            while not stop_event.is_set():
+                self.refresh_if_changed()
+                stop_event.wait(interval_seconds)
+
+        thread = threading.Thread(target=poll, daemon=True)
+        thread.stop_event = stop_event
+        thread.start()
+
+        return thread
 
     def build_adapter(self, source_config):
         adapter_class = get_adapter_class(source_config.adapter)

@@ -58,6 +58,16 @@ BEGIN
         ON ingredient_embeddings
         USING ivfflat (embedding vector_cosine_ops)
         WITH (lists = 100);
+
+        BEGIN
+            CREATE INDEX IF NOT EXISTS idx_ingredient_embeddings_hnsw
+            ON ingredient_embeddings
+            USING hnsw (embedding vector_cosine_ops)
+            WITH (m = 16, ef_construction = 64);
+        EXCEPTION
+            WHEN undefined_object OR feature_not_supported THEN
+                RAISE NOTICE 'Skipping ingredient_embeddings HNSW index because this pgvector version does not support hnsw.';
+        END;
     ELSE
         RAISE NOTICE 'Skipping ingredient_embeddings because pgvector is unavailable.';
     END IF;

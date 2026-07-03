@@ -155,3 +155,56 @@ def test_add_review_endpoint_returns_updated_summary(monkeypatch):
     body = response.json()
     assert body["review"]["rating"] == 5
     assert body["summary"]["review_count"] == 1
+
+
+def test_metrics_endpoint_returns_prometheus_text(monkeypatch):
+    monkeypatch.setattr(
+        main,
+        "build_prometheus_metrics",
+        lambda: b"records_ingested_total 10\n",
+    )
+
+    response = client.get("/metrics")
+
+    assert response.status_code == 200
+    assert "text/plain" in response.headers["content-type"]
+    assert "records_ingested_total 10" in response.text
+
+
+def test_alias_write_back_endpoint(monkeypatch):
+    from services.database.ingredient_repository import IngredientRepository
+
+    def fake_write_back_alias(
+        self,
+        canonical_name,
+        alias_name,
+        language=None,
+        source="curator",
+    ):
+        return {
+            "ingredient_id": 9,
+            "canonical_name": canonical_name,
+            "alias_name": alias_name,
+            "language": language,
+            "source": source,
+        }
+
+    monkeypatch.setattr(
+        IngredientRepository,
+        "write_back_alias",
+        fake_write_back_alias,
+    )
+
+    response = client.post(
+        "/ingredients/aliases",
+        json={
+            "canonical_name": "dry_mango_powder",
+            "alias_name": "amchoor",
+            "language": "hi",
+            "source": "curator",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["canonical_name"] == "dry_mango_powder"
+    assert response.json()["alias_name"] == "amchoor"

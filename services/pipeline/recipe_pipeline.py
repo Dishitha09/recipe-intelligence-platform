@@ -211,6 +211,7 @@ class RecipePipeline:
 
                 logger.info("Inserted Recipe ID: %s", recipe_id)
 
+            summary.update(self._llm_metrics())
             self._complete_run(run_id, summary)
         except Exception as exc:
             self._fail_run(run_id, exc, summary)
@@ -310,3 +311,24 @@ class RecipePipeline:
             error_message=error_message,
             validation_report=validation_report,
         )
+
+    def _llm_metrics(self):
+        resolver = getattr(self.enricher, "ingredient_resolver", None)
+        llm_resolver = getattr(resolver, "llm_resolver", None)
+
+        if llm_resolver is None:
+            return {
+                "llm_calls_made": 0,
+                "llm_calls_succeeded": 0,
+                "llm_cost_usd": 0.0,
+            }
+
+        return {
+            "llm_calls_made": getattr(llm_resolver, "llm_calls_made", 0),
+            "llm_calls_succeeded": getattr(
+                llm_resolver,
+                "llm_calls_succeeded",
+                0,
+            ),
+            "llm_cost_usd": getattr(llm_resolver, "llm_cost_usd", 0.0),
+        }

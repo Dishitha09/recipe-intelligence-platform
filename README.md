@@ -421,6 +421,15 @@ GET /trending
 
 Trending recipe list using stored or computed scores.
 
+GET /metrics
+
+Prometheus scrape endpoint with ingestion, validation, resolution,
+dead-letter, latency, and LLM call metrics.
+
+POST /ingredients/aliases
+
+Curator write-back endpoint for corrected ingredient aliases.
+
 POST /ask
 
 Recipe Question Answering
@@ -574,6 +583,31 @@ ORDER BY run_id DESC
 LIMIT 10;
 ```
 
+Verify vector indexes:
+
+```sql
+SELECT indexname
+FROM pg_indexes
+WHERE indexname IN (
+  'idx_ingredient_embeddings_hnsw',
+  'idx_recipe_embeddings_hnsw'
+);
+```
+
+Scrape operational metrics:
+
+```bash
+curl http://localhost:8000/metrics
+```
+
+Curator alias write-back:
+
+```bash
+curl -X POST http://localhost:8000/ingredients/aliases \
+  -H "Content-Type: application/json" \
+  -d '{"canonical_name":"dry_mango_powder","alias_name":"amchoor","source":"curator"}'
+```
+
 Inspect recipe instructions with recipe context in pgAdmin:
 
 ```sql
@@ -621,11 +655,16 @@ Completed foundations:
 * PostgreSQL persistence for recipes, ingredients, steps, validation reports, review queue, dead-letter queue, source tracking, and ingestion runs.
 * pgvector recipe embeddings and vector-search integration tests.
 * Idempotent recipe loading using source URL and content fingerprints.
+* Gemini-backed Tier 3 ingredient resolution with LLM counters and cost tracking.
+* Prometheus `/metrics` endpoint and Slack webhook hook for critical validation failures.
+* HNSW vector indexes where supported by the installed pgvector extension.
+* Curator alias write-back to improve future Tier 1 resolution.
+* Retry/backoff wrapper for Gemini, embedding, recipe loading, validation persistence, and ingredient write paths.
 
 Remaining scale work:
 
 * Enable more live sources one by one after robots/access checks.
 * Add domain-specific parsers for Times Food, NDTV, Sanjeev Kapoor, Indian Express, and regional blogs.
 * Run controlled batches to 500, then 1000-5000 accepted recipes.
-* Add Prometheus/Grafana metrics and alerting.
-* Add curator UI/workflow for alias and UOM correction write-back.
+* Add Grafana dashboard panels on top of the Prometheus metrics endpoint.
+* Build a curator UI on top of alias/UOM correction APIs.

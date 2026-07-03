@@ -4,12 +4,13 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from sqlalchemy import text
 
 from services.database.connection import engine
+from services.observability.prometheus import build_prometheus_metrics
 
 
 app = FastAPI(
@@ -68,6 +69,13 @@ class ReviewCreateRequest(BaseModel):
     rating: int = Field(ge=1, le=5)
     review_text: str | None = Field(default=None, max_length=2000)
     source: str = Field(default="web", max_length=100)
+
+
+class AliasWriteBackRequest(BaseModel):
+    canonical_name: str = Field(min_length=1, max_length=255)
+    alias_name: str = Field(min_length=1, max_length=255)
+    language: str | None = Field(default=None, max_length=50)
+    source: str = Field(default="curator", max_length=100)
 
 
 def _jsonable(value: Any):
@@ -542,6 +550,26 @@ def home():
     return {
         "message": "Recipe Intelligence API Running"
     }
+
+
+@app.get("/metrics")
+def metrics():
+    return Response(
+        content=build_prometheus_metrics(),
+        media_type="text/plain; version=0.0.4; charset=utf-8",
+    )
+
+
+@app.post("/ingredients/aliases")
+def write_back_alias(request: AliasWriteBackRequest):
+    from services.database.ingredient_repository import IngredientRepository
+
+    return IngredientRepository().write_back_alias(
+        canonical_name=request.canonical_name,
+        alias_name=request.alias_name,
+        language=request.language,
+        source=request.source,
+    )
 
 
 @app.get("/recipes")

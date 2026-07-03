@@ -1,9 +1,15 @@
 import json
+import logging
 
 from sqlalchemy import text
 
 from services.database.connection import engine
 from services.database.fingerprints import stable_hash
+from services.observability.alerts import ValidationAlertDispatcher
+from services.reliability.retry import transient_retry
+
+
+logger = logging.getLogger(__name__)
 
 
 class ValidationRepository:
@@ -51,6 +57,7 @@ class ValidationRepository:
                 {"limit": limit},
             ).mappings().all()
 
+    @transient_retry
     def save_report(self, recipe_id, report, message=None):
         check_results = [
             result.model_dump(mode="json")
@@ -124,8 +131,13 @@ class ValidationRepository:
                 },
             )
 
-            return result.scalar()
+            dlq_id = result.scalar()
 
+        self._alert_on_critical_failures()
+
+        return dlq_id
+
+    @transient_retry
     def save_review(self, record_id, recipe, report, reason=None, recipe_id=None):
         reason_codes = self._failure_codes(report)
         review_payload = {
@@ -196,6 +208,7 @@ class ValidationRepository:
 
             return result.scalar()
 
+    @transient_retry
     def save_dead_letter(
         self,
         source_type,
@@ -311,3 +324,12 @@ class ValidationRepository:
             ]
 
         return []
+
+    def _alert_on_critical_failures(self):
+        try:
+            ValidationAlertDispatcher().maybe_alert()
+        except Exception as exc:
+            logger.warning(
+                "Critical validation alert dispatch failed: %s",
+                exc,
+            )
