@@ -1,3 +1,5 @@
+import csv
+from pathlib import Path
 from urllib.parse import urlparse
 
 from scrapy import signals
@@ -55,9 +57,49 @@ class ScrapyAdapter(SourceAdapter):
         )
 
         items = []
+        checkpoint_csv_path = self.config.get("checkpoint_csv_path")
+        checkpoint_handle = None
+        checkpoint_writer = None
+
+        if checkpoint_csv_path:
+            checkpoint_path = Path(checkpoint_csv_path)
+            checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+            checkpoint_handle = checkpoint_path.open(
+                "w",
+                encoding="utf-8",
+                newline="",
+            )
+            checkpoint_writer = csv.DictWriter(
+                checkpoint_handle,
+                fieldnames=[
+                    "title",
+                    "description",
+                    "source_url",
+                    "ingredients",
+                    "steps",
+                    "image",
+                ],
+            )
+            checkpoint_writer.writeheader()
 
         def collect_item(item, response, spider):
-            items.append(dict(item))
+            record = dict(item)
+            items.append(record)
+
+            if checkpoint_writer is not None:
+                checkpoint_writer.writerow(
+                    {
+                        "title": record.get("title", ""),
+                        "description": record.get("description", ""),
+                        "source_url": record.get("source_url", ""),
+                        "ingredients": " | ".join(
+                            record.get("ingredients") or []
+                        ),
+                        "steps": " | ".join(record.get("steps") or []),
+                        "image": record.get("image", ""),
+                    }
+                )
+                checkpoint_handle.flush()
 
         process = CrawlerProcess(settings=settings)
         crawler = process.create_crawler(RecipeCrawlSpider)
@@ -69,7 +111,11 @@ class ScrapyAdapter(SourceAdapter):
             allowed_domains=allowed_domains,
             parser=self.config.get("parser", "default"),
         )
-        process.start()
+        try:
+            process.start()
+        finally:
+            if checkpoint_handle is not None:
+                checkpoint_handle.close()
 
         self.raw_records = [
             self.build_raw_record(

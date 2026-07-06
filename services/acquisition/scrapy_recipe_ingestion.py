@@ -75,6 +75,11 @@ def main():
     if args.max_pages is not None:
         source.config["max_pages"] = args.max_pages
 
+    if args.output_csv:
+        source.config["checkpoint_csv_path"] = str(
+            args.output_csv.with_suffix(".partial.csv")
+        )
+
     adapter = registry.build_adapter(source)
     raw_records = adapter.extract()
 

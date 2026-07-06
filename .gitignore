@@ -32,6 +32,7 @@ data/datasets/**/raw/*
 data/datasets/**/processed/*
 data/datasets/generated/*sample*.csv
 data/datasets/generated/scrapy_crawl_output*.csv
+data/datasets/generated/web_*.csv
 data/datasets/generated/*_chunk_*.csv
 
 # Local databases
