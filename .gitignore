@@ -25,6 +25,7 @@ data/rejected/
 data/dead_letter/
 data/review_queue/
 data/staging/
+exports/
 
 # Large datasets
 data/datasets/**/raw/*

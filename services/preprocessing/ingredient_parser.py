@@ -2,6 +2,7 @@ import html
 import re
 
 from services.preprocessing.schema_models import Ingredient
+from services.preprocessing.text_cleaner import clean_text
 
 
 class IngredientParser:
@@ -115,7 +116,7 @@ class IngredientParser:
             return None
 
     def parse(self, ingredient_text):
-        ingredient_text = html.unescape(str(ingredient_text)).strip()
+        ingredient_text = clean_text(ingredient_text)
         ingredient_text = self._normalize_fraction_text(ingredient_text)
         quantity = None
         remainder = ingredient_text

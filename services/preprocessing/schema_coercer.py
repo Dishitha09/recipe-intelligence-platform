@@ -8,6 +8,7 @@ from services.ingestion.raw_record import RawRecord
 from services.preprocessing.field_mapping import FieldMappingRegistry
 from services.preprocessing.ingredient_parser import IngredientParser
 from services.preprocessing.schema_models import Ingredient, Recipe, RecipeStep
+from services.preprocessing.text_cleaner import clean_text
 
 
 CANONICAL_FIELDS = [
@@ -212,10 +213,12 @@ class SchemaCoercer:
 
         for index, step in enumerate(step_values, start=1):
             if isinstance(step, dict):
-                instruction = step.get("instruction") or step.get("text")
+                instruction = clean_text(
+                    step.get("instruction") or step.get("text")
+                )
                 step_number = step.get("step_number") or index
             else:
-                instruction = str(step).strip()
+                instruction = clean_text(step)
                 step_number = index
 
             if instruction:
@@ -305,6 +308,22 @@ class SchemaCoercer:
             field: recipe_data.get(field)
             for field in CANONICAL_FIELDS
         }
+
+        for field in [
+            "title",
+            "original_title",
+            "translated_title",
+            "description",
+            "original_description",
+            "translated_description",
+            "cuisine",
+            "state",
+            "region",
+            "language",
+            "source_type",
+            "source_url",
+        ]:
+            canonical[field] = clean_text(canonical.get(field))
 
         canonical["ingredients"] = [
             Ingredient(**ingredient).model_dump()

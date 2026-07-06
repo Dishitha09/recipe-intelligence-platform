@@ -7,6 +7,7 @@ from services.database.fingerprints import recipe_fingerprints
 from services.database.ingredient_repository import IngredientRepository
 from services.enrichment.ingredient_resolution.ingredient_resolver import IngredientResolver
 from services.enrichment.uom.uom_normalizer import UOMNormalizer
+from services.preprocessing.text_cleaner import clean_text
 from services.reliability.retry import transient_retry
 
 
@@ -41,18 +42,18 @@ class RecipeLoader:
             ).scalar()
 
             params = {
-                "title": recipe.title,
-                "description": recipe.description,
-                "cuisine": recipe.cuisine,
-                "state": recipe.state,
-                "region": recipe.region,
+                "title": clean_text(recipe.title),
+                "description": clean_text(recipe.description),
+                "cuisine": clean_text(recipe.cuisine),
+                "state": clean_text(recipe.state),
+                "region": clean_text(recipe.region),
                 "state_confidence": recipe.state_confidence,
                 "state_method": recipe.state_method,
-                "source_type": recipe.source_type,
-                "source_url": recipe.source_url,
+                "source_type": clean_text(recipe.source_type),
+                "source_url": clean_text(recipe.source_url),
                 "source_url_hash": fingerprints["source_url_hash"],
                 "content_hash": fingerprints["content_hash"],
-                "language": recipe.language,
+                "language": clean_text(recipe.language),
             }
 
             if existing_recipe_id is not None:
@@ -307,7 +308,7 @@ class RecipeLoader:
 
                         "ingredient_id": ingredient_id,
 
-                        "ingredient_name": ing.ingredient_name,
+                        "ingredient_name": clean_text(ing.ingredient_name),
 
                         "quantity": ing.quantity,
 
@@ -341,7 +342,7 @@ class RecipeLoader:
 
                         "preparation":
 
-                            ing.preparation
+                            clean_text(ing.preparation)
 
                     }
 
@@ -411,7 +412,7 @@ class RecipeLoader:
 
                         "step_number": step.step_number,
 
-                        "instruction": step.instruction
+                        "instruction": clean_text(step.instruction)
 
                     }
 
