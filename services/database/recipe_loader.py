@@ -231,6 +231,8 @@ class RecipeLoader:
 
                     ingredient_id,
 
+                    ingredient_name,
+
                     quantity,
 
                     unit,
@@ -267,6 +269,8 @@ class RecipeLoader:
 
                     :ingredient_id,
 
+                    :ingredient_name,
+
                     :quantity,
 
                     :unit,
@@ -302,6 +306,8 @@ class RecipeLoader:
                         "recipe_id": recipe_id,
 
                         "ingredient_id": ingredient_id,
+
+                        "ingredient_name": ing.ingredient_name,
 
                         "quantity": ing.quantity,
 

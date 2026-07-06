@@ -1,5 +1,10 @@
 ALTER TABLE recipe_ingredients
 
+ADD COLUMN IF NOT EXISTS ingredient_name TEXT;
+
+
+ALTER TABLE recipe_ingredients
+
 ADD COLUMN IF NOT EXISTS canonical_quantity FLOAT;
 
 

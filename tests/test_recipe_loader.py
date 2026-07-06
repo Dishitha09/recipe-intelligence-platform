@@ -113,6 +113,17 @@ def test_recipe_loader_persists_recipe_ingredients_steps_and_validation_report()
                 ),
                 {"recipe_id": recipe_id},
             ).scalar()
+            ingredient_names = conn.execute(
+                text(
+                    """
+                    SELECT ingredient_name
+                    FROM recipe_ingredients
+                    WHERE recipe_id=:recipe_id
+                    ORDER BY ingredient_name
+                    """
+                ),
+                {"recipe_id": recipe_id},
+            ).scalars().all()
             step_count = conn.execute(
                 text(
                     """
@@ -145,6 +156,7 @@ def test_recipe_loader_persists_recipe_ingredients_steps_and_validation_report()
             ).fetchone()
 
         assert ingredient_count == 2
+        assert ingredient_names == ["paneer", "rice"]
         assert step_count == 2
         assert report_status == "ACCEPTED"
         assert tuple(state_row) == ("Karnataka", "South")

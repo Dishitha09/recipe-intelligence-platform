@@ -18,6 +18,20 @@ def test_alias_resolution_normalizes_case_spacing_and_punctuation():
     assert resolve_alias("  GEHUN-KA   ATTA  ") == "whole_wheat_flour"
 
 
+def test_resolves_common_scraped_recipe_aliases():
+    assert resolve_alias("cumin seeds") == "cumin"
+    assert resolve_alias("red chilli powder") == "red_chili_powder"
+    assert resolve_alias("Kashmiri red chilli powder") == "red_chili_powder"
+    assert resolve_alias("garlic cloves") == "garlic"
+    assert resolve_alias("Pinch hing") == "asafoetida"
+    assert resolve_alias("sea salt") == "salt"
+    assert resolve_alias("water") == "water"
+    assert resolve_alias("2 cloves ((optional))") == "clove"
+    assert resolve_alias("Salt as needed") == "salt"
+    assert resolve_alias("to 2 cups water") == "water"
+    assert resolve_alias("medium tomatoes") == "tomato"
+
+
 def test_alias_match_returns_resolution_metadata():
     match = resolve_alias_match("Besan")
 

@@ -119,6 +119,8 @@ CREATE TABLE IF NOT EXISTS recipe_ingredients (
 
     ingredient_id INT REFERENCES master_ingredients(ingredient_id),
 
+    ingredient_name TEXT,
+
     quantity FLOAT,
 
     unit VARCHAR(50),
