@@ -96,6 +96,79 @@ def test_all_file_and_url_adapters_validate_required_config():
         assert raised is True
 
 
+def test_youtube_adapter_uses_transcript_sidecar(tmp_path):
+    transcript_path = tmp_path / "transcript.txt"
+    transcript_path.write_text(
+        "Dosa Transcript\nIngredients:\n1 cup rice\nInstructions:\nCook dosa.",
+        encoding="utf-8",
+    )
+
+    adapter = YouTubeAdapter(
+        "local-video",
+        config={
+            "transcript_path": str(transcript_path),
+            "source_url": "file://transcript.txt",
+        },
+    )
+    records = adapter.extract()
+
+    assert records[0].raw_content["title"] == "Dosa Transcript"
+    assert "1 cup rice" in records[0].raw_content["raw_text"]
+    assert records[0].raw_content["source_url"] == "file://transcript.txt"
+    assert records[0].metadata["transcript_status"] == "sidecar_file"
+
+
+def test_image_adapter_uses_ocr_text_sidecar(tmp_path):
+    image_path = tmp_path / "recipe.png"
+    ocr_path = tmp_path / "recipe.txt"
+
+    from PIL import Image
+
+    Image.new("RGB", (10, 10), "white").save(image_path)
+    ocr_path.write_text(
+        "Poha Card\nIngredients:\n2 cups poha\nInstructions:\nSteam poha.",
+        encoding="utf-8",
+    )
+
+    adapter = ImageAdapter(
+        str(image_path),
+        config={
+            "ocr_text_path": str(ocr_path),
+            "source_url": "file://recipe.png",
+        },
+    )
+    records = adapter.extract()
+
+    assert records[0].raw_content["title"] == "Poha Card"
+    assert "2 cups poha" in records[0].raw_content["raw_text"]
+    assert records[0].raw_content["source_url"] == "file://recipe.png"
+    assert records[0].metadata["ocr_status"] == "sidecar_file"
+
+
+def test_pdf_adapter_uses_text_sidecar(tmp_path):
+    pdf_path = tmp_path / "cookbook.pdf"
+    text_path = tmp_path / "cookbook.txt"
+    pdf_path.write_bytes(b"%PDF-1.4\n%%EOF\n")
+    text_path.write_text(
+        "Coconut Rice Page\nIngredients:\n1 cup rice\nInstructions:\nMix rice.",
+        encoding="utf-8",
+    )
+
+    adapter = PDFAdapter(
+        str(pdf_path),
+        config={
+            "text_path": str(text_path),
+            "source_url": "file://cookbook.pdf",
+        },
+    )
+    records = adapter.extract()
+
+    assert records[0].raw_content["title"] == "Coconut Rice Page"
+    assert "1 cup rice" in records[0].raw_content["raw_text"]
+    assert records[0].raw_content["source_url"] == "file://cookbook.pdf"
+    assert records[0].metadata["extraction_status"] == "sidecar_file"
+
+
 def test_source_registry_lazy_loads_adapter_classes():
     adapter_class = get_adapter_class("csv")
 
