@@ -55,6 +55,24 @@ def main():
         default=None,
         help="Stop the crawl after this many downloaded pages.",
     )
+    parser.add_argument(
+        "--max-depth",
+        type=int,
+        default=None,
+        help="Override the source crawl depth for deeper web discovery.",
+    )
+    parser.add_argument(
+        "--crawl-delay-seconds",
+        type=float,
+        default=None,
+        help="Override the per-request crawl delay.",
+    )
+    parser.add_argument(
+        "--concurrent-requests",
+        type=int,
+        default=None,
+        help="Override Scrapy concurrent request count.",
+    )
     args = parser.parse_args()
 
     registry = SourceRegistry(config_path=str(args.config))
@@ -74,6 +92,15 @@ def main():
 
     if args.max_pages is not None:
         source.config["max_pages"] = args.max_pages
+
+    if args.max_depth is not None:
+        source.config["max_depth"] = args.max_depth
+
+    if args.crawl_delay_seconds is not None:
+        source.config["crawl_delay_seconds"] = args.crawl_delay_seconds
+
+    if args.concurrent_requests is not None:
+        source.config["concurrent_requests"] = args.concurrent_requests
 
     if args.output_csv:
         source.config["checkpoint_csv_path"] = str(
