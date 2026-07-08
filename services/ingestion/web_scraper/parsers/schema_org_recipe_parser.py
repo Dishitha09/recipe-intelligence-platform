@@ -5,6 +5,10 @@ from typing import Any, Dict, List, Optional
 from scrapy.http import Response
 
 
+_NON_ENGLISH_INGREDIENT_RE = re.compile(r"[\u0900-\u097F\u0C80-\u0CFF]")
+_JUNK_INGREDIENT_RE = re.compile(r"^\s*(?:[-\u2013\u2014]|\d+)\s*$")
+
+
 def parse_schema_org_recipe(response: Response) -> Optional[Dict[str, Any]]:
     scripts = response.css("script[type='application/ld+json']::text").getall()
 
@@ -67,7 +71,7 @@ def _is_recipe(payload: Dict[str, Any]) -> bool:
 
 
 def _build_recipe(payload: Dict[str, Any], source_url: str) -> Dict[str, Any]:
-    ingredients = payload.get("recipeIngredient") or []
+    ingredients = _filter_english_ingredients(payload.get("recipeIngredient") or [])
     steps = _parse_recipe_instructions(payload.get("recipeInstructions") or [])
 
     return {
@@ -78,6 +82,21 @@ def _build_recipe(payload: Dict[str, Any], source_url: str) -> Dict[str, Any]:
         "steps": steps,
         "image": _extract_image(payload),
     }
+
+
+def _filter_english_ingredients(ingredients: Any) -> List[str]:
+    cleaned = []
+    for item in ingredients or []:
+        text = str(item or "").strip()
+        if not text:
+            continue
+        if _NON_ENGLISH_INGREDIENT_RE.search(text):
+            continue
+        if _JUNK_INGREDIENT_RE.match(text):
+            continue
+        cleaned.append(text)
+
+    return cleaned
 
 
 def _parse_recipe_instructions(instructions: Any) -> List[str]:

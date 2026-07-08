@@ -123,6 +123,42 @@ def test_parse_schema_org_recipe_flattens_howto_sections():
     ]
 
 
+def test_parse_schema_org_recipe_filters_multilingual_junk_ingredients():
+    response = make_response(
+        """
+        <html>
+          <head>
+            <script type="application/ld+json">
+            {
+              "@context": "https://schema.org",
+              "@type": "Recipe",
+              "name": "Besan Chilla",
+              "recipeIngredient": [
+                "1 cup besan",
+                "1 tsp cumin",
+                "1 टी स्पून जीरा",
+                "1 ಟೀಸ್ಪೂನ್ ಜೀರಿಗೆ",
+                "-",
+                "250"
+              ],
+              "recipeInstructions": [
+                {"@type": "HowToStep", "text": "Mix the batter."}
+              ]
+            }
+            </script>
+          </head>
+        </html>
+        """
+    )
+
+    recipe = parse_schema_org_recipe(response)
+
+    assert recipe["ingredients"] == [
+        "1 cup besan",
+        "1 tsp cumin",
+    ]
+
+
 def test_parse_schema_org_recipe_prefers_full_article_instructions():
     response = make_response(
         """

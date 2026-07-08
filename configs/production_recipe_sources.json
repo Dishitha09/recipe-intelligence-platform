@@ -93,6 +93,82 @@
       }
     },
     {
+      "source_id": "hebbars_kitchen_web",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://hebbarskitchen.com/",
+      "enabled": false,
+      "config": {
+        "priority": 2,
+        "source_group": "structured_html",
+        "expected_volume": 1500,
+        "quality": "high",
+        "parser": "schema_org_recipe_json_ld",
+        "crawl_delay_seconds": 3,
+        "max_depth": 3,
+        "concurrent_requests": 8,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "veg_recipes_of_india_web",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://www.vegrecipesofindia.com/",
+      "enabled": false,
+      "config": {
+        "priority": 2,
+        "source_group": "structured_html",
+        "expected_volume": 1000,
+        "quality": "high",
+        "parser": "schema_org_recipe_json_ld",
+        "crawl_delay_seconds": 3,
+        "max_depth": 3,
+        "concurrent_requests": 8,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "archanas_kitchen_web",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://www.archanaskitchen.com/",
+      "enabled": false,
+      "config": {
+        "priority": 3,
+        "source_group": "structured_html",
+        "expected_volume": 1200,
+        "quality": "high",
+        "parser": "schema_org_recipe_json_ld",
+        "crawl_delay_seconds": 3,
+        "max_depth": 3,
+        "concurrent_requests": 8,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "tarla_dalal_web",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://www.tarladalal.com/",
+      "enabled": false,
+      "config": {
+        "priority": 3,
+        "source_group": "structured_html",
+        "expected_volume": 1000,
+        "quality": "high",
+        "parser": "schema_org_recipe_json_ld",
+        "crawl_delay_seconds": 3,
+        "max_depth": 3,
+        "concurrent_requests": 6,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
       "source_id": "indian_express_food",
       "source_type": "web",
       "adapter": "scrapy",
