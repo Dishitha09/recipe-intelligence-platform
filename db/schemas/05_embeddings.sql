@@ -13,6 +13,9 @@ BEGIN
 
         );
 
+        CREATE UNIQUE INDEX IF NOT EXISTS ux_recipe_embeddings_recipe_id
+        ON recipe_embeddings(recipe_id);
+
         BEGIN
             CREATE INDEX IF NOT EXISTS idx_recipe_embeddings_hnsw
             ON recipe_embeddings
