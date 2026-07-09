@@ -1,6 +1,6 @@
 {
   "pipeline": {
-    "target_recipe_count": 10000,
+    "target_recipe_count": 20000,
     "default_user_agent": "ShopConnect-RecipeBot/1.0",
     "dedup_strategy": "content_hash_and_source_url",
     "quality_gate": "validation_engine",
