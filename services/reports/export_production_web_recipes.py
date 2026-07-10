@@ -81,7 +81,7 @@ def main():
     )
     parser.add_argument(
         "--output",
-        default="data/datasets/production/real_web_recipes_3080_20260709.csv",
+        default="data/datasets/production/real_web_recipes_3883_20260710.csv",
     )
     args = parser.parse_args()
 

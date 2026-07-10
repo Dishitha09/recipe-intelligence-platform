@@ -295,6 +295,101 @@
       }
     },
     {
+      "source_id": "yummy_tummy_aarthi_web",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://www.yummytummyaarthi.com/",
+      "enabled": false,
+      "config": {
+        "priority": 3,
+        "source_group": "structured_html",
+        "expected_volume": 800,
+        "quality": "medium_high",
+        "parser": "schema_org_recipe_json_ld",
+        "crawl_delay_seconds": 3,
+        "max_depth": 3,
+        "concurrent_requests": 6,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "kannamma_cooks_web",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://www.kannammacooks.com/",
+      "enabled": false,
+      "config": {
+        "priority": 3,
+        "source_group": "structured_html",
+        "expected_volume": 600,
+        "quality": "medium_high",
+        "parser": "schema_org_recipe_json_ld",
+        "crawl_delay_seconds": 3,
+        "max_depth": 3,
+        "concurrent_requests": 6,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "whiskaffair_web",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://www.whiskaffair.com/",
+      "enabled": false,
+      "config": {
+        "priority": 3,
+        "source_group": "structured_html",
+        "expected_volume": 700,
+        "quality": "medium_high",
+        "parser": "schema_org_recipe_json_ld",
+        "crawl_delay_seconds": 3,
+        "max_depth": 3,
+        "concurrent_requests": 6,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "cook_with_manali_web",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://www.cookwithmanali.com/",
+      "enabled": false,
+      "config": {
+        "priority": 3,
+        "source_group": "structured_html",
+        "expected_volume": 500,
+        "quality": "medium_high",
+        "parser": "schema_org_recipe_json_ld",
+        "crawl_delay_seconds": 3,
+        "max_depth": 3,
+        "concurrent_requests": 6,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "my_food_story_web",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://myfoodstory.com/",
+      "enabled": false,
+      "config": {
+        "priority": 3,
+        "source_group": "structured_html",
+        "expected_volume": 500,
+        "quality": "medium_high",
+        "parser": "schema_org_recipe_json_ld",
+        "crawl_delay_seconds": 3,
+        "max_depth": 3,
+        "concurrent_requests": 6,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
       "source_id": "youtube_sanjeev_kapoor",
       "source_type": "youtube",
       "adapter": "youtube",

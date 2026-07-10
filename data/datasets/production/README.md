@@ -3,7 +3,10 @@
 This folder contains reviewer-facing exports from the PostgreSQL production
 tables.
 
-- `real_web_recipes_3080_20260709.csv`: 3,080 real webpage recipes exported
+- `real_web_recipes_3883_20260710.csv`: 3,883 real webpage recipes exported
+  from PostgreSQL after adding Yummy Tummy Aarthi crawling, validation,
+  ingredient-resolution backfill, and pgvector recipe embedding backfill.
+- `real_web_recipes_3080_20260709.csv`: earlier 3,080 real webpage export
   from PostgreSQL after Indian Healthy Recipes, Hebbars Kitchen, and Veg
   Recipes of India crawling, validation, ingredient-resolution backfill, and
   pgvector recipe embedding backfill.
@@ -22,5 +25,5 @@ tables.
 Regenerate the CSV with:
 
 ```bash
-python -m services.reports.export_production_web_recipes --output data/datasets/production/real_web_recipes_3080_20260709.csv
+python -m services.reports.export_production_web_recipes --output data/datasets/production/real_web_recipes_3883_20260710.csv
 ```
