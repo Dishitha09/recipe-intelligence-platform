@@ -232,6 +232,45 @@ def test_recipe_loader_is_idempotent_for_recipe_children_and_reports():
             cleanup_recipe(recipe_id)
 
 
+def test_recipe_loader_preserves_source_attribution_for_duplicate_recipe():
+    require_database()
+    recipe = build_enriched_recipe()
+    loader = RecipeLoader()
+    recipe_ids = []
+
+    try:
+        recipe_id = loader.insert_recipe(recipe)
+        recipe_ids.append(recipe_id)
+        duplicate = recipe.model_copy(
+            update={
+                "source_type": "dataset",
+                "source_url": recipe.source_url,
+            }
+        )
+
+        duplicate_recipe_id = loader.insert_recipe(duplicate)
+        recipe_ids.append(duplicate_recipe_id)
+
+        with engine.connect() as conn:
+            source_row = conn.execute(
+                text(
+                    """
+                    SELECT source_type, source_url
+                    FROM recipes
+                    WHERE recipe_id=:recipe_id
+                    """
+                ),
+                {"recipe_id": recipe_id},
+            ).mappings().one()
+
+        assert duplicate_recipe_id == recipe_id
+        assert source_row["source_type"] == recipe.source_type
+        assert source_row["source_url"] == recipe.source_url
+    finally:
+        for recipe_id in set(recipe_ids):
+            cleanup_recipe(recipe_id)
+
+
 def test_validation_repository_persists_review_and_dead_letter_records():
     require_database()
     recipe = build_enriched_recipe().model_copy(

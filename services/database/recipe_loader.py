@@ -69,10 +69,6 @@ class RecipeLoader:
                             region = :region,
                             state_confidence = :state_confidence,
                             state_method = :state_method,
-                            source_type = :source_type,
-                            source_url = :source_url,
-                            source_url_hash = :source_url_hash,
-                            content_hash = :content_hash,
                             language = :language,
                             updated_at = CURRENT_TIMESTAMP
                         WHERE recipe_id = :recipe_id

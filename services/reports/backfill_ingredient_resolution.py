@@ -17,8 +17,6 @@ from services.enrichment.ingredient_resolution.alias_resolver import (
 _MEASUREMENT_WORDS = {
     "cup",
     "cups",
-    "gram",
-    "grams",
     "kg",
     "tablespoon",
     "tablespoons",
@@ -114,6 +112,10 @@ def backfill(limit=None, dry_run=False, use_normalized_fallback=False):
 def _normalized_fallback(ingredient_name):
     normalized = normalize_ingredient_name(ingredient_name)
     normalized = re.sub(r"\b(?:as needed|optional)\b", " ", normalized)
+    normalized = re.sub(r"\([^)]*\)", " ", normalized)
+    normalized = re.sub(r"\s+-\s+\d.*$", " ", normalized)
+    normalized = re.sub(r"^\s*or\s+\d+\s+", " ", normalized)
+    normalized = re.sub(r"^\s*\d+\s+", " ", normalized)
     normalized = re.sub(r"\s+", " ", normalized).strip()
 
     if not normalized:
@@ -124,7 +126,7 @@ def _normalized_fallback(ingredient_name):
     if len(tokens) > 6:
         return {"canonical_name": None}
 
-    if any(token in _MEASUREMENT_WORDS for token in tokens):
+    if len(tokens) == 1 and tokens[0] in _MEASUREMENT_WORDS:
         return {"canonical_name": None}
 
     if any(token.replace(".", "", 1).isdigit() for token in tokens):
