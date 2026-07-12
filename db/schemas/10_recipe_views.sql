@@ -1,4 +1,5 @@
 DROP VIEW IF EXISTS recipe_with_instructions;
+DROP VIEW IF EXISTS dataset_recipe_provenance;
 DROP VIEW IF EXISTS recipe_state_target_coverage;
 DROP VIEW IF EXISTS indian_state_reference;
 DROP VIEW IF EXISTS recipe_instruction_summary;
@@ -54,6 +55,82 @@ GROUP BY
     r.language,
     r.created_at,
     r.updated_at;
+
+
+CREATE OR REPLACE VIEW dataset_recipe_provenance AS
+WITH dataset_sources_raw AS (
+    SELECT
+        recipe_id,
+        source_name AS dataset_source_name,
+        source_url AS dataset_source_url,
+        run_id,
+        ingested_at
+    FROM recipe_source_tracking
+    WHERE source_type = 'dataset'
+
+    UNION
+
+    SELECT
+        recipe_id,
+        'recipes.source_type=dataset' AS dataset_source_name,
+        source_url AS dataset_source_url,
+        NULL::integer AS run_id,
+        created_at AS ingested_at
+    FROM recipes
+    WHERE source_type = 'dataset'
+),
+dataset_sources AS (
+    SELECT
+        recipe_id,
+        STRING_AGG(DISTINCT dataset_source_name, ' | ') AS dataset_source_names,
+        STRING_AGG(DISTINCT dataset_source_url, ' | ') AS dataset_source_urls,
+        STRING_AGG(DISTINCT run_id::text, ' | ') FILTER (
+            WHERE run_id IS NOT NULL
+        ) AS dataset_ingestion_run_ids,
+        MAX(ingested_at) AS latest_dataset_ingested_at
+    FROM dataset_sources_raw
+    GROUP BY recipe_id
+),
+ingredient_lines AS (
+    SELECT
+        recipe_id,
+        STRING_AGG(
+            CONCAT_WS(
+                ' ',
+                NULLIF(TRIM(TRAILING '.0' FROM quantity::text), ''),
+                unit,
+                ingredient_name
+            ),
+            ', '
+            ORDER BY recipe_ingredient_id
+        ) AS ingredients,
+        COUNT(*) AS ingredient_count
+    FROM recipe_ingredients
+    GROUP BY recipe_id
+)
+SELECT
+    r.recipe_id,
+    r.title,
+    r.state,
+    r.region,
+    r.source_type AS primary_source_type,
+    r.source_url AS primary_source_url,
+    ds.dataset_source_names,
+    ds.dataset_source_urls,
+    ds.dataset_ingestion_run_ids,
+    ds.latest_dataset_ingested_at,
+    COALESCE(il.ingredient_count, 0) AS ingredient_count,
+    r.step_count,
+    il.ingredients,
+    r.instructions_one_line AS instructions
+FROM dataset_sources ds
+JOIN recipe_with_instructions r
+    ON r.recipe_id = ds.recipe_id
+LEFT JOIN ingredient_lines il
+    ON il.recipe_id = r.recipe_id
+ORDER BY
+    r.title,
+    r.recipe_id;
 
 
 CREATE OR REPLACE VIEW recipe_instructions AS
