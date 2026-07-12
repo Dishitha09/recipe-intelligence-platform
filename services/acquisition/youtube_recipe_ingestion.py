@@ -1,5 +1,6 @@
 import argparse
 import csv
+import json
 import re
 from pathlib import Path
 
@@ -18,6 +19,7 @@ YOUR_FOOD_LAB_CHANNEL_URL = (
 )
 DEFAULT_OUTPUT_DIR = Path("data/datasets/youtube/your_food_lab")
 SOURCE_ID = "youtube.your_food_lab"
+SOURCE_NAME = "Your Food Lab"
 
 
 def clean_text(value):
@@ -49,16 +51,37 @@ def fetch_video_info(video_id):
     return yt_dlp.YoutubeDL(opts).extract_info(url, download=False)
 
 
-def parse_description_recipe(info):
+def parse_description_recipe(
+    info,
+    channel_name=SOURCE_NAME,
+    channel_url=YOUR_FOOD_LAB_CHANNEL_URL,
+):
     description = info.get("description") or ""
     ingredients_block = _between(
         description,
-        [r"^Ingredients\s*:"],
-        [r"^Method\s*:", r"^Process\s*:", r"^Directions\s*:"],
+        [
+            r"^Ingredients(?:\b.*)?\s*:?\s*$",
+            r"^Ingredient(?:\b.*)?\s*:?\s*$",
+        ],
+        [
+            r"^Method(?:\b.*)?\s*:?\s*$",
+            r"^Process(?:\b.*)?\s*:?\s*$",
+            r"^Directions(?:\b.*)?\s*:?\s*$",
+            r"^Instructions(?:\b.*)?\s*:?\s*$",
+            r"^Procedure(?:\b.*)?\s*:?\s*$",
+            r"^Recipe(?:\b.*)?\s*:?\s*$",
+        ],
     )
     method_block = _after(
         description,
-        [r"^Method\s*:", r"^Process\s*:", r"^Directions\s*:"],
+        [
+            r"^Method(?:\b.*)?\s*:?\s*$",
+            r"^Process(?:\b.*)?\s*:?\s*$",
+            r"^Directions(?:\b.*)?\s*:?\s*$",
+            r"^Instructions(?:\b.*)?\s*:?\s*$",
+            r"^Procedure(?:\b.*)?\s*:?\s*$",
+            r"^Recipe(?:\b.*)?\s*:?\s*$",
+        ],
     )
 
     if method_block:
@@ -70,6 +93,9 @@ def parse_description_recipe(info):
                 r"^Intro\s+\d",
                 r"^Outro\s+\d",
                 r"^The Music I use",
+                r"^Subscribe",
+                r"^Download",
+                r"^Website",
             ],
         )
 
@@ -90,8 +116,8 @@ def parse_description_recipe(info):
         "instructions": " | ".join(steps),
         "raw_text": clean_text(description),
         "youtube_video_id": info.get("id"),
-        "youtube_channel": "Your Food Lab",
-        "youtube_channel_url": YOUR_FOOD_LAB_CHANNEL_URL,
+        "youtube_channel": channel_name,
+        "youtube_channel_url": channel_url,
         "duration_seconds": info.get("duration"),
         "upload_date": info.get("upload_date"),
         "view_count": info.get("view_count"),
@@ -249,13 +275,15 @@ def _intro_text(description):
 
 def collect_youtube_recipes(
     channel_url=YOUR_FOOD_LAB_CHANNEL_URL,
+    channel_name=SOURCE_NAME,
     max_videos=100,
     output_dir=DEFAULT_OUTPUT_DIR,
+    file_prefix="your_food_lab",
 ):
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    raw_path = output_dir / "your_food_lab_raw_video_metadata.csv"
-    normalized_path = output_dir / "your_food_lab_normalized_recipes.csv"
+    raw_path = output_dir / f"{file_prefix}_raw_video_metadata.csv"
+    normalized_path = output_dir / f"{file_prefix}_normalized_recipes.csv"
 
     videos = list_channel_videos(channel_url, max_videos)
     raw_rows = []
@@ -292,7 +320,11 @@ def collect_youtube_recipes(
             }
         )
 
-        recipe = parse_description_recipe(info)
+        recipe = parse_description_recipe(
+            info,
+            channel_name=channel_name,
+            channel_url=channel_url,
+        )
 
         if recipe:
             normalized_rows.append(recipe)
@@ -310,7 +342,7 @@ def collect_youtube_recipes(
     }
 
 
-def ingest_normalized(path, limit=None):
+def ingest_normalized(path, limit=None, source_id=SOURCE_ID):
     records = []
 
     with Path(path).open("r", encoding="utf-8-sig", newline="") as handle:
@@ -322,7 +354,7 @@ def ingest_normalized(path, limit=None):
 
             records.append(
                 RawRecord(
-                    source_id=SOURCE_ID,
+                    source_id=source_id,
                     source_type="youtube",
                     _raw_content=dict(row),
                     metadata={
@@ -339,7 +371,7 @@ def ingest_normalized(path, limit=None):
     )
     return pipeline.run_records(
         records,
-        source_id=SOURCE_ID,
+        source_id=source_id,
         source_name=str(path),
         source_type="youtube",
     )
@@ -367,6 +399,9 @@ def main():
         description="Collect and ingest structured YouTube recipe descriptions."
     )
     parser.add_argument("--channel-url", default=YOUR_FOOD_LAB_CHANNEL_URL)
+    parser.add_argument("--channel-name", default=SOURCE_NAME)
+    parser.add_argument("--source-id", default=SOURCE_ID)
+    parser.add_argument("--file-prefix", default="your_food_lab")
     parser.add_argument("--max-videos", type=int, default=100)
     parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR))
     parser.add_argument("--ingest", action="store_true")
@@ -375,18 +410,36 @@ def main():
     args = parser.parse_args()
 
     if args.ingest_path:
-        print(ingest_normalized(args.ingest_path, args.ingest_limit))
+        _print_summary(
+            ingest_normalized(
+                args.ingest_path,
+                args.ingest_limit,
+                source_id=args.source_id,
+            )
+        )
         return
 
     summary = collect_youtube_recipes(
         channel_url=args.channel_url,
+        channel_name=args.channel_name,
         max_videos=args.max_videos,
         output_dir=args.output_dir,
+        file_prefix=args.file_prefix,
     )
-    print(summary)
+    _print_summary(summary)
 
     if args.ingest:
-        print(ingest_normalized(summary["normalized_path"], args.ingest_limit))
+        _print_summary(
+            ingest_normalized(
+                summary["normalized_path"],
+                args.ingest_limit,
+                source_id=args.source_id,
+            )
+        )
+
+
+def _print_summary(summary):
+    print(json.dumps(summary, ensure_ascii=True, default=str))
 
 
 if __name__ == "__main__":
