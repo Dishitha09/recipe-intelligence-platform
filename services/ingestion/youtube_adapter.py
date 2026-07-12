@@ -45,8 +45,25 @@ class YouTubeAdapter(SourceAdapter):
         else:
             from youtube_transcript_api import YouTubeTranscriptApi
 
-            transcript = YouTubeTranscriptApi.get_transcript(self.video_id)
-            raw_text = " ".join(item.get("text", "") for item in transcript).strip()
+            api = YouTubeTranscriptApi()
+            if hasattr(api, "fetch"):
+                transcript = api.fetch(
+                    self.video_id,
+                    languages=self.config.get("languages", ["en", "hi"]),
+                )
+                raw_text = " ".join(
+                    item.text
+                    for item in transcript
+                ).strip()
+            else:
+                transcript = YouTubeTranscriptApi.get_transcript(
+                    self.video_id,
+                    languages=self.config.get("languages", ["en", "hi"]),
+                )
+                raw_text = " ".join(
+                    item.get("text", "")
+                    for item in transcript
+                ).strip()
             segment_count = len(transcript)
 
         source_url = self.config.get(
