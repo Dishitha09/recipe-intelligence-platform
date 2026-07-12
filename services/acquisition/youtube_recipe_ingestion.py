@@ -29,12 +29,13 @@ def clean_text(value):
     return text.strip()
 
 
-def list_channel_videos(channel_url, max_videos):
+def list_channel_videos(channel_url, max_videos, playlist_start=1):
     opts = {
         "quiet": True,
         "no_warnings": True,
         "extract_flat": True,
         "playlistend": max_videos,
+        "playliststart": playlist_start,
         "skip_download": True,
     }
     info = yt_dlp.YoutubeDL(opts).extract_info(channel_url, download=False)
@@ -51,10 +52,31 @@ def fetch_video_info(video_id):
     return yt_dlp.YoutubeDL(opts).extract_info(url, download=False)
 
 
+def fetch_transcript_text(video_id, languages=None):
+    languages = languages or ["en", "hi"]
+
+    try:
+        from youtube_transcript_api import YouTubeTranscriptApi
+
+        api = YouTubeTranscriptApi()
+        if hasattr(api, "fetch"):
+            transcript = api.fetch(video_id, languages=languages)
+            return " ".join(item.text for item in transcript).strip()
+
+        transcript = YouTubeTranscriptApi.get_transcript(
+            video_id,
+            languages=languages,
+        )
+        return " ".join(item.get("text", "") for item in transcript).strip()
+    except Exception:
+        return ""
+
+
 def parse_description_recipe(
     info,
     channel_name=SOURCE_NAME,
     channel_url=YOUR_FOOD_LAB_CHANNEL_URL,
+    transcript_text=None,
 ):
     description = info.get("description") or ""
     ingredients_block = _between(
@@ -102,6 +124,11 @@ def parse_description_recipe(
     ingredients = _ingredient_lines(ingredients_block)
     steps = _step_lines(method_block)
 
+    transcript_used = False
+    if ingredients and not steps and transcript_text:
+        steps = _transcript_step_lines(transcript_text)
+        transcript_used = bool(steps)
+
     if not ingredients or not steps:
         return None
 
@@ -121,6 +148,7 @@ def parse_description_recipe(
         "duration_seconds": info.get("duration"),
         "upload_date": info.get("upload_date"),
         "view_count": info.get("view_count"),
+        "youtube_transcript_used": transcript_used,
     }
 
 
@@ -245,6 +273,50 @@ def _step_lines(block):
     ]
 
 
+def _transcript_step_lines(text):
+    cooking_verbs = (
+        "add",
+        "bake",
+        "boil",
+        "cook",
+        "fry",
+        "garnish",
+        "grind",
+        "heat",
+        "knead",
+        "marinate",
+        "mix",
+        "pour",
+        "roast",
+        "saute",
+        "serve",
+        "simmer",
+        "stir",
+        "temper",
+        "transfer",
+        "wash",
+    )
+    text = clean_text(text)
+    lines = []
+
+    for sentence in re.split(r"(?<=[.!?])\s+", text):
+        sentence = clean_text(sentence)
+        lower = sentence.lower()
+
+        if len(sentence) < 18:
+            continue
+
+        if not any(verb in lower for verb in cooking_verbs):
+            continue
+
+        lines.append(sentence)
+
+        if len(lines) >= 18:
+            break
+
+    return lines
+
+
 def _written_recipe_title(description):
     match = re.search(
         r"Full written recipe\s*[-:]\s*(.+)",
@@ -277,15 +349,17 @@ def collect_youtube_recipes(
     channel_url=YOUR_FOOD_LAB_CHANNEL_URL,
     channel_name=SOURCE_NAME,
     max_videos=100,
+    playlist_start=1,
     output_dir=DEFAULT_OUTPUT_DIR,
     file_prefix="your_food_lab",
+    use_transcript_fallback=False,
 ):
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     raw_path = output_dir / f"{file_prefix}_raw_video_metadata.csv"
     normalized_path = output_dir / f"{file_prefix}_normalized_recipes.csv"
 
-    videos = list_channel_videos(channel_url, max_videos)
+    videos = list_channel_videos(channel_url, max_videos, playlist_start)
     raw_rows = []
     normalized_rows = []
 
@@ -326,6 +400,16 @@ def collect_youtube_recipes(
             channel_url=channel_url,
         )
 
+        if not recipe and use_transcript_fallback:
+            transcript_text = fetch_transcript_text(video_id)
+            if transcript_text:
+                recipe = parse_description_recipe(
+                    info,
+                    channel_name=channel_name,
+                    channel_url=channel_url,
+                    transcript_text=transcript_text,
+                )
+
         if recipe:
             normalized_rows.append(recipe)
 
@@ -334,6 +418,7 @@ def collect_youtube_recipes(
 
     return {
         "channel_url": channel_url,
+        "playlist_start": playlist_start,
         "videos_examined": len(videos),
         "raw_metadata_rows": len(raw_rows),
         "normalized_recipe_rows": len(normalized_rows),
@@ -402,11 +487,13 @@ def main():
     parser.add_argument("--channel-name", default=SOURCE_NAME)
     parser.add_argument("--source-id", default=SOURCE_ID)
     parser.add_argument("--file-prefix", default="your_food_lab")
+    parser.add_argument("--playlist-start", type=int, default=1)
     parser.add_argument("--max-videos", type=int, default=100)
     parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR))
     parser.add_argument("--ingest", action="store_true")
     parser.add_argument("--ingest-path")
     parser.add_argument("--ingest-limit", type=int)
+    parser.add_argument("--use-transcript-fallback", action="store_true")
     args = parser.parse_args()
 
     if args.ingest_path:
@@ -423,8 +510,10 @@ def main():
         channel_url=args.channel_url,
         channel_name=args.channel_name,
         max_videos=args.max_videos,
+        playlist_start=args.playlist_start,
         output_dir=args.output_dir,
         file_prefix=args.file_prefix,
+        use_transcript_fallback=args.use_transcript_fallback,
     )
     _print_summary(summary)
 
@@ -439,6 +528,25 @@ def main():
 
 
 def _print_summary(summary):
+    if isinstance(summary, dict) and "validation_reports" in summary:
+        summary = {
+            "records_found": summary.get("records_found"),
+            "coerced": summary.get("coerced"),
+            "enriched": summary.get("enriched"),
+            "accepted": summary.get("accepted"),
+            "review": summary.get("review"),
+            "loaded": summary.get("loaded"),
+            "rejected": summary.get("rejected"),
+            "dead_letter_count": len(summary.get("dead_letter") or []),
+            "review_queue_count": len(summary.get("review_queue") or []),
+            "validation_error_count": len(summary.get("validation_errors") or []),
+            "validation_report_count": len(summary.get("validation_reports") or []),
+            "ingestion_run_id": summary.get("ingestion_run_id"),
+            "llm_calls_made": summary.get("llm_calls_made", 0),
+            "llm_calls_succeeded": summary.get("llm_calls_succeeded", 0),
+            "llm_cost_usd": summary.get("llm_cost_usd", 0.0),
+        }
+
     print(json.dumps(summary, ensure_ascii=True, default=str))
 
 
