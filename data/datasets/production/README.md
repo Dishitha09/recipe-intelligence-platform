@@ -6,10 +6,15 @@ tables.
 - `real_web_recipes_3883_20260710.csv`: 3,883 real webpage recipes exported
   from PostgreSQL after adding Yummy Tummy Aarthi crawling, validation,
   ingredient-resolution backfill, and pgvector recipe embedding backfill.
+- `real_dataset_recipes_6559_20260712.csv`: 6,559 structured-dataset-attributed
+  Indian recipes exported from PostgreSQL after ingesting the public
+  `kanishk307/IndianFoodDatasetGeneration` Archana's Kitchen dataset plus the
+  earlier local structured dataset rows. Invalid localized/no-ingredient rows
+  were pruned after quality cleanup. Each row has source provenance,
+  ingredients, step count, and full one-line instructions.
 - `real_dataset_recipes_50_20260712.csv`: 50 structured-dataset-attributed
-  recipes exported from PostgreSQL. This includes primary dataset recipes plus
-  deduplicated recipes whose dataset provenance is stored in
-  `recipe_source_tracking`, with full ingredients and one-line instructions.
+  earlier dataset export kept for comparison before the Archana's Kitchen
+  dataset batch.
 - `real_web_recipes_3080_20260709.csv`: earlier 3,080 real webpage export
   from PostgreSQL after Indian Healthy Recipes, Hebbars Kitchen, and Veg
   Recipes of India crawling, validation, ingredient-resolution backfill, and
@@ -30,5 +35,5 @@ Regenerate the CSV with:
 
 ```bash
 python -m services.reports.export_production_web_recipes --output data/datasets/production/real_web_recipes_3883_20260710.csv
-python -m services.reports.export_production_dataset_recipes --output data/datasets/production/real_dataset_recipes_50_20260712.csv
+python -m services.reports.export_production_dataset_recipes --output data/datasets/production/real_dataset_recipes_6559_20260712.csv
 ```
