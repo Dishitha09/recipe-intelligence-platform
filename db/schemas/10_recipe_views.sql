@@ -1,10 +1,11 @@
-DROP VIEW IF EXISTS recipe_with_instructions;
 DROP VIEW IF EXISTS dataset_recipe_provenance;
 DROP VIEW IF EXISTS recipe_state_target_coverage;
+DROP VIEW IF EXISTS recipe_state_coverage;
 DROP VIEW IF EXISTS indian_state_reference;
 DROP VIEW IF EXISTS recipe_instruction_summary;
 DROP VIEW IF EXISTS recipe_instruction_details;
 DROP VIEW IF EXISTS recipe_instructions;
+DROP VIEW IF EXISTS recipe_with_instructions;
 
 
 CREATE OR REPLACE VIEW recipe_with_instructions AS
@@ -187,9 +188,6 @@ GROUP BY
     r.region,
     r.source_type,
     r.source_url;
-
-
-DROP VIEW IF EXISTS recipe_state_coverage;
 
 
 CREATE OR REPLACE VIEW recipe_state_coverage AS

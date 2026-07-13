@@ -2,7 +2,7 @@ from services.ingestion.csv_adapter import CSVAdapter
 from services.ingestion.raw_record import RawRecord
 from services.ingestion.text_adapter import TextAdapter
 from services.preprocessing.field_mapping import FieldMappingRegistry
-from services.preprocessing.schema_coercer import SchemaCoercer
+from services.preprocessing.schema_coercer import CANONICAL_FIELDS, SchemaCoercer
 
 
 MAPPING_FILE = "configs/source_field_mappings.json"
@@ -25,27 +25,10 @@ def test_schema_coercer_outputs_all_canonical_fields_with_unmapped_metadata():
     assert recipe_data["ingredients"][0]["ingredient_name"] == "Rice"
     assert recipe_data["steps"] == []
     assert recipe_data["metadata"]["source_id"] == "csv.default"
-    assert set(recipe_data.keys()) == {
-        "title",
-        "original_title",
-        "translated_title",
-        "description",
-        "original_description",
-        "translated_description",
-        "cuisine",
-        "state",
-        "region",
-        "state_confidence",
-        "state_method",
-        "language",
-        "canonical_recipe_id",
-        "duplicate_score",
-        "ingredients",
-        "steps",
-        "source_type",
-        "source_url",
-        "metadata",
-    }
+    assert set(recipe_data.keys()) == set(CANONICAL_FIELDS)
+    assert recipe_data["servings"] is None
+    assert recipe_data["tags"] == []
+    assert recipe_data["nutrition_info"] == {}
 
 
 def test_field_mapping_config_covers_all_source_types():

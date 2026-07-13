@@ -5,6 +5,13 @@ from pathlib import Path
 
 import pandas as pd
 
+from services.reports.cleanup_non_indian_non_english_recipes import (
+    HINDI_MARKER_RE,
+    HINDI_MOJIBAKE_RE,
+    INDIC_RE,
+    is_indian_cuisine,
+)
+
 
 DEFAULT_INPUT = (
     "data/datasets/external/indian_food_dataset_generation/"
@@ -71,6 +78,28 @@ def split_instruction_steps(value):
     return " | ".join(steps)
 
 
+def is_source_truth_english_indian(row, title, ingredients, steps, source_url):
+    text_blob = " ".join(
+        [
+            title,
+            ingredients,
+            steps,
+            source_url,
+            clean_text(row.get("RecipeName")),
+            clean_text(row.get("Instructions")),
+            clean_text(row.get("TranslatedInstructions")),
+        ]
+    )
+
+    if HINDI_MARKER_RE.search(f"{title} {source_url}"):
+        return False
+
+    if HINDI_MOJIBAKE_RE.search(text_blob) or INDIC_RE.search(text_blob):
+        return False
+
+    return is_indian_cuisine(clean_text(row.get("Cuisine")))
+
+
 def normalize_archanas_dataset(input_path=DEFAULT_INPUT, output_path=DEFAULT_OUTPUT):
     input_path = Path(input_path)
     output_path = Path(output_path)
@@ -92,6 +121,15 @@ def normalize_archanas_dataset(input_path=DEFAULT_INPUT, output_path=DEFAULT_OUT
         source_url = clean_text(row.get("URL"))
 
         if not title or not ingredients or not steps or not source_url:
+            continue
+
+        if not is_source_truth_english_indian(
+            row,
+            title,
+            ingredients,
+            steps,
+            source_url,
+        ):
             continue
 
         rows.append(

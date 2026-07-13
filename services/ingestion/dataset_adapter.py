@@ -44,7 +44,7 @@ class DatasetAdapter(SourceAdapter):
 
             self.file_path
 
-        )
+        ).fillna("")
 
         self.raw_records = []
 

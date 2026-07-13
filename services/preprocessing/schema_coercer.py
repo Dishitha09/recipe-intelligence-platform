@@ -18,18 +18,55 @@ CANONICAL_FIELDS = [
     "description",
     "original_description",
     "translated_description",
+    "nutrition_info",
+    "tags",
+    "servings",
+    "difficulty_level",
+    "youtube_url",
+    "image_url",
+    "course",
     "cuisine",
     "state",
     "region",
     "state_confidence",
     "state_method",
     "language",
+    "diet",
+    "spice_level",
+    "complexity",
+    "budget_band",
+    "diet_tags",
+    "allergen_tags",
+    "cuisines",
+    "meal_types",
+    "dish_types",
+    "texture",
+    "prep_time_min",
+    "cook_time_min",
+    "total_time_min",
+    "passive_time_min",
     "canonical_recipe_id",
     "duplicate_score",
+    "estimated_cost_per_serving",
+    "popularity_score",
+    "side_category",
+    "meal_role",
+    "dish_family",
+    "health_tags",
+    "efficiency_tags",
+    "experience_tags",
+    "cost_tier",
+    "festival_tags",
     "ingredients",
     "steps",
     "source_type",
     "source_url",
+    "source",
+    "owner_code",
+    "owner_name",
+    "created_by",
+    "is_public",
+    "is_active",
     "metadata",
 ]
 
@@ -101,6 +138,11 @@ class SchemaCoercer:
             if recipe_data.get(key) is None:
                 recipe_data[key] = value
 
+        for field in CANONICAL_FIELDS:
+            if recipe_data.get(field) is None and field in raw_content:
+                recipe_data[field] = raw_content[field]
+                mapped_source_keys.add(field)
+
         recipe_data["source_type"] = mapping.defaults.get(
             "source_type",
             raw_record.source_type,
@@ -129,6 +171,9 @@ class SchemaCoercer:
 
         if images:
             recipe_data["metadata"]["images"] = images
+
+        if images and not recipe_data.get("image_url"):
+            recipe_data["image_url"] = images[0]
 
         return self._canonicalize(recipe_data)
 
@@ -316,14 +361,52 @@ class SchemaCoercer:
             "description",
             "original_description",
             "translated_description",
+            "difficulty_level",
+            "youtube_url",
+            "image_url",
             "cuisine",
             "state",
             "region",
             "language",
+            "diet",
+            "spice_level",
+            "complexity",
+            "budget_band",
+            "side_category",
+            "meal_role",
+            "dish_family",
+            "cost_tier",
+            "source",
             "source_type",
             "source_url",
+            "owner_code",
+            "owner_name",
+            "created_by",
         ]:
             canonical[field] = clean_text(canonical.get(field))
+
+        for field in [
+            "tags",
+            "course",
+            "diet_tags",
+            "allergen_tags",
+            "cuisines",
+            "meal_types",
+            "dish_types",
+            "texture",
+            "health_tags",
+            "efficiency_tags",
+            "experience_tags",
+            "festival_tags",
+        ]:
+            canonical[field] = self._as_list(canonical.get(field))
+
+        canonical["nutrition_info"] = canonical.get("nutrition_info") or {}
+        canonical["is_public"] = bool(canonical.get("is_public") or False)
+        canonical["is_active"] = (
+            True if canonical.get("is_active") is None
+            else bool(canonical.get("is_active"))
+        )
 
         canonical["ingredients"] = [
             Ingredient(**ingredient).model_dump()

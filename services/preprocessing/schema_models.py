@@ -64,6 +64,20 @@ class Recipe(BaseModel):
 
     translated_description: Optional[str] = None
 
+    nutrition_info: Optional[Dict[str, Any]] = None
+
+    tags: List[str] = Field(default_factory=list)
+
+    servings: Optional[int] = None
+
+    difficulty_level: Optional[str] = None
+
+    youtube_url: Optional[str] = None
+
+    image_url: Optional[str] = None
+
+    course: List[str] = Field(default_factory=list)
+
     # Recipe Classification
 
     cuisine: Optional[str] = None
@@ -78,11 +92,59 @@ class Recipe(BaseModel):
 
     language: Optional[str] = None
 
+    diet: Optional[str] = None
+
+    spice_level: Optional[str] = None
+
+    complexity: Optional[str] = None
+
+    budget_band: Optional[str] = None
+
+    diet_tags: List[str] = Field(default_factory=list)
+
+    allergen_tags: List[str] = Field(default_factory=list)
+
+    cuisines: List[str] = Field(default_factory=list)
+
+    meal_types: List[str] = Field(default_factory=list)
+
+    dish_types: List[str] = Field(default_factory=list)
+
+    texture: List[str] = Field(default_factory=list)
+
+    prep_time_min: Optional[int] = None
+
+    cook_time_min: Optional[int] = None
+
+    total_time_min: Optional[int] = None
+
+    passive_time_min: Optional[int] = None
+
     # Duplicate Detection
 
     canonical_recipe_id: Optional[int] = None
 
     duplicate_score: Optional[float] = None
+
+    estimated_cost_per_serving: Optional[float] = None
+
+    popularity_score: Optional[float] = None
+
+    side_category: Optional[str] = None
+
+    meal_role: Optional[str] = None
+
+    dish_family: Optional[str] = None
+
+    health_tags: List[str] = Field(default_factory=list)
+
+    efficiency_tags: List[str] = Field(default_factory=list)
+
+    experience_tags: List[str] = Field(default_factory=list)
+
+    cost_tier: Optional[str] = None
+
+    festival_tags: List[str] = Field(default_factory=list)
 
     # Ingredients
 
@@ -97,5 +159,17 @@ class Recipe(BaseModel):
     source_type: str
 
     source_url: Optional[str] = None
+
+    source: Optional[str] = None
+
+    owner_code: Optional[str] = None
+
+    owner_name: Optional[str] = None
+
+    created_by: Optional[str] = None
+
+    is_public: bool = False
+
+    is_active: bool = True
 
     metadata: Optional[Dict[str, Any]] = None
