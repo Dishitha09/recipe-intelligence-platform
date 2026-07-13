@@ -8,6 +8,7 @@ non-web source adapters:
 - `datasets/`: structured dataset CSV rows.
 - `images/`: OCR sidecar text for a recipe card image.
 - `audio/`: transcript sidecar text for an audio source.
+- `text/`: plain-text recipe files.
 - `csv/`: manual CSV upload rows.
 
 Run the ingestion proof with:

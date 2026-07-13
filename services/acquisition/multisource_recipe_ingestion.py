@@ -14,6 +14,7 @@ from services.ingestion.csv_adapter import CSVAdapter
 from services.ingestion.dataset_adapter import DatasetAdapter
 from services.ingestion.image_adapter import ImageAdapter
 from services.ingestion.pdf_adapter import PDFAdapter
+from services.ingestion.text_adapter import TextAdapter
 from services.ingestion.youtube_adapter import YouTubeAdapter
 from services.pipeline.recipe_pipeline import RecipePipeline
 
@@ -159,6 +160,21 @@ def build_sources():
                     "source_url": (
                         "file://data/datasets/multisource/audio/"
                         "karnataka_lemon_rice.mp3"
+                    ),
+                },
+            ),
+        },
+        {
+            "label": "plain text",
+            "source_id": "text.default",
+            "source_type": "text",
+            "source_name": "tamil_tomato_rasam.txt",
+            "adapter": TextAdapter(
+                str(ROOT / "text" / "tamil_tomato_rasam.txt"),
+                config={
+                    "source_url": (
+                        "file://data/datasets/multisource/text/"
+                        "tamil_tomato_rasam.txt"
                     ),
                 },
             ),
