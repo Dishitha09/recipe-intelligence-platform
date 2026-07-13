@@ -36,6 +36,7 @@ data/datasets/generated/*.partial.csv
 data/datasets/generated/scrapy_crawl_output*.csv
 data/datasets/generated/web_*.csv
 data/datasets/generated/*_chunk_*.csv
+data/datasets/pdf_scrape/raw_text/
 
 # Local databases
 *.sqlite

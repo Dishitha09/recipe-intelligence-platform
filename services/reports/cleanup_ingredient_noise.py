@@ -12,7 +12,10 @@ NOISE_PATTERNS = (
     r"^\s*[-–—()]+\s*$",
     r"^\s*\(?optional\)?\s*$",
     r"^\s*[0-9]+(?:\s*[./-]\s*[0-9]+)?\s*$",
+    r"^\s*[0-9]+\s+[0-9]+(?:\s*(?:tsp|tbsp|teaspoons?|tablespoons?|cups?|kg|g|ml|inch))?\s*$",
     r"^\s*(?:[0-9]+(?:\s*[./-]\s*[0-9]+)?\s*)?(?:tsp|tbsp|teaspoons?|tablespoons?|cups?|nos?|pcs|pieces?)\s*$",
+    r"^\s*to\s+[0-9]+\s*$",
+    r"^\s*of\s+[0-9]+\s+[0-9]+\s+lemons?\s*$",
 )
 
 

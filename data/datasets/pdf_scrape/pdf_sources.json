@@ -1,0 +1,218 @@
+[
+  {
+    "identifier": "1indiancookery-1887",
+    "title": "1Indiancookery 1887",
+    "pdf_url": "https://archive.org/download/1indiancookery-1887/1indiancookery-1887.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\1indiancookery-1887.txt",
+    "parsed_recipe_count": 77,
+    "local_parse": true
+  },
+  {
+    "identifier": "b2152824x",
+    "title": "B2152824X",
+    "pdf_url": "https://archive.org/download/b2152824x/b2152824x.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\b2152824x.txt",
+    "parsed_recipe_count": 36,
+    "local_parse": true
+  },
+  {
+    "identifier": "b21528378",
+    "title": "B21528378",
+    "pdf_url": "https://archive.org/download/b21528378/b21528378.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\b21528378.txt",
+    "parsed_recipe_count": 24,
+    "local_parse": true
+  },
+  {
+    "identifier": "b21528731",
+    "title": "B21528731",
+    "pdf_url": "https://archive.org/download/b21528731/b21528731.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\b21528731.txt",
+    "parsed_recipe_count": 10,
+    "local_parse": true
+  },
+  {
+    "identifier": "b21529942",
+    "title": "B21529942",
+    "pdf_url": "https://archive.org/download/b21529942/b21529942.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\b21529942.txt",
+    "parsed_recipe_count": 50,
+    "local_parse": true
+  },
+  {
+    "identifier": "b28047898",
+    "title": "Anglo-Indian cookery at home : a short treatise for returned exiles",
+    "pdf_url": "https://archive.org/download/b28047898/b28047898.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\b28047898.txt",
+    "parsed_recipe_count": 18,
+    "local_parse": true
+  },
+  {
+    "identifier": "b28055524",
+    "title": "B28055524",
+    "pdf_url": "https://archive.org/download/b28055524/b28055524.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\b28055524.txt",
+    "parsed_recipe_count": 44,
+    "local_parse": true
+  },
+  {
+    "identifier": "b28055597",
+    "title": "B28055597",
+    "pdf_url": "https://archive.org/download/b28055597/b28055597.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\b28055597.txt",
+    "parsed_recipe_count": 52,
+    "local_parse": true
+  },
+  {
+    "identifier": "b28119617",
+    "title": "B28119617",
+    "pdf_url": "https://archive.org/download/b28119617/b28119617.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\b28119617.txt",
+    "parsed_recipe_count": 4,
+    "local_parse": true
+  },
+  {
+    "identifier": "b29293832",
+    "title": "B29293832",
+    "pdf_url": "https://archive.org/download/b29293832/b29293832.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\b29293832.txt",
+    "parsed_recipe_count": 54,
+    "local_parse": true
+  },
+  {
+    "identifier": "cu31924059630735",
+    "title": "Indian cookery and confectionery (407 recipes)",
+    "pdf_url": "https://archive.org/download/cu31924059630735/cu31924059630735.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\cu31924059630735.txt",
+    "parsed_recipe_count": 45,
+    "local_parse": true
+  },
+  {
+    "identifier": "dli.ministry.01542",
+    "title": "Dli.Ministry.01542",
+    "pdf_url": "https://archive.org/download/dli.ministry.01542/dli.ministry.01542.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\dli.ministry.01542.txt",
+    "parsed_recipe_count": 13,
+    "local_parse": true
+  },
+  {
+    "identifier": "dli.ministry.03112",
+    "title": "Indian cookery : for use in all countries",
+    "pdf_url": "https://archive.org/download/dli.ministry.03112/E05334_Indian_Cookery.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\dli.ministry.03112.txt",
+    "parsed_recipe_count": 138,
+    "local_parse": true
+  },
+  {
+    "identifier": "dli.ministry.07262",
+    "title": "Wyvern\u2019s Indian cookery book",
+    "pdf_url": "https://archive.org/download/dli.ministry.07262/E05326_Indian_cookery_Book.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\dli.ministry.07262.txt",
+    "parsed_recipe_count": 10,
+    "local_parse": true
+  },
+  {
+    "identifier": "dli.ministry.11684",
+    "title": "Dli.Ministry.11684",
+    "pdf_url": "https://archive.org/download/dli.ministry.11684/dli.ministry.11684.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\dli.ministry.11684.txt",
+    "parsed_recipe_count": 11,
+    "local_parse": true
+  },
+  {
+    "identifier": "dli.ministry.11685",
+    "title": "Dli.Ministry.11685",
+    "pdf_url": "https://archive.org/download/dli.ministry.11685/dli.ministry.11685.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\dli.ministry.11685.txt",
+    "parsed_recipe_count": 21,
+    "local_parse": true
+  },
+  {
+    "identifier": "in.ernet.dli.2015.150459",
+    "title": "In.Ernet.Dli.2015.150459",
+    "pdf_url": "https://archive.org/download/in.ernet.dli.2015.150459/in.ernet.dli.2015.150459.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\in.ernet.dli.2015.150459.txt",
+    "parsed_recipe_count": 116,
+    "local_parse": true
+  },
+  {
+    "identifier": "in.ernet.dli.2015.221260",
+    "title": "In.Ernet.Dli.2015.221260",
+    "pdf_url": "https://archive.org/download/in.ernet.dli.2015.221260/in.ernet.dli.2015.221260.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\in.ernet.dli.2015.221260.txt",
+    "parsed_recipe_count": 9,
+    "local_parse": true
+  },
+  {
+    "identifier": "in.ernet.dli.2015.221261",
+    "title": "Indian Cookery",
+    "pdf_url": "https://archive.org/download/in.ernet.dli.2015.221261/2015.221261.Indian-Cookery.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\in.ernet.dli.2015.221261.txt",
+    "parsed_recipe_count": 81,
+    "local_parse": true
+  },
+  {
+    "identifier": "Indian_Cookery",
+    "title": "Indian Cookery",
+    "pdf_url": "https://archive.org/download/Indian_Cookery/Indian_Cookery.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\Indian_Cookery.txt",
+    "parsed_recipe_count": 22,
+    "local_parse": true
+  },
+  {
+    "identifier": "indiancookeryboo00unse",
+    "title": "Indiancookeryboo00Unse",
+    "pdf_url": "https://archive.org/download/indiancookeryboo00unse/indiancookeryboo00unse.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\indiancookeryboo00unse.txt",
+    "parsed_recipe_count": 38,
+    "local_parse": true
+  },
+  {
+    "identifier": "indiandomestice00riddgoog",
+    "title": "Indiandomestice00Riddgoog",
+    "pdf_url": "https://archive.org/download/indiandomestice00riddgoog/indiandomestice00riddgoog.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\indiandomestice00riddgoog.txt",
+    "parsed_recipe_count": 56,
+    "local_parse": true
+  },
+  {
+    "identifier": "tdl.47286-culinary-jottings-for-madras-a-treatise-in-thirty-chapters-on-reformed",
+    "title": "Tdl.47286 Culinary Jottings For Madras A Treatise In Thirty Chapters On Reformed",
+    "pdf_url": "https://archive.org/download/tdl.47286-culinary-jottings-for-madras-a-treatise-in-thirty-chapters-on-reformed/tdl.47286-culinary-jottings-for-madras-a-treatise-in-thirty-chapters-on-reformed.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\tdl.47286-culinary-jottings-for-madras-a-treatise-in-thirty-chapters-on-reformed.txt",
+    "parsed_recipe_count": 0,
+    "local_parse": true
+  },
+  {
+    "identifier": "tdl.47311-indian-domestic-economy-and-receipt-book-comprising-numerous-direction",
+    "title": "Tdl.47311 Indian Domestic Economy And Receipt Book Comprising Numerous Direction",
+    "pdf_url": "https://archive.org/download/tdl.47311-indian-domestic-economy-and-receipt-book-comprising-numerous-direction/tdl.47311-indian-domestic-economy-and-receipt-book-comprising-numerous-direction.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\tdl.47311-indian-domestic-economy-and-receipt-book-comprising-numerous-direction.txt",
+    "parsed_recipe_count": 0,
+    "local_parse": true
+  },
+  {
+    "identifier": "tdl.47333-culinary-jottings-for-madras-a-treatise-in-thirty-chapters-on-reformed",
+    "title": "Tdl.47333 Culinary Jottings For Madras A Treatise In Thirty Chapters On Reformed",
+    "pdf_url": "https://archive.org/download/tdl.47333-culinary-jottings-for-madras-a-treatise-in-thirty-chapters-on-reformed/tdl.47333-culinary-jottings-for-madras-a-treatise-in-thirty-chapters-on-reformed.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\tdl.47333-culinary-jottings-for-madras-a-treatise-in-thirty-chapters-on-reformed.txt",
+    "parsed_recipe_count": 0,
+    "local_parse": true
+  },
+  {
+    "identifier": "the-indian-cookery-book-a-practical-handbook-to-the-kitchen-in-india-1880",
+    "title": "The Indian Cookery Book A Practical Handbook To The Kitchen In India 1880",
+    "pdf_url": "https://archive.org/download/the-indian-cookery-book-a-practical-handbook-to-the-kitchen-in-india-1880/the-indian-cookery-book-a-practical-handbook-to-the-kitchen-in-india-1880.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\the-indian-cookery-book-a-practical-handbook-to-the-kitchen-in-india-1880.txt",
+    "parsed_recipe_count": 39,
+    "local_parse": true
+  },
+  {
+    "identifier": "TheIndianCookeryBook",
+    "title": "Theindiancookerybook",
+    "pdf_url": "https://archive.org/download/TheIndianCookeryBook/TheIndianCookeryBook.pdf",
+    "local_text_path": "data\\datasets\\pdf_scrape\\raw_text\\TheIndianCookeryBook.txt",
+    "parsed_recipe_count": 32,
+    "local_parse": true
+  }
+]
