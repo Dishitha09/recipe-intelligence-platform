@@ -1,0 +1,137 @@
+{
+  "ingredient_rows": 135411,
+  "resolved_rows": 130085,
+  "unresolved_rows": 5326,
+  "resolution_rate": 0.9607,
+  "llm_resolved_rows": 0,
+  "llm_escalation_rate": 0.0,
+  "rows_with_raw_ingredient_name": 135411,
+  "hnsw_indexes": 2,
+  "top_unresolved": [
+    {
+      "ingredient_name": "kashmiri red chilli powder lal mirch powder",
+      "unit": "tsp",
+      "row_count": 30
+    },
+    {
+      "ingredient_name": "Coriander Leaves - a small bunch finely chopped",
+      "unit": null,
+      "row_count": 28
+    },
+    {
+      "ingredient_name": "Cumin Seeds Jeerakam - 1 tsp",
+      "unit": null,
+      "row_count": 21
+    },
+    {
+      "ingredient_name": "Mustard Seeds Kaduku - 1 tsp",
+      "unit": null,
+      "row_count": 17
+    },
+    {
+      "ingredient_name": "Chilli Powder - 1 tsp",
+      "unit": null,
+      "row_count": 13
+    },
+    {
+      "ingredient_name": "Salt - 1 2 tsp",
+      "unit": null,
+      "row_count": 13
+    },
+    {
+      "ingredient_name": "All Purpose Flour Maida - 1 cup",
+      "unit": null,
+      "row_count": 12
+    },
+    {
+      "ingredient_name": "Turmeric Powder Manjal Podi - 1 tsp",
+      "unit": null,
+      "row_count": 12
+    },
+    {
+      "ingredient_name": "Vanilla Essence - 1 tsp",
+      "unit": null,
+      "row_count": 12
+    },
+    {
+      "ingredient_name": "Vanilla Extract - 1 tsp",
+      "unit": null,
+      "row_count": 12
+    },
+    {
+      "ingredient_name": "Oil - 1 tblspn",
+      "unit": null,
+      "row_count": 11
+    },
+    {
+      "ingredient_name": "Sugar - 1 tsp",
+      "unit": null,
+      "row_count": 11
+    },
+    {
+      "ingredient_name": "Turmeric Powder - 1 tsp",
+      "unit": null,
+      "row_count": 11
+    },
+    {
+      "ingredient_name": "- Salt- 1 tsp",
+      "unit": null,
+      "row_count": 10
+    },
+    {
+      "ingredient_name": "Egg - 1",
+      "unit": null,
+      "row_count": 10
+    },
+    {
+      "ingredient_name": "Milk - 1 2 cup",
+      "unit": null,
+      "row_count": 10
+    },
+    {
+      "ingredient_name": "Oil - 1 tsp",
+      "unit": null,
+      "row_count": 10
+    },
+    {
+      "ingredient_name": "Sugar - 1 2 cup",
+      "unit": null,
+      "row_count": 10
+    },
+    {
+      "ingredient_name": "Sugar - 1 cup",
+      "unit": null,
+      "row_count": 10
+    },
+    {
+      "ingredient_name": "Water - 1 cup",
+      "unit": null,
+      "row_count": 10
+    },
+    {
+      "ingredient_name": "Drumstick - cut into 2 inch pieces",
+      "unit": null,
+      "row_count": 9
+    },
+    {
+      "ingredient_name": "Eggs - 2",
+      "unit": null,
+      "row_count": 9
+    },
+    {
+      "ingredient_name": "Onion - 1 chopped finely",
+      "unit": null,
+      "row_count": 9
+    },
+    {
+      "ingredient_name": "Cumin Seeds - 1 tsp",
+      "unit": null,
+      "row_count": 8
+    },
+    {
+      "ingredient_name": "Drumstick - cut into 1 inch pieces",
+      "unit": null,
+      "row_count": 8
+    }
+  ]
+}

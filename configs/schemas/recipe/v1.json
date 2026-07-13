@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://shopconnect.local/schemas/recipe/v1.json",
+  "title": "ShopConnect Canonical Recipe",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "title",
+    "ingredients",
+    "steps",
+    "source_type"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "v1",
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": ["string", "null"]
+    },
+    "nutrition_info": {
+      "type": ["object", "null"]
+    },
+    "tags": {
+      "type": "array"
+    },
+    "servings": {
+      "type": ["integer", "null"]
+    },
+    "difficulty_level": {
+      "type": ["string", "null"]
+    },
+    "youtube_url": {
+      "type": ["string", "null"]
+    },
+    "image_url": {
+      "type": ["string", "null"]
+    },
+    "course": {
+      "type": "array"
+    },
+    "cuisine": {
+      "type": ["string", "null"]
+    },
+    "state": {
+      "type": ["string", "null"]
+    },
+    "region": {
+      "type": ["string", "null"]
+    },
+    "language": {
+      "type": ["string", "null"]
+    },
+    "diet": {
+      "type": ["string", "null"]
+    },
+    "cuisines": {
+      "type": "array"
+    },
+    "meal_types": {
+      "type": "array"
+    },
+    "dish_types": {
+      "type": "array"
+    },
+    "prep_time_min": {
+      "type": ["integer", "null"]
+    },
+    "cook_time_min": {
+      "type": ["integer", "null"]
+    },
+    "total_time_min": {
+      "type": ["integer", "null"]
+    },
+    "ingredients": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["ingredient_name"],
+        "properties": {
+          "ingredient_name": {"type": "string"},
+          "quantity": {"type": ["number", "null"]},
+          "unit": {"type": ["string", "null"]},
+          "canonical_name": {"type": ["string", "null"]},
+          "master_ingredient_id": {"type": ["integer", "null"]},
+          "canonical_quantity": {"type": ["number", "null"]},
+          "canonical_unit": {"type": ["string", "null"]},
+          "enrichment_flags": {"type": "array"}
+        }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["step_number", "instruction"],
+        "properties": {
+          "step_number": {"type": "integer"},
+          "instruction": {"type": "string"}
+        }
+      }
+    },
+    "source_type": {
+      "type": "string"
+    },
+    "source_url": {
+      "type": ["string", "null"]
+    },
+    "source": {
+      "type": ["string", "null"]
+    },
+    "metadata": {
+      "type": ["object", "null"]
+    }
+  }
+}

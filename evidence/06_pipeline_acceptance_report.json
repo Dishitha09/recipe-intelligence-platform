@@ -1,0 +1,102 @@
+{
+  "summary": {
+    "recipe_count": 9932,
+    "distinct_source_urls": 9931,
+    "missing_titles": 0,
+    "recipes_missing_ingredients": 0,
+    "recipes_missing_steps": 0,
+    "ingredient_rows": 135411,
+    "resolved_ingredient_rows": 130085,
+    "llm_resolved_rows": 0,
+    "invalid_canonical_unit_rows": 0,
+    "density_rows": 0,
+    "validation_reports": 13121,
+    "accepted_validation_reports": 13121,
+    "critical_catalogue_failures": 0,
+    "hnsw_indexes": 2,
+    "ingredient_resolution_rate": 0.9607,
+    "llm_escalation_rate": 0.0,
+    "validation_acceptance_rate": 1.0,
+    "registered_adapter_types": [
+      "audio",
+      "csv",
+      "dataset",
+      "image",
+      "pdf",
+      "scrapy",
+      "text",
+      "web",
+      "youtube"
+    ],
+    "configured_source_types": [
+      "csv",
+      "image",
+      "pdf",
+      "web",
+      "youtube"
+    ]
+  },
+  "acceptance": {
+    "PS-1": {
+      "description": "7/7 source adapter types operational and registered",
+      "passed": true,
+      "evidence": {
+        "registered_adapter_type_count": 9,
+        "registered_adapter_types": [
+          "audio",
+          "csv",
+          "dataset",
+          "image",
+          "pdf",
+          "scrapy",
+          "text",
+          "web",
+          "youtube"
+        ]
+      }
+    },
+    "PS-2": {
+      "description": "No missing required recipe fields after coercion/load",
+      "passed": true,
+      "evidence": {
+        "missing_titles": 0,
+        "recipes_missing_ingredients": 0,
+        "recipes_missing_steps": 0
+      }
+    },
+    "PS-3": {
+      "description": "Ingredient resolution target >= 94%; LLM escalation < 10%",
+      "passed": true,
+      "evidence": {
+        "ingredient_resolution_rate": 0.9607,
+        "llm_escalation_rate": 0.0,
+        "hnsw_indexes": 2
+      }
+    },
+    "PS-4": {
+      "description": "Canonical unit rows stay inside accepted unit set",
+      "passed": true,
+      "evidence": {
+        "invalid_canonical_unit_rows": 0,
+        "canonical_units": [
+          "g",
+          "ml",
+          "tsp",
+          "tbsp",
+          "cup",
+          "count"
+        ],
+        "density_rows": 0
+      }
+    },
+    "PS-5": {
+      "description": "Validation acceptance >= 85%; no critical catalogue failures",
+      "passed": true,
+      "evidence": {
+        "validation_acceptance_rate": 1.0,
+        "critical_catalogue_failures": 0,
+        "validation_reports": 13121
+      }
+    }
+  }
+}

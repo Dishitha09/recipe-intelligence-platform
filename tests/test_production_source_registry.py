@@ -33,7 +33,7 @@ def test_production_source_registry_targets_large_scale_volume():
         for source in payload["sources"]
     )
 
-    assert payload["pipeline"]["target_recipe_count"] == 10000
+    assert payload["pipeline"]["target_recipe_count"] == 20000
     assert expected_total >= payload["pipeline"]["target_recipe_count"]
 
 

@@ -1,7 +1,9 @@
 import json
 import os
+import re
 from datetime import datetime, timezone
 
+from services.database.fingerprints import recipe_fingerprints
 from services.enrichment.uom.ingredient_type import is_liquid
 from services.validation.severity import Severity
 from services.validation.validation_result import (
@@ -11,9 +13,16 @@ from services.validation.validation_result import (
 
 
 class ValidationEngine:
-    def __init__(self, config_path="configs/validation_checks.json"):
+    def __init__(
+        self,
+        config_path="configs/validation_checks.json",
+        duplicate_lookup=None,
+        image_url_checker=None,
+    ):
         self.config_path = config_path
         self.check_config = self._load_config(config_path)
+        self.duplicate_lookup = duplicate_lookup
+        self.image_url_checker = image_url_checker
         self.checks = [
             ("V01", "Schema Completeness", Severity.CRITICAL, "REJECT", self._v01_schema_completeness),
             ("V02", "Ingredient Count Bounds", Severity.CRITICAL, "REJECT", self._v02_ingredient_count_bounds),
@@ -172,11 +181,11 @@ class ValidationEngine:
 
     def _v02_ingredient_count_bounds(self, recipe):
         count = len(recipe.ingredients or [])
-        passed = 1 <= count <= 100
+        passed = 2 <= count <= 100
 
         return (
             passed,
-            "Ingredient count in bounds" if passed else "Ingredient count outside 1-100",
+            "Ingredient count in bounds" if passed else "Ingredient count outside 2-100",
             {"ingredient_count": count},
         )
 
@@ -364,7 +373,17 @@ class ValidationEngine:
 
     def _v09_duplicate_guard(self, recipe):
         duplicate_score = recipe.duplicate_score or 0.0
-        passed = recipe.canonical_recipe_id is None and duplicate_score < 0.95
+        fingerprints = recipe_fingerprints(recipe)
+        duplicate = None
+
+        if self.duplicate_lookup is not None:
+            duplicate = self.duplicate_lookup(fingerprints, recipe)
+
+        passed = (
+            recipe.canonical_recipe_id is None
+            and duplicate_score < 0.95
+            and duplicate is None
+        )
 
         return (
             passed,
@@ -372,25 +391,75 @@ class ValidationEngine:
             {
                 "canonical_recipe_id": recipe.canonical_recipe_id,
                 "duplicate_score": duplicate_score,
+                "content_hash": fingerprints["content_hash"],
+                "source_url_hash": fingerprints["source_url_hash"],
+                "duplicate": duplicate,
             },
         )
 
     def _v10_language_consistency(self, recipe):
         language = (recipe.language or "english").lower()
-        passed = language in {"english", "en"}
+        text = " ".join(
+            [
+                recipe.title or "",
+                recipe.description or "",
+                " ".join(
+                    step.instruction
+                    for step in recipe.steps or []
+                    if step.instruction
+                ),
+            ]
+        )
+        untranslated_fragments = self._untranslated_fragments(text)
+        passed = language in {"english", "en"} and not untranslated_fragments
 
         return (
             passed,
             "Language consistency OK" if passed else "Non-English content requires translation",
-            {"language": recipe.language},
+            {
+                "language": recipe.language,
+                "untranslated_fragments": untranslated_fragments,
+            },
         )
 
     def _v11_image_availability(self, recipe):
-        images = (recipe.metadata or {}).get("images") or []
-        passed = len(images) >= 1
+        metadata = recipe.metadata or {}
+        images = metadata.get("images") or []
+        image_urls = [recipe.image_url] if recipe.image_url else []
+        image_urls.extend(images)
+        image_urls = [url for url in image_urls if url]
+        status_code = metadata.get("image_status_code")
+        status_ok = status_code in (None, 200)
+        checker_ok = True
+
+        if self.image_url_checker is not None and image_urls:
+            checker_ok = bool(self.image_url_checker(image_urls[0]))
+
+        passed = len(image_urls) >= 1 and status_ok and checker_ok
 
         return (
             passed,
-            "Image availability OK" if passed else "No image available",
-            {"image_count": len(images)},
+            "Image availability OK" if passed else "No reachable image available",
+            {
+                "image_count": len(image_urls),
+                "image_status_code": status_code,
+                "url_checker_passed": checker_ok,
+            },
         )
+
+    def _untranslated_fragments(self, text):
+        fragments = []
+
+        if re.search(r"[\u0900-\u097F\u0980-\u0D7F]", text):
+            fragments.append("indic_script")
+
+        markers = re.findall(
+            r"\b(?:recipe in hindi|ki recipe|ka recipe|ke recipe|"
+            r"podi|pachadi|poriyal|sabzi)\b",
+            text.lower(),
+        )
+
+        if len(markers) > 2:
+            fragments.append("repeated_transliteration_markers")
+
+        return fragments

@@ -59,6 +59,9 @@ class PDFAdapter(SourceAdapter):
 
             raw_text = "\n".join(page_text).strip()
 
+            if not raw_text:
+                extraction_status = "pdf_ocr_required"
+
         title = self.config.get("title") or _first_nonempty_line(raw_text)
         source_url = self.config.get("source_url")
 
@@ -74,6 +77,9 @@ class PDFAdapter(SourceAdapter):
                     "raw_path": self.file_path,
                     "page_count": len(page_text),
                     "extraction_status": extraction_status,
+                    "fallback_flags": [extraction_status]
+                    if extraction_status == "pdf_ocr_required"
+                    else [],
                     "text_path": text_path,
                 }
             )

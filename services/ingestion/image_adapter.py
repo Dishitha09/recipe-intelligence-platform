@@ -52,7 +52,14 @@ class ImageAdapter(SourceAdapter):
         else:
             import pytesseract
 
-            raw_text = pytesseract.image_to_string(image).strip()
+            try:
+                raw_text = pytesseract.image_to_string(image).strip()
+            except Exception:
+                raw_text = ""
+                ocr_status = "image_ocr_failed"
+
+            if not raw_text and ocr_status == "tesseract":
+                ocr_status = "image_ocr_failed"
 
         title = self.config.get("title") or _first_nonempty_line(raw_text)
         source_url = self.config.get("source_url")
@@ -69,6 +76,9 @@ class ImageAdapter(SourceAdapter):
                     "raw_path": self.file_path,
                     "image_size": image.size,
                     "ocr_status": ocr_status,
+                    "fallback_flags": [ocr_status]
+                    if ocr_status == "image_ocr_failed"
+                    else [],
                     "ocr_text_path": ocr_text_path,
                 }
             )

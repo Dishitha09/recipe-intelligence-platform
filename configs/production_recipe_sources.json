@@ -231,7 +231,7 @@
       "config": {
         "priority": 3,
         "source_group": "structured_html",
-        "expected_volume": 300,
+        "expected_volume": 1000,
         "quality": "medium",
         "parser": "html_recipe_heuristics",
         "crawl_delay_seconds": 5,
@@ -415,7 +415,7 @@
       "config": {
         "priority": 4,
         "source_group": "video_transcript",
-        "expected_volume": 200,
+        "expected_volume": 1000,
         "quality": "medium",
         "channel_url": "https://www.youtube.com/user/BraaiMaster",
         "languages": ["en", "hi"],
@@ -432,7 +432,7 @@
       "config": {
         "priority": 5,
         "source_group": "pdf_ocr",
-        "expected_volume": 100,
+        "expected_volume": 500,
         "quality": "authoritative",
         "extraction": "pdf_text_or_tesseract_ocr",
         "idempotency": "file_hash_and_page_number"
@@ -447,7 +447,7 @@
       "config": {
         "priority": 5,
         "source_group": "pdf_ocr",
-        "expected_volume": 300,
+        "expected_volume": 500,
         "quality": "medium",
         "extraction": "pdf_text_or_tesseract_ocr",
         "idempotency": "file_hash_and_page_number"

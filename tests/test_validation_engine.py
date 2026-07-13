@@ -75,7 +75,7 @@ def test_validation_rejects_critical_schema_failures():
     )
 
 
-def test_validation_allows_single_ingredient_preparations():
+def test_validation_rejects_single_ingredient_preparations():
     recipe = build_recipe(
         ingredients=[
             Ingredient(
@@ -94,8 +94,58 @@ def test_validation_allows_single_ingredient_preparations():
 
     report = ValidationEngine().validate(recipe)
 
-    assert not any(
+    assert report.status == "REJECTED"
+    assert any(
         result.check_id == "V02" and not result.passed
+        for result in report
+    )
+
+
+def test_validation_detects_duplicate_fingerprint():
+    recipe = build_recipe()
+
+    report = ValidationEngine(
+        duplicate_lookup=lambda fingerprints, recipe: {
+            "recipe_id": 123,
+            "match": "content_hash",
+        }
+    ).validate(recipe)
+
+    assert report.status == "REJECTED"
+    assert any(
+        result.check_id == "V09" and not result.passed
+        for result in report
+    )
+
+
+def test_validation_detects_untranslated_fragments():
+    recipe = build_recipe(
+        title="Aloo Gobi की recipe",
+        steps=[
+            RecipeStep(
+                step_number=1,
+                instruction="Mix ingredients and cook.",
+            )
+        ],
+    )
+
+    report = ValidationEngine().validate(recipe)
+
+    assert any(
+        result.check_id == "V10" and not result.passed
+        for result in report
+    )
+
+
+def test_validation_uses_mockable_image_url_checker():
+    recipe = build_recipe(image_url="https://cdn.example.com/dosa.jpg")
+
+    report = ValidationEngine(image_url_checker=lambda url: False).validate(
+        recipe
+    )
+
+    assert any(
+        result.check_id == "V11" and not result.passed
         for result in report
     )
 

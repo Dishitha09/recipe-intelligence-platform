@@ -1,0 +1,56 @@
+{
+  "required_adapter_types": [
+    "csv",
+    "dataset",
+    "text",
+    "pdf",
+    "audio",
+    "image",
+    "youtube"
+  ],
+  "results": [
+    {
+      "source_type": "csv",
+      "status": "PASS",
+      "record_count": 1,
+      "record_id_present": true
+    },
+    {
+      "source_type": "dataset",
+      "status": "PASS",
+      "record_count": 1,
+      "record_id_present": true
+    },
+    {
+      "source_type": "text",
+      "status": "PASS",
+      "record_count": 1,
+      "record_id_present": true
+    },
+    {
+      "source_type": "pdf",
+      "status": "PASS",
+      "record_count": 1,
+      "record_id_present": true
+    },
+    {
+      "source_type": "audio",
+      "status": "PASS",
+      "record_count": 1,
+      "record_id_present": true
+    },
+    {
+      "source_type": "image",
+      "status": "PASS",
+      "record_count": 1,
+      "record_id_present": true
+    },
+    {
+      "source_type": "youtube",
+      "status": "PASS",
+      "record_count": 1,
+      "record_id_present": true
+    }
+  ],
+  "passed": true
+}

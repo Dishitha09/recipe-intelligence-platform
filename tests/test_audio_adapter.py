@@ -11,7 +11,8 @@ def test_audio_adapter_returns_raw_record_for_existing_file(tmp_path):
     assert len(records) == 1
     assert records[0].source_type == "audio"
     assert records[0].metadata["filename"] == "sample.mp3"
-    assert records[0].metadata["transcription_status"] == "not_transcribed"
+    assert records[0].metadata["transcription_status"] == "transcription_missing"
+    assert records[0].metadata["fallback_flags"] == ("transcription_missing",)
 
 
 def test_audio_adapter_uses_transcript_sidecar(tmp_path):

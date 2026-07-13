@@ -61,6 +61,7 @@ class AudioAdapter(SourceAdapter):
             transcription_status = "sidecar_file"
         else:
             raw_text = ""
+            transcription_status = "transcription_missing"
 
         title = self.config.get("title") or _first_nonempty_line(raw_text)
         source_url = self.config.get("source_url")
@@ -76,6 +77,9 @@ class AudioAdapter(SourceAdapter):
                     "filename": os.path.basename(self.file_path),
                     "raw_path": self.file_path,
                     "transcription_status": transcription_status,
+                    "fallback_flags": [transcription_status]
+                    if transcription_status == "transcription_missing"
+                    else [],
                     "transcript_path": transcript_path,
                 }
             )

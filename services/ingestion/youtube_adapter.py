@@ -43,28 +43,32 @@ class YouTubeAdapter(SourceAdapter):
             raw_text = _read_text(transcript_path)
             transcript_status = "sidecar_file"
         else:
-            from youtube_transcript_api import YouTubeTranscriptApi
+            try:
+                from youtube_transcript_api import YouTubeTranscriptApi
 
-            api = YouTubeTranscriptApi()
-            if hasattr(api, "fetch"):
-                transcript = api.fetch(
-                    self.video_id,
-                    languages=self.config.get("languages", ["en", "hi"]),
-                )
-                raw_text = " ".join(
-                    item.text
-                    for item in transcript
-                ).strip()
-            else:
-                transcript = YouTubeTranscriptApi.get_transcript(
-                    self.video_id,
-                    languages=self.config.get("languages", ["en", "hi"]),
-                )
-                raw_text = " ".join(
-                    item.get("text", "")
-                    for item in transcript
-                ).strip()
-            segment_count = len(transcript)
+                api = YouTubeTranscriptApi()
+                if hasattr(api, "fetch"):
+                    transcript = api.fetch(
+                        self.video_id,
+                        languages=self.config.get("languages", ["en", "hi"]),
+                    )
+                    raw_text = " ".join(
+                        item.text
+                        for item in transcript
+                    ).strip()
+                else:
+                    transcript = YouTubeTranscriptApi.get_transcript(
+                        self.video_id,
+                        languages=self.config.get("languages", ["en", "hi"]),
+                    )
+                    raw_text = " ".join(
+                        item.get("text", "")
+                        for item in transcript
+                    ).strip()
+                segment_count = len(transcript)
+            except Exception:
+                raw_text = ""
+                transcript_status = "youtube_transcript_missing"
 
         source_url = self.config.get(
             "source_url",
@@ -83,6 +87,9 @@ class YouTubeAdapter(SourceAdapter):
                     "video_id": self.video_id,
                     "segments": segment_count,
                     "transcript_status": transcript_status,
+                    "fallback_flags": [transcript_status]
+                    if transcript_status == "youtube_transcript_missing"
+                    else [],
                     "transcript_path": transcript_path,
                 }
             )

@@ -46,6 +46,8 @@ class Ingredient(BaseModel):
 
 class Recipe(BaseModel):
 
+    schema_version: str = "v1"
+
     # Main Title
 
     title: str

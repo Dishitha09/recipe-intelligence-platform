@@ -12,6 +12,7 @@ from services.preprocessing.text_cleaner import clean_text
 
 
 CANONICAL_FIELDS = [
+    "schema_version",
     "title",
     "original_title",
     "translated_title",
@@ -190,6 +191,7 @@ class SchemaCoercer:
             field: None
             for field in CANONICAL_FIELDS
         } | {
+            "schema_version": "v1",
             "ingredients": [],
             "steps": [],
             "source_type": raw_record.source_type,
@@ -382,8 +384,11 @@ class SchemaCoercer:
             "owner_code",
             "owner_name",
             "created_by",
+            "schema_version",
         ]:
             canonical[field] = clean_text(canonical.get(field))
+
+        canonical["schema_version"] = canonical["schema_version"] or "v1"
 
         for field in [
             "tags",

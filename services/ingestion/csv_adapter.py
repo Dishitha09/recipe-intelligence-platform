@@ -31,7 +31,7 @@ class CSVAdapter(SourceAdapter):
 
     def extract(self):
 
-        self.df = pd.read_csv(self.file_path)
+        self.df = pd.read_csv(self.file_path).fillna("")
 
         self.raw_records = []
 

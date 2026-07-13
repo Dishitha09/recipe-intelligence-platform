@@ -1,0 +1,15 @@
+{
+  "canonical_units": [
+    "g",
+    "ml",
+    "tsp",
+    "tbsp",
+    "cup",
+    "count"
+  ],
+  "invalid_canonical_unit_rows": 0,
+  "db_density_rows": 0,
+  "reference_density_rows": 0,
+  "top_200_density_reference_present": false,
+  "passed": false
+}
