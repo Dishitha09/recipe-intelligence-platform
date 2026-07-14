@@ -1,7 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
-CREATE OR REPLACE FUNCTION catalogue_v3_text_array_is_uppercase(values TEXT[])
+CREATE OR REPLACE FUNCTION catalogue_v3_text_array_is_uppercase(text_values TEXT[])
 RETURNS BOOLEAN
 LANGUAGE SQL
 IMMUTABLE
@@ -10,7 +10,7 @@ AS $$
         bool_and(value = upper(value)),
         TRUE
     )
-    FROM unnest(values) AS value
+    FROM unnest(text_values) AS value
     WHERE value IS NOT NULL AND value <> ''
 $$;
 

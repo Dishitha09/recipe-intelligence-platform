@@ -51,7 +51,9 @@ def run_schema(target_url):
 
 def _target_url(admin_url):
     url = make_url(admin_url)
-    return str(url.set(database=DATABASE_NAME))
+    return url.set(database=DATABASE_NAME).render_as_string(
+        hide_password=False,
+    )
 
 
 if __name__ == "__main__":
