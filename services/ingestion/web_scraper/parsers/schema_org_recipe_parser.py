@@ -25,12 +25,16 @@ def parse_schema_org_recipe(response: Response) -> Optional[Dict[str, Any]]:
         if _is_recipe(candidate):
             recipe = _build_recipe(candidate, response.url)
             html_steps = _extract_html_instruction_steps(response)
+            html_nutrition = _extract_html_nutrition(response)
 
             if _is_better_instruction_set(html_steps, recipe["steps"]):
                 recipe["steps"] = html_steps
                 recipe["instruction_source"] = "html_article"
             else:
                 recipe["instruction_source"] = "schema_org"
+
+            if html_nutrition and not recipe.get("nutrition_info"):
+                recipe["nutrition_info"] = html_nutrition
 
             return recipe
 
@@ -238,6 +242,79 @@ def _extract_nutrition(value: Any) -> Dict[str, Any]:
         for key, item in value.items()
         if not str(key).startswith("@") and item not in (None, "")
     }
+
+
+def _extract_html_nutrition(response: Response) -> Dict[str, Any]:
+    nutrition_text = ""
+
+    for heading in response.xpath("//*[self::h2 or self::h3 or self::h4]"):
+        heading_text = _selector_text(heading).strip().lower()
+
+        if "nutrition" not in heading_text:
+            continue
+
+        parts = []
+        for node in heading.xpath("following-sibling::*"):
+            tag_name = (node.xpath("name()").get() or "").lower()
+
+            if tag_name in {"h2", "h3", "h4"}:
+                break
+
+            text = _selector_text(node)
+
+            if text:
+                parts.append(text)
+
+        nutrition_text = " ".join(parts)
+        break
+
+    if not nutrition_text:
+        page_text = _selector_text(response.selector)
+        match = re.search(r"\bNutrition\s+Calories\b", page_text, flags=re.I)
+
+        if match:
+            nutrition_text = page_text[match.start():match.start() + 600]
+        else:
+            return {}
+
+    labels = (
+        "Calories",
+        "Carbohydrates",
+        "Protein",
+        "Fat",
+        "Saturated Fat",
+        "Polyunsaturated Fat",
+        "Monounsaturated Fat",
+        "Trans Fat",
+        "Cholesterol",
+        "Sodium",
+        "Potassium",
+        "Fiber",
+        "Sugar",
+        "Vitamin A",
+        "Vitamin C",
+        "Calcium",
+        "Iron",
+    )
+    label_pattern = "|".join(re.escape(label) for label in labels)
+    matches = re.finditer(
+        rf"\b({label_pattern})\s+(.+?)(?=\s+(?:{label_pattern})\b|$)",
+        nutrition_text,
+    )
+    nutrition = {}
+
+    for match in matches:
+        key = _nutrition_key(match.group(1))
+        value = match.group(2).strip()
+
+        if value:
+            nutrition[key] = value
+
+    return nutrition
+
+
+def _nutrition_key(label: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "_", label.lower()).strip("_")
 
 
 def _extract_html_instruction_steps(response: Response) -> List[str]:

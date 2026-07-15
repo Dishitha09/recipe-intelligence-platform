@@ -1,6 +1,8 @@
 from types import SimpleNamespace
 
 from services.acquisition.scrape_catalogue_v3_web import (
+    clean,
+    json_object,
     record_to_catalogue_v3_payload,
     validation_skip_reason,
 )
@@ -55,3 +57,16 @@ def test_validation_skip_reason_requires_source_servings():
     }
 
     assert validation_skip_reason(payload) == "missing_source_servings"
+
+
+def test_json_object_handles_nested_stringified_dict():
+    value = "\"{'calories': '250 kcal', 'proteinContent': '9 g'}\""
+
+    assert json_object(value) == {
+        "calories": "250 kcal",
+        "proteinContent": "9 g",
+    }
+
+
+def test_clean_repairs_common_fraction_mojibake():
+    assert clean("1\u00c2\u00bd cups rice") == "1 1/2 cups rice"

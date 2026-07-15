@@ -27,6 +27,7 @@ def scrape_catalogue_v3_web(
     max_depth=None,
     crawl_delay_seconds=None,
     concurrent_requests=None,
+    update_existing=False,
 ):
     source = _load_source(source_id, config_path, allow_disabled)
     _apply_runtime_overrides(
@@ -45,7 +46,11 @@ def scrape_catalogue_v3_web(
         record_to_catalogue_v3_payload(record, source)
         for record in raw_records
     ]
-    report = _load_payloads(payloads, ingest=ingest)
+    report = _load_payloads(
+        payloads,
+        ingest=ingest,
+        update_existing=update_existing,
+    )
 
     if output_csv:
         write_scrape_csv(output_csv, payloads)
@@ -139,10 +144,11 @@ def record_to_catalogue_v3_payload(record, source):
     }
 
 
-def _load_payloads(payloads, ingest):
+def _load_payloads(payloads, ingest, update_existing=False):
     report = {
         "inserted": 0,
         "skipped_duplicate": 0,
+        "updated_existing": 0,
         "skipped_invalid": 0,
         "failed": 0,
         "errors": [],
@@ -167,7 +173,11 @@ def _load_payloads(payloads, ingest):
             continue
 
         if already_loaded(payload):
-            report["skipped_duplicate"] += 1
+            if update_existing:
+                report["updated_existing"] += update_existing_recipe(payload)
+            else:
+                report["skipped_duplicate"] += 1
+
             continue
 
         try:
@@ -188,6 +198,77 @@ def _load_payloads(payloads, ingest):
 
     report["errors"] = report["errors"][:20]
     return report
+
+
+def update_existing_recipe(payload):
+    from services.database.catalogue_v3_loader import CatalogueV3Loader
+
+    params = CatalogueV3Loader()._normalize_payload(payload)
+    source_url = payload.get("metadata", {}).get("source_url")
+    content_hash = payload.get("metadata", {}).get("content_hash")
+
+    update_sql = text(
+        """
+        UPDATE recipe_catalogue_v3
+        SET
+            description = COALESCE(:description, description),
+            nutrition_info = CASE
+                WHEN CAST(:nutrition_info AS jsonb) <> '{}'::jsonb
+                THEN CAST(:nutrition_info AS jsonb)
+                ELSE nutrition_info
+            END,
+            tags = CASE
+                WHEN cardinality(CAST(:tags AS text[])) > 0
+                THEN CAST(:tags AS text[])
+                ELSE tags
+            END,
+            metadata = metadata || CAST(:metadata AS jsonb),
+            servings = COALESCE(:servings, servings),
+            image_url = COALESCE(:image_url, image_url),
+            course = CASE
+                WHEN cardinality(CAST(:course AS text[])) > 0
+                THEN CAST(:course AS text[])
+                ELSE course
+            END,
+            cuisines = CASE
+                WHEN cardinality(CAST(:cuisines AS text[])) > 0
+                THEN CAST(:cuisines AS text[])
+                ELSE cuisines
+            END,
+            meal_types = CASE
+                WHEN cardinality(CAST(:meal_types AS text[])) > 0
+                THEN CAST(:meal_types AS text[])
+                ELSE meal_types
+            END,
+            prep_time_min = COALESCE(:prep_time_min, prep_time_min),
+            cook_time_min = COALESCE(:cook_time_min, cook_time_min),
+            total_time_min = COALESCE(:total_time_min, total_time_min),
+            ingredients_json = CASE
+                WHEN jsonb_array_length(CAST(:ingredients_json AS jsonb)) > 0
+                THEN CAST(:ingredients_json AS jsonb)
+                ELSE ingredients_json
+            END,
+            cook_steps = CASE
+                WHEN jsonb_array_length(CAST(:cook_steps AS jsonb)) > 0
+                THEN CAST(:cook_steps AS jsonb)
+                ELSE cook_steps
+            END,
+            quick_steps = CASE
+                WHEN cardinality(CAST(:quick_steps AS text[])) > 0
+                THEN CAST(:quick_steps AS text[])
+                ELSE quick_steps
+            END
+        WHERE metadata->>'source_url' = :source_url
+        OR metadata->>'content_hash' = :content_hash
+        """
+    )
+    params["source_url"] = source_url
+    params["content_hash"] = content_hash
+
+    with get_catalogue_v3_engine().begin() as conn:
+        result = conn.execute(update_sql, params)
+
+    return result.rowcount or 0
 
 
 def validation_skip_reason(payload):
@@ -357,7 +438,22 @@ def lower_list(value):
 
 
 def clean(value):
-    return " ".join(html.unescape(str(value or "")).split()).strip()
+    value = html.unescape(str(value or ""))
+    replacements = {
+        "\u00c2\u00bc": " 1/4",
+        "\u00c2\u00bd": " 1/2",
+        "\u00c2\u00be": " 3/4",
+        "\u00e2\u20ac\u201c": "-",
+        "\u00e2\u20ac\u201d": "-",
+        "\u00e2\u20ac\u2122": "'",
+        "\u00e2\u20ac\u0153": '"',
+        "\u00e2\u20ac\u009d": '"',
+    }
+
+    for mojibake, replacement in replacements.items():
+        value = value.replace(mojibake, replacement)
+
+    return " ".join(value.split()).strip()
 
 
 def json_object(value):
@@ -376,6 +472,12 @@ def json_object(value):
 
             if isinstance(parsed, dict):
                 return parsed
+
+            if isinstance(parsed, str) and parsed != value:
+                nested = json_object(parsed)
+
+                if nested:
+                    return nested
 
     return {}
 
@@ -419,6 +521,11 @@ def main():
     parser.add_argument("--max-depth", type=int, default=None)
     parser.add_argument("--crawl-delay-seconds", type=float, default=None)
     parser.add_argument("--concurrent-requests", type=int, default=None)
+    parser.add_argument(
+        "--update-existing",
+        action="store_true",
+        help="Refresh existing rows with newly scraped source-provided fields.",
+    )
     args = parser.parse_args()
 
     print(
@@ -433,6 +540,7 @@ def main():
                 max_depth=args.max_depth,
                 crawl_delay_seconds=args.crawl_delay_seconds,
                 concurrent_requests=args.concurrent_requests,
+                update_existing=args.update_existing,
             ),
             indent=2,
         )

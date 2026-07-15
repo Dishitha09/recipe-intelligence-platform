@@ -227,3 +227,76 @@ def test_parse_schema_org_recipe_prefers_full_article_instructions():
         "Increase the flame to high and stir fry just for a minute. "
         "Remove to a serving plate immediately and serve.",
     ]
+
+
+def test_parse_schema_org_recipe_extracts_html_nutrition_fallback():
+    response = make_response(
+        """
+        <html>
+          <head>
+            <script type="application/ld+json">
+            {
+              "@context": "https://schema.org",
+              "@type": "Recipe",
+              "name": "Nihari",
+              "recipeIngredient": ["500 g mutton"],
+              "recipeInstructions": [
+                {"@type": "HowToStep", "text": "Cook slowly."}
+              ]
+            }
+            </script>
+          </head>
+          <body>
+            <h3>Nutrition</h3>
+            <p>
+              Calories 292 kcal Carbohydrates 26 g Protein 15 g
+              Fat 16 g Sodium 975 mg
+            </p>
+            <h3>Comments</h3>
+          </body>
+        </html>
+        """
+    )
+
+    recipe = parse_schema_org_recipe(response)
+
+    assert recipe["nutrition_info"] == {
+        "calories": "292 kcal",
+        "carbohydrates": "26 g",
+        "protein": "15 g",
+        "fat": "16 g",
+        "sodium": "975 mg",
+    }
+
+
+def test_parse_schema_org_recipe_extracts_page_text_nutrition_fallback():
+    response = make_response(
+        """
+        <html>
+          <head>
+            <script type="application/ld+json">
+            {
+              "@context": "https://schema.org",
+              "@type": "Recipe",
+              "name": "Nihari",
+              "recipeIngredient": ["500 g mutton"],
+              "recipeInstructions": [
+                {"@type": "HowToStep", "text": "Cook slowly."}
+              ]
+            }
+            </script>
+          </head>
+          <body>
+            <div>
+              Nutrition Calories 292 kcal Carbohydrates 26 g
+              Protein 15 g Fat 16 g Sodium 975 mg
+            </div>
+          </body>
+        </html>
+        """
+    )
+
+    recipe = parse_schema_org_recipe(response)
+
+    assert recipe["nutrition_info"]["calories"] == "292 kcal"
+    assert recipe["nutrition_info"]["protein"] == "15 g"
