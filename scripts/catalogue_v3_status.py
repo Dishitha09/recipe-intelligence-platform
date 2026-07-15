@@ -46,6 +46,24 @@ def main():
     FROM pg_indexes
     WHERE tablename = 'recipe_catalogue_v3'
     """
+    source_sql = """
+    SELECT
+        source,
+        count(*) AS total,
+        count(*) FILTER (
+            WHERE metadata->>'source_url' IS NOT NULL
+        ) AS with_source_url,
+        count(*) FILTER (
+            WHERE jsonb_array_length(ingredients_json) > 0
+        ) AS with_ingredients,
+        count(*) FILTER (
+            WHERE jsonb_array_length(cook_steps) > 0
+        ) AS with_steps
+    FROM recipe_catalogue_v3
+    GROUP BY source
+    ORDER BY total DESC
+    LIMIT 10
+    """
 
     with get_catalogue_v3_engine().connect() as conn:
         summary = dict(conn.execute(text(summary_sql)).mappings().one())
@@ -54,8 +72,13 @@ def main():
             for row in conn.execute(text(sample_sql)).mappings()
         ]
         index_count = conn.execute(text(index_sql)).scalar_one()
+        sources = [
+            dict(row)
+            for row in conn.execute(text(source_sql)).mappings()
+        ]
 
     print({"summary": summary, "index_count": index_count})
+    print({"sources": sources})
     print({"samples": samples})
 
 

@@ -16,42 +16,57 @@ pytestmark = pytest.mark.skipif(
 
 def test_catalogue_v3_insert_recipe_works():
     loader = CatalogueV3Loader()
-    recipe_id = loader.insert_recipe(
-        {
-            "name": "Pytest Masala Dosa",
-            "description": "Crispy dosa with potato masala",
-            "servings": 4,
-            "difficulty_level": "medium",
-            "diet": "Vegetarian",
-            "diet_tags": ["vegetarian"],
-            "allergen_tags": ["gluten"],
-            "cuisines": ["south_indian"],
-            "meal_types": ["breakfast"],
-            "dish_types": ["dosa"],
-            "course": ["main"],
-            "ingredients_json": [
-                {"name": "dosa batter", "quantity": 3, "unit": "cup"},
-                {"name": "potato", "quantity": 4, "unit": "count"},
-            ],
-            "cook_steps": [
-                {"step_number": 1, "instruction": "Spread batter."},
-                {"step_number": 2, "instruction": "Cook until crisp."},
-            ],
-            "source": "pytest",
-        }
-    )
+    recipe_id = None
 
-    with get_catalogue_v3_engine().connect() as conn:
-        row = conn.execute(
-            text(
-                """
-                SELECT name, servings, difficulty_level, diet, diet_tags
-                FROM recipe_catalogue_v3
-                WHERE recipe_id = :recipe_id
-                """
-            ),
-            {"recipe_id": recipe_id},
-        ).mappings().one()
+    try:
+        recipe_id = loader.insert_recipe(
+            {
+                "name": "Pytest Masala Dosa",
+                "description": "Crispy dosa with potato masala",
+                "servings": 4,
+                "difficulty_level": "medium",
+                "diet": "Vegetarian",
+                "diet_tags": ["vegetarian"],
+                "allergen_tags": ["gluten"],
+                "cuisines": ["south_indian"],
+                "meal_types": ["breakfast"],
+                "dish_types": ["dosa"],
+                "course": ["main"],
+                "ingredients_json": [
+                    {"name": "dosa batter", "quantity": 3, "unit": "cup"},
+                    {"name": "potato", "quantity": 4, "unit": "count"},
+                ],
+                "cook_steps": [
+                    {"step_number": 1, "instruction": "Spread batter."},
+                    {"step_number": 2, "instruction": "Cook until crisp."},
+                ],
+                "source": "pytest",
+            }
+        )
+
+        with get_catalogue_v3_engine().connect() as conn:
+            row = conn.execute(
+                text(
+                    """
+                    SELECT name, servings, difficulty_level, diet, diet_tags
+                    FROM recipe_catalogue_v3
+                    WHERE recipe_id = :recipe_id
+                    """
+                ),
+                {"recipe_id": recipe_id},
+            ).mappings().one()
+    finally:
+        if recipe_id:
+            with get_catalogue_v3_engine().begin() as conn:
+                conn.execute(
+                    text(
+                        """
+                        DELETE FROM recipe_catalogue_v3
+                        WHERE recipe_id = :recipe_id
+                        """
+                    ),
+                    {"recipe_id": recipe_id},
+                )
 
     assert row["name"] == "Pytest Masala Dosa"
     assert row["servings"] == 4

@@ -73,6 +73,9 @@ def _is_recipe(payload: Dict[str, Any]) -> bool:
 def _build_recipe(payload: Dict[str, Any], source_url: str) -> Dict[str, Any]:
     ingredients = _filter_english_ingredients(payload.get("recipeIngredient") or [])
     steps = _parse_recipe_instructions(payload.get("recipeInstructions") or [])
+    categories = _string_list(payload.get("recipeCategory"))
+    cuisines = _string_list(payload.get("recipeCuisine"))
+    keywords = _string_list(payload.get("keywords"))
 
     return {
         "title": payload.get("name") or payload.get("headline"),
@@ -81,6 +84,14 @@ def _build_recipe(payload: Dict[str, Any], source_url: str) -> Dict[str, Any]:
         "ingredients": ingredients,
         "steps": steps,
         "image": _extract_image(payload),
+        "servings": _parse_yield(payload.get("recipeYield")),
+        "prep_time_min": _parse_duration_minutes(payload.get("prepTime")),
+        "cook_time_min": _parse_duration_minutes(payload.get("cookTime")),
+        "total_time_min": _parse_duration_minutes(payload.get("totalTime")),
+        "course": categories,
+        "cuisines": cuisines,
+        "tags": keywords,
+        "nutrition_info": _extract_nutrition(payload.get("nutrition")),
     }
 
 
@@ -149,6 +160,84 @@ def _extract_image(payload: Dict[str, Any]) -> Optional[str]:
     if isinstance(image, dict):
         return image.get("url")
     return None
+
+
+def _string_list(value: Any) -> List[str]:
+    if not value:
+        return []
+
+    if isinstance(value, str):
+        parts = re.split(r"[,|]", value)
+    elif isinstance(value, list):
+        parts = value
+    else:
+        parts = [value]
+
+    cleaned = []
+    for part in parts:
+        text = str(part or "").strip()
+        if text and text not in cleaned:
+            cleaned.append(text)
+
+    return cleaned
+
+
+def _parse_yield(value: Any) -> Optional[int]:
+    values = _string_list(value)
+
+    for item in values:
+        match = re.search(r"\d+", item)
+        if match:
+            return int(match.group(0))
+
+    return None
+
+
+def _parse_duration_minutes(value: Any) -> Optional[int]:
+    if not value:
+        return None
+
+    text = str(value).strip()
+    iso_match = re.fullmatch(
+        r"P(?:\d+D)?T?(?:(?P<hours>\d+)H)?(?:(?P<minutes>\d+)M)?",
+        text,
+        flags=re.I,
+    )
+
+    if iso_match:
+        hours = int(iso_match.group("hours") or 0)
+        minutes = int(iso_match.group("minutes") or 0)
+        total = hours * 60 + minutes
+        return total or None
+
+    hours_match = re.search(r"(\d+)\s*(?:hours?|hrs?|hr)\b", text, flags=re.I)
+    minutes_match = re.search(r"(\d+)\s*(?:minutes?|mins?|min)\b", text, flags=re.I)
+
+    total = 0
+    if hours_match:
+        total += int(hours_match.group(1)) * 60
+    if minutes_match:
+        total += int(minutes_match.group(1))
+
+    if total:
+        return total
+
+    bare_number = re.fullmatch(r"\d+", text)
+    if bare_number:
+        return int(text)
+
+    return None
+
+
+def _extract_nutrition(value: Any) -> Dict[str, Any]:
+    if not isinstance(value, dict):
+        return {}
+
+    return {
+        key: item
+        for key, item in value.items()
+        if not str(key).startswith("@") and item not in (None, "")
+    }
 
 
 def _extract_html_instruction_steps(response: Response) -> List[str]:

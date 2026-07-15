@@ -26,6 +26,16 @@ def test_parse_schema_org_recipe_extracts_json_ld_recipe():
               "description": "A quick South Indian rice dish.",
               "url": "https://example.com/tomato-rice",
               "image": "https://example.com/tomato-rice.jpg",
+              "recipeYield": "4 servings",
+              "prepTime": "PT15M",
+              "cookTime": "PT25M",
+              "totalTime": "PT40M",
+              "recipeCategory": "Dinner",
+              "recipeCuisine": "South Indian",
+              "keywords": "rice, tomato",
+              "nutrition": {
+                "calories": "250 kcal"
+              },
               "recipeIngredient": [
                 "200 g rice",
                 "150 g tomato",
@@ -59,6 +69,14 @@ def test_parse_schema_org_recipe_extracts_json_ld_recipe():
             "Add tomato masala.",
         ],
         "image": "https://example.com/tomato-rice.jpg",
+        "servings": 4,
+        "prep_time_min": 15,
+        "cook_time_min": 25,
+        "total_time_min": 40,
+        "course": ["Dinner"],
+        "cuisines": ["South Indian"],
+        "tags": ["rice", "tomato"],
+        "nutrition_info": {"calories": "250 kcal"},
         "instruction_source": "schema_org",
     }
 

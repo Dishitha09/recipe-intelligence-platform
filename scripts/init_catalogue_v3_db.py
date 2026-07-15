@@ -17,7 +17,11 @@ def main():
     sys.path.insert(0, str(PROJECT_ROOT))
     load_dotenv(PROJECT_ROOT / ".env")
 
-    admin_url = os.getenv("POSTGRES_ADMIN_URL", DEFAULT_ADMIN_URL)
+    admin_url = (
+        os.getenv("POSTGRES_ADMIN_URL")
+        or _admin_url_from_database_url()
+        or DEFAULT_ADMIN_URL
+    )
     target_url = _target_url(admin_url)
 
     create_database_if_missing(admin_url)
@@ -52,6 +56,17 @@ def run_schema(target_url):
 def _target_url(admin_url):
     url = make_url(admin_url)
     return url.set(database=DATABASE_NAME).render_as_string(
+        hide_password=False,
+    )
+
+
+def _admin_url_from_database_url():
+    database_url = os.getenv("DATABASE_URL")
+
+    if not database_url:
+        return None
+
+    return make_url(database_url).set(database="postgres").render_as_string(
         hide_password=False,
     )
 

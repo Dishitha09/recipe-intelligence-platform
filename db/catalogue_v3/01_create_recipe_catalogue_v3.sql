@@ -200,3 +200,13 @@ ON recipe_catalogue_v3 (source);
 
 CREATE INDEX IF NOT EXISTS idx_recipe_catalogue_v3_created_at
 ON recipe_catalogue_v3 (created_at);
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_recipe_catalogue_v3_source_url
+ON recipe_catalogue_v3 ((metadata->>'source_url'))
+WHERE metadata->>'source_url' IS NOT NULL
+AND metadata->>'source_url' <> '';
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_recipe_catalogue_v3_content_hash
+ON recipe_catalogue_v3 ((metadata->>'content_hash'))
+WHERE metadata->>'content_hash' IS NOT NULL
+AND metadata->>'content_hash' <> '';
