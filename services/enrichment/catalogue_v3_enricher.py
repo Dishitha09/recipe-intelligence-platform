@@ -160,7 +160,6 @@ class CatalogueV3Enricher:
             row.get("description"),
             row.get("diet"),
             row.get("region"),
-            row.get("source"),
             row.get("course"),
             row.get("cuisines"),
             row.get("meal_types"),
@@ -253,11 +252,14 @@ class CatalogueV3Enricher:
         if self._contains_any(text, EGG_TERMS):
             return "egg"
 
+        if (
+            "vegan" in text
+            and not self._contains_any(text, DAIRY_TERMS | EGG_TERMS | MEAT_TERMS)
+        ):
+            return "vegan"
+
         if "vegetarian" in text or "veg " in f"{text} ":
             return "vegetarian"
-
-        if "vegan" in text:
-            return "vegan"
 
         return None
 

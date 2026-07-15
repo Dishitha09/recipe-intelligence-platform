@@ -93,6 +93,82 @@
       }
     },
     {
+      "source_id": "indianhealthyrecipes_chicken_web",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://www.indianhealthyrecipes.com/recipes/chicken-recipes/",
+      "enabled": false,
+      "config": {
+        "priority": 2,
+        "source_group": "web_crawl_non_veg",
+        "expected_volume": 300,
+        "quality": "medium",
+        "parser": "schema_org_recipe_json_ld",
+        "crawl_delay_seconds": 3,
+        "max_depth": 3,
+        "concurrent_requests": 6,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "indianhealthyrecipes_mutton_web",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://www.indianhealthyrecipes.com/recipes/mutton-recipes/",
+      "enabled": false,
+      "config": {
+        "priority": 2,
+        "source_group": "web_crawl_non_veg",
+        "expected_volume": 200,
+        "quality": "medium",
+        "parser": "schema_org_recipe_json_ld",
+        "crawl_delay_seconds": 3,
+        "max_depth": 3,
+        "concurrent_requests": 6,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "indianhealthyrecipes_egg_web",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://www.indianhealthyrecipes.com/recipes/egg-recipes/",
+      "enabled": false,
+      "config": {
+        "priority": 2,
+        "source_group": "web_crawl_egg",
+        "expected_volume": 150,
+        "quality": "medium",
+        "parser": "schema_org_recipe_json_ld",
+        "crawl_delay_seconds": 3,
+        "max_depth": 3,
+        "concurrent_requests": 6,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "indianhealthyrecipes_vegan_web",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://www.indianhealthyrecipes.com/recipes/vegan-recipes/",
+      "enabled": false,
+      "config": {
+        "priority": 2,
+        "source_group": "web_crawl_vegan",
+        "expected_volume": 300,
+        "quality": "medium",
+        "parser": "schema_org_recipe_json_ld",
+        "crawl_delay_seconds": 3,
+        "max_depth": 3,
+        "concurrent_requests": 6,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
       "source_id": "hebbars_kitchen_web",
       "source_type": "web",
       "adapter": "scrapy",

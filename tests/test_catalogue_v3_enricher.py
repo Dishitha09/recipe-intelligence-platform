@@ -130,3 +130,80 @@ def test_catalogue_v3_enricher_repairs_mojibake_and_normalizes_uom():
     assert ingredient["unit"] == "cup"
     assert ingredient["canonical_unit"] == "cup"
     assert ingredient["normalized_text"] == "1.5 cup rolled oats"
+
+
+def test_catalogue_v3_enricher_does_not_infer_diet_from_source_id():
+    row = {
+        "name": "Curd Rice Recipe",
+        "description": "A cooling rice dish with yogurt.",
+        "source": "indianhealthyrecipes_chicken_web",
+        "ingredients_json": [
+            {"raw_text": "1 cup cooked rice"},
+            {"raw_text": "1 cup curd"},
+        ],
+        "cook_steps": [{"instruction": "Mix rice and curd."}],
+        "tags": [],
+        "course": [],
+        "cuisines": ["Indian"],
+        "meal_types": [],
+        "diet_tags": [],
+        "allergen_tags": [],
+        "health_tags": [],
+        "efficiency_tags": [],
+        "dish_types": [],
+        "metadata": {},
+        "servings": 2,
+        "prep_time_min": 5,
+        "cook_time_min": 0,
+        "total_time_min": 5,
+        "difficulty_level": None,
+        "diet": None,
+        "meal_role": None,
+        "dish_family": None,
+        "cost_tier": None,
+        "budget_band": None,
+        "region": None,
+    }
+
+    updates = CatalogueV3Enricher().enrich_row(row).updates
+
+    assert updates.get("diet") is None
+    assert "NON_VEGETARIAN" not in updates.get("diet_tags", [])
+
+
+def test_catalogue_v3_enricher_does_not_mark_dairy_recipe_vegan():
+    row = {
+        "name": "Category Ladoo",
+        "description": "A sweet from a vegan category page.",
+        "ingredients_json": [
+            {"raw_text": "1 cup rava"},
+            {"raw_text": "2 tbsp ghee"},
+        ],
+        "cook_steps": [{"instruction": "Roast and mix."}],
+        "tags": ["vegan"],
+        "course": [],
+        "cuisines": ["Indian"],
+        "meal_types": [],
+        "diet_tags": [],
+        "allergen_tags": [],
+        "health_tags": [],
+        "efficiency_tags": [],
+        "dish_types": [],
+        "metadata": {},
+        "servings": 4,
+        "prep_time_min": 5,
+        "cook_time_min": 10,
+        "total_time_min": 15,
+        "difficulty_level": None,
+        "diet": None,
+        "meal_role": None,
+        "dish_family": None,
+        "cost_tier": None,
+        "budget_band": None,
+        "region": None,
+    }
+
+    updates = CatalogueV3Enricher().enrich_row(row).updates
+
+    assert updates.get("diet") is None
+    assert "VEGAN" not in updates.get("diet_tags", [])
