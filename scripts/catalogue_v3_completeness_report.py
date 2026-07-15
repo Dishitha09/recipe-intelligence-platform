@@ -48,6 +48,23 @@ def main():
         count(*) FILTER (WHERE array_length(efficiency_tags, 1) > 0) AS with_efficiency_tags,
         count(*) FILTER (WHERE cost_tier IS NOT NULL) AS with_cost_tier,
         count(*) FILTER (WHERE metadata ? 'catalogue_v3_enrichment') AS with_enrichment_metadata
+        ,
+        count(*) FILTER (
+            WHERE jsonb_path_exists(ingredients_json, '$[*].name')
+        ) AS with_ingredient_names,
+        count(*) FILTER (
+            WHERE jsonb_path_exists(ingredients_json, '$[*].quantity')
+        ) AS with_ingredient_quantities,
+        count(*) FILTER (
+            WHERE jsonb_path_exists(ingredients_json, '$[*].canonical_unit')
+        ) AS with_canonical_units,
+        count(*) FILTER (
+            WHERE jsonb_path_exists(ingredients_json, '$[*].conversion_method')
+        ) AS with_conversion_methods
+        ,
+        count(*) FILTER (
+            WHERE jsonb_path_exists(ingredients_json, '$[*].normalized_text')
+        ) AS with_normalized_ingredient_text
     FROM recipe_catalogue_v3
     GROUP BY source
     ORDER BY total DESC

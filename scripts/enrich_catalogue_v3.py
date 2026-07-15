@@ -62,19 +62,19 @@ UPDATE_SQL = text(
     SET
         ingredients_json = CAST(:ingredients_json AS jsonb),
         metadata = metadata || CAST(:metadata_patch AS jsonb),
-        difficulty_level = COALESCE(difficulty_level, :difficulty_level),
-        diet = COALESCE(diet, :diet),
-        budget_band = COALESCE(budget_band, :budget_band),
+        difficulty_level = COALESCE(:difficulty_level, difficulty_level),
+        diet = COALESCE(:diet, diet),
+        budget_band = COALESCE(:budget_band, budget_band),
         region = COALESCE(region, :region),
         diet_tags = CAST(:diet_tags AS text[]),
         allergen_tags = CAST(:allergen_tags AS text[]),
         dish_types = CAST(:dish_types AS text[]),
-        meal_role = COALESCE(meal_role, :meal_role),
-        dish_family = COALESCE(dish_family, :dish_family),
+        meal_role = :meal_role,
+        dish_family = :dish_family,
         health_tags = CAST(:health_tags AS text[]),
         efficiency_tags = CAST(:efficiency_tags AS text[]),
-        cost_tier = COALESCE(cost_tier, :cost_tier),
-        complexity = COALESCE(complexity, :complexity)
+        cost_tier = COALESCE(:cost_tier, cost_tier),
+        complexity = COALESCE(:complexity, complexity)
     WHERE recipe_id = :recipe_id
     """
 )
@@ -143,7 +143,7 @@ def _params(row, updates, metadata_patch, loader):
             "allergen_tags",
             row.get("allergen_tags") or [],
         ),
-        "dish_types": updates.get("dish_types", row.get("dish_types") or []),
+        "dish_types": updates.get("dish_types", []),
         "meal_role": updates.get("meal_role"),
         "dish_family": updates.get("dish_family"),
         "health_tags": updates.get("health_tags", row.get("health_tags") or []),

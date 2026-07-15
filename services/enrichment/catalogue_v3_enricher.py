@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from services.enrichment.state.state_classifier import RecipeStateClassifier
+from services.enrichment.uom.uom_normalizer import UOMNormalizer
 from services.preprocessing.ingredient_parser import IngredientParser
 
 
@@ -13,9 +14,15 @@ class CatalogueV3Enrichment:
 
 
 class CatalogueV3Enricher:
-    def __init__(self, ingredient_parser=None, state_classifier=None):
+    def __init__(
+        self,
+        ingredient_parser=None,
+        state_classifier=None,
+        uom_normalizer=None,
+    ):
         self.ingredient_parser = ingredient_parser or IngredientParser()
         self.state_classifier = state_classifier or RecipeStateClassifier()
+        self.uom_normalizer = uom_normalizer or UOMNormalizer()
 
     def enrich_row(self, row: dict[str, Any]) -> CatalogueV3Enrichment:
         ingredients = self._enrich_ingredients(row.get("ingredients_json") or [])
@@ -49,8 +56,8 @@ class CatalogueV3Enricher:
             "diet": inferred_diet,
             "diet_tags": diet_tags,
             "allergen_tags": allergen_tags,
-            "dish_types": self._merge(row.get("dish_types") or [], dish_types),
-            "dish_family": row.get("dish_family") or dish_family,
+            "dish_types": dish_types,
+            "dish_family": dish_family,
             "meal_role": meal_role,
             "health_tags": health_tags,
             "efficiency_tags": efficiency_tags,
@@ -59,10 +66,15 @@ class CatalogueV3Enricher:
             "complexity": row.get("complexity") or difficulty,
             "region": row.get("region") or state_region.get("region"),
         }
+        clearable_fields = {
+            "dish_types",
+            "dish_family",
+            "meal_role",
+        }
         updates = {
             key: value
             for key, value in updates.items()
-            if value not in (None, [], {})
+            if value not in (None, [], {}) or key in clearable_fields
         }
 
         return CatalogueV3Enrichment(
@@ -89,18 +101,54 @@ class CatalogueV3Enricher:
                 or ingredient.get("name")
                 or ""
             )
+            raw_text = self._clean_text(raw_text)
             parsed = self.ingredient_parser.parse(raw_text)
             name = ingredient.get("name") or ingredient.get("item")
+            quantity = ingredient.get("quantity")
+            unit = ingredient.get("unit")
+            ingredient_name = self._clean_text(name or parsed.ingredient_name)
 
             ingredient.setdefault("raw_text", raw_text)
             ingredient.setdefault("source_position", index)
-            ingredient.setdefault("name", name or parsed.ingredient_name)
+            ingredient["raw_text"] = raw_text
+            ingredient["name"] = ingredient_name
 
-            if "quantity" not in ingredient or ingredient.get("quantity") is None:
-                ingredient["quantity"] = parsed.quantity
+            if quantity is None:
+                quantity = parsed.quantity
 
-            if "unit" not in ingredient or ingredient.get("unit") is None:
-                ingredient["unit"] = parsed.unit
+            if unit is None:
+                unit = parsed.unit
+
+            ingredient["quantity"] = quantity
+            ingredient["unit"] = unit
+
+            normalized = self.uom_normalizer.normalize(
+                ingredient_name=ingredient_name,
+                quantity_str=quantity,
+                unit_str=unit,
+            )
+            ingredient["canonical_quantity"] = normalized.get(
+                "canonical_quantity"
+            )
+            ingredient["canonical_unit"] = normalized.get("canonical_unit")
+            ingredient["normalized_text"] = self._ingredient_display_text(
+                ingredient_name,
+                quantity,
+                unit,
+            )
+            ingredient["conversion_method"] = normalized.get(
+                "conversion_method"
+            )
+            ingredient["conversion_factor"] = normalized.get(
+                "conversion_factor"
+            )
+            ingredient["uom_confidence_score"] = normalized.get(
+                "confidence_score"
+            )
+            ingredient["normalization_flags"] = normalized.get(
+                "enrichment_flags",
+                [],
+            )
 
             enriched.append(ingredient)
 
@@ -129,7 +177,6 @@ class CatalogueV3Enricher:
             row.get("cuisines"),
             row.get("meal_types"),
             row.get("tags"),
-            row.get("dish_types"),
         ]
         return " ".join(self._flatten(parts)).lower()
 
@@ -147,6 +194,52 @@ class CatalogueV3Enricher:
                 flattened.append(str(value))
 
         return flattened
+
+    def _clean_text(self, value):
+        text = str(value or "")
+        replacements = {
+            "\u00c2\u00bc": " 1/4",
+            "\u00c2\u00bd": " 1/2",
+            "\u00c2\u00be": " 3/4",
+            "Ã‚Â¼": " 1/4",
+            "Ã‚Â½": " 1/2",
+            "Ã‚Â¾": " 3/4",
+            "\u00e2\u20ac\u201c": "-",
+            "\u00e2\u20ac\u201d": "-",
+            "\u00e2\u20ac\u2122": "'",
+            "\u00e2\u20ac\u0153": '"',
+            "\u00e2\u20ac\u009d": '"',
+        }
+
+        for bad_text, replacement in replacements.items():
+            text = text.replace(bad_text, replacement)
+
+        return re.sub(r"\s+", " ", text).strip()
+
+    def _ingredient_display_text(self, name, quantity, unit):
+        parts = []
+
+        if quantity is not None:
+            parts.append(self._format_quantity(quantity))
+
+        if unit:
+            parts.append(str(unit).strip())
+
+        if name:
+            parts.append(str(name).strip())
+
+        return " ".join(part for part in parts if part).strip()
+
+    def _format_quantity(self, quantity):
+        try:
+            value = float(quantity)
+        except (TypeError, ValueError):
+            return str(quantity)
+
+        if value.is_integer():
+            return str(int(value))
+
+        return f"{value:g}"
 
     def _diet(self, row, text):
         existing = row.get("diet")
@@ -426,7 +519,7 @@ DISH_FAMILY_TERMS = {
     "chutney": {"chutney"},
     "sambar": {"sambar"},
     "dal": {"dal", "lentil"},
-    "curry": {"curry", "gravy", "masala"},
+    "curry": {"curry", "gravy"},
     "kabab": {"kabab", "kebab"},
     "kheer": {"kheer"},
     "halwa": {"halwa"},
@@ -439,7 +532,9 @@ DISH_FAMILY_TERMS = {
 DISH_TYPE_TERMS = {
     "rice": {"rice", "biryani", "pulao", "khichdi"},
     "bread": {"chapati", "roti", "naan", "paratha", "kulcha"},
-    "curry": {"curry", "gravy", "masala"},
+    "curry": {"curry", "gravy"},
+    "idli": {"idli"},
+    "dosa": {"dosa"},
     "snack": SNACK_TERMS,
     "dessert": DESSERT_TERMS,
     "drink": {"tea", "kahwa", "lassi", "sharbat", "juice"},
