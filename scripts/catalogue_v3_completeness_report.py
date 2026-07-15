@@ -37,6 +37,17 @@ def main():
             AS with_ingredients,
         count(*) FILTER (WHERE jsonb_array_length(cook_steps) > 0) AS with_cook_steps,
         count(*) FILTER (WHERE array_length(quick_steps, 1) > 0) AS with_quick_steps
+        ,
+        count(*) FILTER (WHERE difficulty_level IS NOT NULL) AS with_difficulty,
+        count(*) FILTER (WHERE array_length(diet_tags, 1) > 0) AS with_diet_tags,
+        count(*) FILTER (WHERE array_length(allergen_tags, 1) > 0) AS with_allergen_tags,
+        count(*) FILTER (WHERE array_length(dish_types, 1) > 0) AS with_dish_types,
+        count(*) FILTER (WHERE dish_family IS NOT NULL) AS with_dish_family,
+        count(*) FILTER (WHERE meal_role IS NOT NULL) AS with_meal_role,
+        count(*) FILTER (WHERE array_length(health_tags, 1) > 0) AS with_health_tags,
+        count(*) FILTER (WHERE array_length(efficiency_tags, 1) > 0) AS with_efficiency_tags,
+        count(*) FILTER (WHERE cost_tier IS NOT NULL) AS with_cost_tier,
+        count(*) FILTER (WHERE metadata ? 'catalogue_v3_enrichment') AS with_enrichment_metadata
     FROM recipe_catalogue_v3
     GROUP BY source
     ORDER BY total DESC
