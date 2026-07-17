@@ -562,6 +562,15 @@ Run a controlled live scrape into PostgreSQL:
 python -m services.acquisition.scrapy_recipe_ingestion --source-id scrapy_indianhealthyrecipes --allow-disabled --max-items 100 --max-pages 250 --ingest
 ```
 
+Run the automated catalogue v3 scrape -> load -> enrich -> nutrition pipeline:
+
+```bash
+python -m scripts.run_catalogue_v3_pipeline --source-group structured_html --allow-disabled --max-items 250 --max-pages 500 --max-depth 3
+```
+
+See `docs/catalogue_v3_pipeline_automation.md` for scheduling and idempotency
+details.
+
 Refresh fuller instructions from real source pages when a site exposes short
 recipe-card steps and longer article/photo-guide steps:
 

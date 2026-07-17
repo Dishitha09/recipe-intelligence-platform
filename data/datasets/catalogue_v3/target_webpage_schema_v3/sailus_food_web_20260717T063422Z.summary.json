@@ -1,0 +1,28 @@
+{
+  "source_id": "sailus_food_web",
+  "source_url": "https://www.sailusfood.com/",
+  "records_scraped": 11,
+  "inserted": 8,
+  "skipped_duplicate": 0,
+  "updated_existing": 0,
+  "skipped_invalid": 3,
+  "failed": 0,
+  "errors": [
+    {
+      "name": "Diwali Sweets – Badam Halwa, Bobbatlu & Annam Payasam",
+      "source_url": "https://www.sailusfood.com/diwali-sweets-badam-halwa-bobbatlu-annam-payasam",
+      "reason": "missing_source_servings"
+    },
+    {
+      "name": "Godhuma (Wheat) Rava – Tomato Upma",
+      "source_url": "https://www.sailusfood.com/godhuma-wheat-rava-tomato-upma",
+      "reason": "missing_source_servings"
+    },
+    {
+      "name": "Sambar",
+      "source_url": "https://www.sailusfood.com/sambar-recipe-spiced-lentil-vegetable-stew",
+      "reason": "missing_source_servings"
+    }
+  ],
+  "output_csv": "data\\datasets\\catalogue_v3\\target_webpage_schema_v3\\sailus_food_web_20260717T063422Z.csv"
+}

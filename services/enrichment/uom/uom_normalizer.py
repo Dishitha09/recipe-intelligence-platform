@@ -143,6 +143,17 @@ class UOMNormalizer:
 
         return None
 
+    def _round_quantity(self, value):
+        if value is None:
+            return None
+
+        rounded = round(float(value), 2)
+
+        if rounded.is_integer():
+            return int(rounded)
+
+        return rounded
+
     def normalize(self, ingredient_name, quantity_str, unit_str):
         ingredient_key = self._ingredient_key(ingredient_name)
         raw_unit = self._normalize_unit(unit_str)
@@ -259,11 +270,11 @@ class UOMNormalizer:
                 ingredient_name,
                 quantity,
                 normalized_volume_unit,
-                quantity,
-                normalized_volume_unit,
-                "volume_passthrough_without_density",
+                round(ml, 2),
+                "ml",
+                "metric_volume_without_density",
                 0.75,
-                conversion_factor=1.0,
+                conversion_factor=ml_factor,
                 flags=["density_missing"],
             )
 
@@ -314,6 +325,30 @@ class UOMNormalizer:
         if alias:
             return DENSITY.get(alias)
 
+        words = compact.split()
+        descriptor_words = {
+            "black",
+            "brown",
+            "diced",
+            "green",
+            "raw",
+            "red",
+            "ripe",
+            "sliced",
+            "small",
+            "sweet",
+            "white",
+            "yellow",
+        }
+        stripped = " ".join(word for word in words if word not in descriptor_words)
+
+        if stripped in DENSITY:
+            return DENSITY[stripped]
+
+        for key, density in DENSITY.items():
+            if compact.endswith(f" {key}") or stripped.endswith(f" {key}"):
+                return density
+
         return None
 
     def _result(
@@ -330,13 +365,13 @@ class UOMNormalizer:
     ):
         return {
             "ingredient_name": ingredient_name,
-            "quantity": quantity,
+            "quantity": self._round_quantity(quantity),
             "unit": unit,
             "raw_unit": unit,
-            "canonical_quantity": canonical_quantity,
+            "canonical_quantity": self._round_quantity(canonical_quantity),
             "canonical_unit": canonical_unit,
             "conversion_method": conversion_method,
-            "conversion_factor": conversion_factor,
+            "conversion_factor": self._round_quantity(conversion_factor),
             "confidence_score": confidence_score,
             "enrichment_flags": flags or [],
         }

@@ -67,10 +67,21 @@ def test_solid_volume_without_density_passes_through_without_conflict():
 
     result = uom.normalize("unknown spice", "1", "tsp")
 
-    assert result["canonical_quantity"] == 1
-    assert result["canonical_unit"] == "tsp"
-    assert result["conversion_method"] == "volume_passthrough_without_density"
+    assert result["canonical_quantity"] == 5
+    assert result["canonical_unit"] == "ml"
+    assert result["conversion_method"] == "metric_volume_without_density"
     assert "uom_conflict" not in result["enrichment_flags"]
+    assert "density_missing" in result["enrichment_flags"]
+
+
+def test_descriptor_density_alias_converts_to_grams():
+    uom = UOMNormalizer()
+
+    result = uom.normalize("red onion", "3/4", "cup")
+
+    assert result["canonical_quantity"] == 120
+    assert result["canonical_unit"] == "g"
+    assert result["conversion_method"] == "density_lookup"
 
 
 def test_common_dairy_liquids_are_classified_as_liquid():

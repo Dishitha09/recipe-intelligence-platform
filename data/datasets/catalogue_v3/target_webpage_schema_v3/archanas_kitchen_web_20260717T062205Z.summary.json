@@ -1,0 +1,12 @@
+{
+  "source_id": "archanas_kitchen_web",
+  "source_url": "https://www.archanaskitchen.com/",
+  "records_scraped": 0,
+  "inserted": 0,
+  "skipped_duplicate": 0,
+  "updated_existing": 0,
+  "skipped_invalid": 0,
+  "failed": 0,
+  "errors": [],
+  "output_csv": "data\\datasets\\catalogue_v3\\target_webpage_schema_v3\\archanas_kitchen_web_20260717T062205Z.csv"
+}

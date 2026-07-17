@@ -108,6 +108,13 @@ class CatalogueV3Enricher:
             unit = ingredient.get("unit")
             ingredient_name = self._clean_text(name or parsed.ingredient_name)
 
+            if self._should_use_parsed_name(
+                ingredient_name,
+                parsed.ingredient_name,
+                parsed.unit,
+            ):
+                ingredient_name = self._clean_text(parsed.ingredient_name)
+
             ingredient.setdefault("raw_text", raw_text)
             ingredient.setdefault("source_position", index)
             ingredient["raw_text"] = raw_text
@@ -115,6 +122,14 @@ class CatalogueV3Enricher:
 
             if quantity is None:
                 quantity = parsed.quantity
+            else:
+                quantity = self._numeric_quantity(quantity)
+
+            if quantity is None:
+                quantity = parsed.quantity
+
+            quantity_for_normalization = quantity
+            quantity = self._round_quantity(quantity)
 
             if unit is None:
                 unit = parsed.unit
@@ -124,7 +139,7 @@ class CatalogueV3Enricher:
 
             normalized = self.uom_normalizer.normalize(
                 ingredient_name=ingredient_name,
-                quantity_str=quantity,
+                quantity_str=quantity_for_normalization,
                 unit_str=unit,
             )
             ingredient["canonical_quantity"] = normalized.get(
@@ -132,6 +147,10 @@ class CatalogueV3Enricher:
             )
             ingredient["canonical_unit"] = normalized.get("canonical_unit")
             ingredient["normalized_text"] = self._ingredient_display_text(
+                ingredient_name,
+                normalized.get("canonical_quantity"),
+                normalized.get("canonical_unit"),
+            ) or self._ingredient_display_text(
                 ingredient_name,
                 quantity,
                 unit,
@@ -231,14 +250,48 @@ class CatalogueV3Enricher:
 
     def _format_quantity(self, quantity):
         try:
-            value = float(quantity)
+            value = self._round_quantity(quantity)
         except (TypeError, ValueError):
             return str(quantity)
 
-        if value.is_integer():
+        if isinstance(value, int) or value.is_integer():
             return str(int(value))
 
-        return f"{value:g}"
+        return f"{value:.2f}".rstrip("0").rstrip(".")
+
+    def _numeric_quantity(self, quantity):
+        parsed = self.ingredient_parser.parse_quantity(quantity)
+
+        if parsed is not None:
+            return parsed
+
+        return self.uom_normalizer.parse_quantity(quantity)
+
+    def _should_use_parsed_name(self, existing_name, parsed_name, parsed_unit):
+        if not parsed_name:
+            return False
+
+        if not existing_name:
+            return True
+
+        if not parsed_unit:
+            return False
+
+        existing = existing_name.lower().strip()
+        unit = str(parsed_unit).lower().strip()
+
+        return existing == unit or existing.startswith(f"{unit} ")
+
+    def _round_quantity(self, quantity):
+        if quantity is None:
+            return None
+
+        value = round(float(quantity), 2)
+
+        if value.is_integer():
+            return int(value)
+
+        return value
 
     def _diet(self, row, text):
         existing = row.get("diet")

@@ -1,0 +1,632 @@
+{
+  "run_started_at": "20260717T063422Z",
+  "dry_run": false,
+  "selected_sources": [
+    "archanas_kitchen_web",
+    "whiskaffair_indian_state_web",
+    "sailus_food_web",
+    "eat_by_state_web",
+    "vegan_richa_indian_web"
+  ],
+  "totals": {
+    "records_scraped": 54,
+    "inserted": 41,
+    "skipped_duplicate": 10,
+    "updated_existing": 0,
+    "skipped_invalid": 3,
+    "failed": 0,
+    "enriched": 38,
+    "nutrition_updated": 0
+  },
+  "sources": [
+    {
+      "source_id": "archanas_kitchen_web",
+      "source_type": "web",
+      "source_group": "target_webpage_schema_v3",
+      "started_at": "2026-07-17T06:34:22.510003+00:00",
+      "status": "failed",
+      "error": "Scrape job timed out for archanas_kitchen_web after 180 seconds. See data\\datasets\\catalogue_v3\\target_webpage_schema_v3\\archanas_kitchen_web_20260717T063422Z.log.",
+      "ended_at": "2026-07-17T06:37:22.533470+00:00"
+    },
+    {
+      "source_id": "whiskaffair_indian_state_web",
+      "source_type": "web",
+      "source_group": "target_webpage_schema_v3",
+      "started_at": "2026-07-17T06:37:22.547994+00:00",
+      "scrape": {
+        "source_id": "whiskaffair_indian_state_web",
+        "source_url": "https://www.whiskaffair.com/category/recipes/indian/",
+        "records_scraped": 15,
+        "inserted": 5,
+        "skipped_duplicate": 10,
+        "updated_existing": 0,
+        "skipped_invalid": 0,
+        "failed": 0,
+        "errors": [],
+        "output_csv": "data\\datasets\\catalogue_v3\\target_webpage_schema_v3\\whiskaffair_indian_state_web_20260717T063422Z.csv",
+        "job_log": "data\\datasets\\catalogue_v3\\target_webpage_schema_v3\\whiskaffair_indian_state_web_20260717T063422Z.log",
+        "job_started_at": "20260717T063422Z"
+      },
+      "enrichment": {
+        "source": "whiskaffair_indian_state_web",
+        "selected": 10,
+        "updated": 10,
+        "dry_run": false,
+        "samples": [
+          {
+            "name": "White Urad Dal Recipe (Dhuli Urad Dal)",
+            "source": "whiskaffair_indian_state_web",
+            "updates": {
+              "difficulty_level": "MEDIUM",
+              "allergen_tags": [
+                "DAIRY"
+              ],
+              "dish_types": [],
+              "dish_family": "dal",
+              "meal_role": "dal_side",
+              "health_tags": [
+                "HIGH_PROTEIN"
+              ],
+              "cost_tier": "BUDGET",
+              "budget_band": "BUDGET",
+              "complexity": "MEDIUM"
+            }
+          },
+          {
+            "name": "Beetroot Raita Recipe (Beet Raita)",
+            "source": "whiskaffair_indian_state_web",
+            "updates": {
+              "difficulty_level": "MEDIUM",
+              "allergen_tags": [
+                "DAIRY"
+              ],
+              "dish_types": [
+                "condiment"
+              ],
+              "dish_family": "raita",
+              "meal_role": "condiment",
+              "efficiency_tags": [
+                "QUICK"
+              ],
+              "cost_tier": "MID_RANGE",
+              "budget_band": "MID_RANGE",
+              "complexity": "MEDIUM"
+            }
+          },
+          {
+            "name": "Cold Coffee Recipe",
+            "source": "whiskaffair_indian_state_web",
+            "updates": {
+              "difficulty_level": "MEDIUM",
+              "allergen_tags": [
+                "DAIRY"
+              ],
+              "dish_types": [],
+              "dish_family": null,
+              "meal_role": null,
+              "efficiency_tags": [
+                "QUICK"
+              ],
+              "cost_tier": "MID_RANGE",
+              "budget_band": "MID_RANGE",
+              "complexity": "MEDIUM"
+            }
+          },
+          {
+            "name": "Mint Chutney Recipe (Pudina Chutney)",
+            "source": "whiskaffair_indian_state_web",
+            "updates": {
+              "difficulty_level": "EASY",
+              "dish_types": [
+                "condiment"
+              ],
+              "dish_family": "chutney",
+              "meal_role": "condiment",
+              "efficiency_tags": [
+                "QUICK",
+                "BEGINNER_FRIENDLY"
+              ],
+              "cost_tier": "MID_RANGE",
+              "budget_band": "MID_RANGE",
+              "complexity": "EASY"
+            }
+          },
+          {
+            "name": "Paneer Masala Recipe",
+            "source": "whiskaffair_indian_state_web",
+            "updates": {
+              "difficulty_level": "HARD",
+              "allergen_tags": [
+                "DAIRY",
+                "GLUTEN"
+              ],
+              "dish_types": [],
+              "dish_family": null,
+              "meal_role": "protein_side",
+              "health_tags": [
+                "HIGH_PROTEIN"
+              ],
+              "cost_tier": "BUDGET",
+              "budget_band": "BUDGET",
+              "complexity": "HARD"
+            }
+          }
+        ]
+      },
+      "nutrition": {
+        "skipped": true
+      },
+      "status": "completed",
+      "ended_at": "2026-07-17T06:39:14.684085+00:00"
+    },
+    {
+      "source_id": "sailus_food_web",
+      "source_type": "web",
+      "source_group": "target_webpage_schema_v3",
+      "started_at": "2026-07-17T06:39:14.687834+00:00",
+      "scrape": {
+        "source_id": "sailus_food_web",
+        "source_url": "https://www.sailusfood.com/",
+        "records_scraped": 11,
+        "inserted": 8,
+        "skipped_duplicate": 0,
+        "updated_existing": 0,
+        "skipped_invalid": 3,
+        "failed": 0,
+        "errors": [
+          {
+            "name": "Diwali Sweets – Badam Halwa, Bobbatlu & Annam Payasam",
+            "source_url": "https://www.sailusfood.com/diwali-sweets-badam-halwa-bobbatlu-annam-payasam",
+            "reason": "missing_source_servings"
+          },
+          {
+            "name": "Godhuma (Wheat) Rava – Tomato Upma",
+            "source_url": "https://www.sailusfood.com/godhuma-wheat-rava-tomato-upma",
+            "reason": "missing_source_servings"
+          },
+          {
+            "name": "Sambar",
+            "source_url": "https://www.sailusfood.com/sambar-recipe-spiced-lentil-vegetable-stew",
+            "reason": "missing_source_servings"
+          }
+        ],
+        "output_csv": "data\\datasets\\catalogue_v3\\target_webpage_schema_v3\\sailus_food_web_20260717T063422Z.csv",
+        "job_log": "data\\datasets\\catalogue_v3\\target_webpage_schema_v3\\sailus_food_web_20260717T063422Z.log",
+        "job_started_at": "20260717T063422Z"
+      },
+      "enrichment": {
+        "source": "sailus_food_web",
+        "selected": 8,
+        "updated": 8,
+        "dry_run": false,
+        "samples": [
+          {
+            "name": "Khatta meetha mirch ka achar recipe",
+            "source": "sailus_food_web",
+            "updates": {
+              "difficulty_level": "EASY",
+              "diet": "vegan",
+              "diet_tags": [
+                "VEGAN"
+              ],
+              "dish_types": [],
+              "dish_family": "pickle",
+              "meal_role": "condiment",
+              "health_tags": [
+                "VEGAN"
+              ],
+              "efficiency_tags": [
+                "QUICK"
+              ],
+              "cost_tier": "MID_RANGE",
+              "budget_band": "MID_RANGE",
+              "complexity": "EASY"
+            }
+          },
+          {
+            "name": "Raju gari kodi pulao recipe – restaurant style andhra chicken pulao",
+            "source": "sailus_food_web",
+            "updates": {
+              "difficulty_level": "HARD",
+              "diet": "non_vegetarian",
+              "diet_tags": [
+                "NON_VEGETARIAN"
+              ],
+              "allergen_tags": [
+                "DAIRY",
+                "NUTS"
+              ],
+              "dish_types": [
+                "rice"
+              ],
+              "dish_family": "pulao",
+              "meal_role": "complete_meal",
+              "health_tags": [
+                "HIGH_PROTEIN",
+                "GLUTEN_FREE"
+              ],
+              "cost_tier": "PREMIUM",
+              "budget_band": "PREMIUM",
+              "complexity": "HARD",
+              "region": "South"
+            }
+          },
+          {
+            "name": "Spicy chicken curry recipe",
+            "source": "sailus_food_web",
+            "updates": {
+              "difficulty_level": "MEDIUM",
+              "diet": "non_vegetarian",
+              "diet_tags": [
+                "NON_VEGETARIAN"
+              ],
+              "dish_types": [
+                "curry"
+              ],
+              "dish_family": "curry",
+              "meal_role": "protein_side",
+              "health_tags": [
+                "HIGH_PROTEIN"
+              ],
+              "cost_tier": "MID_RANGE",
+              "budget_band": "MID_RANGE",
+              "complexity": "MEDIUM",
+              "region": "South"
+            }
+          },
+          {
+            "name": "Gutti vankaya fry – Andhra style stuffed brinjal fry recipe",
+            "source": "sailus_food_web",
+            "updates": {
+              "difficulty_level": "MEDIUM",
+              "diet": "vegan",
+              "diet_tags": [
+                "VEGAN"
+              ],
+              "dish_types": [],
+              "dish_family": null,
+              "meal_role": null,
+              "health_tags": [
+                "HIGH_PROTEIN",
+                "VEGAN"
+              ],
+              "cost_tier": "BUDGET",
+              "budget_band": "BUDGET",
+              "complexity": "MEDIUM",
+              "region": "South"
+            }
+          },
+          {
+            "name": "Khara bath recipe",
+            "source": "sailus_food_web",
+            "updates": {
+              "difficulty_level": "HARD",
+              "allergen_tags": [
+                "DAIRY",
+                "GLUTEN",
+                "NUTS"
+              ],
+              "dish_types": [],
+              "dish_family": null,
+              "meal_role": null,
+              "health_tags": [
+                "HIGH_PROTEIN"
+              ],
+              "efficiency_tags": [
+                "BEGINNER_FRIENDLY"
+              ],
+              "cost_tier": "PREMIUM",
+              "budget_band": "PREMIUM",
+              "complexity": "HARD",
+              "region": "South"
+            }
+          }
+        ]
+      },
+      "nutrition": {
+        "skipped": true
+      },
+      "status": "completed",
+      "ended_at": "2026-07-17T06:41:14.675476+00:00"
+    },
+    {
+      "source_id": "eat_by_state_web",
+      "source_type": "web",
+      "source_group": "target_webpage_schema_v3",
+      "started_at": "2026-07-17T06:41:14.678034+00:00",
+      "scrape": {
+        "source_id": "eat_by_state_web",
+        "source_url": "https://www.eatbystate.com/",
+        "records_scraped": 14,
+        "inserted": 14,
+        "skipped_duplicate": 0,
+        "updated_existing": 0,
+        "skipped_invalid": 0,
+        "failed": 0,
+        "errors": [],
+        "output_csv": "data\\datasets\\catalogue_v3\\target_webpage_schema_v3\\eat_by_state_web_20260717T063422Z.csv",
+        "job_log": "data\\datasets\\catalogue_v3\\target_webpage_schema_v3\\eat_by_state_web_20260717T063422Z.log",
+        "job_started_at": "20260717T063422Z"
+      },
+      "enrichment": {
+        "source": "eat_by_state_web",
+        "selected": 10,
+        "updated": 10,
+        "dry_run": false,
+        "samples": [
+          {
+            "name": "Vendha Kollu",
+            "source": "eat_by_state_web",
+            "updates": {
+              "difficulty_level": "MEDIUM",
+              "diet": "vegetarian",
+              "diet_tags": [
+                "VEGETARIAN"
+              ],
+              "allergen_tags": [
+                "DAIRY"
+              ],
+              "dish_types": [],
+              "dish_family": null,
+              "meal_role": null,
+              "cost_tier": "BUDGET",
+              "budget_band": "BUDGET",
+              "complexity": "MEDIUM",
+              "region": "South"
+            }
+          },
+          {
+            "name": "Tuna Thoran",
+            "source": "eat_by_state_web",
+            "updates": {
+              "difficulty_level": "MEDIUM",
+              "diet": "non_vegetarian",
+              "diet_tags": [
+                "NON_VEGETARIAN"
+              ],
+              "allergen_tags": [
+                "SEAFOOD"
+              ],
+              "dish_types": [],
+              "dish_family": null,
+              "meal_role": null,
+              "health_tags": [
+                "HIGH_PROTEIN"
+              ],
+              "cost_tier": "PREMIUM",
+              "budget_band": "PREMIUM",
+              "complexity": "MEDIUM",
+              "region": "Southwest"
+            }
+          },
+          {
+            "name": "Tsampa",
+            "source": "eat_by_state_web",
+            "updates": {
+              "difficulty_level": "MEDIUM",
+              "diet": "vegetarian",
+              "diet_tags": [
+                "VEGETARIAN"
+              ],
+              "allergen_tags": [
+                "DAIRY"
+              ],
+              "dish_types": [],
+              "dish_family": null,
+              "meal_role": null,
+              "efficiency_tags": [
+                "QUICK"
+              ],
+              "cost_tier": "MID_RANGE",
+              "budget_band": "MID_RANGE",
+              "complexity": "MEDIUM",
+              "region": "North"
+            }
+          },
+          {
+            "name": "Yakhni",
+            "source": "eat_by_state_web",
+            "updates": {
+              "difficulty_level": "HARD",
+              "diet": "non_vegetarian",
+              "diet_tags": [
+                "NON_VEGETARIAN"
+              ],
+              "allergen_tags": [
+                "DAIRY"
+              ],
+              "dish_types": [],
+              "dish_family": null,
+              "meal_role": null,
+              "health_tags": [
+                "HIGH_PROTEIN"
+              ],
+              "efficiency_tags": [
+                "MEAL_PREP"
+              ],
+              "cost_tier": "PREMIUM",
+              "budget_band": "PREMIUM",
+              "complexity": "HARD",
+              "region": "North"
+            }
+          },
+          {
+            "name": "Tandoori Roti",
+            "source": "eat_by_state_web",
+            "updates": {
+              "difficulty_level": "MEDIUM",
+              "diet": "vegetarian",
+              "diet_tags": [
+                "VEGETARIAN"
+              ],
+              "allergen_tags": [
+                "DAIRY",
+                "GLUTEN"
+              ],
+              "dish_types": [
+                "bread"
+              ],
+              "dish_family": null,
+              "meal_role": null,
+              "cost_tier": "MID_RANGE",
+              "budget_band": "MID_RANGE",
+              "complexity": "MEDIUM",
+              "region": "North"
+            }
+          }
+        ]
+      },
+      "nutrition": {
+        "skipped": true
+      },
+      "status": "completed",
+      "ended_at": "2026-07-17T06:43:12.589689+00:00"
+    },
+    {
+      "source_id": "vegan_richa_indian_web",
+      "source_type": "web",
+      "source_group": "target_webpage_schema_v3",
+      "started_at": "2026-07-17T06:43:12.592641+00:00",
+      "scrape": {
+        "source_id": "vegan_richa_indian_web",
+        "source_url": "https://www.veganricha.com/category/indian-vegan-recipes",
+        "records_scraped": 14,
+        "inserted": 14,
+        "skipped_duplicate": 0,
+        "updated_existing": 0,
+        "skipped_invalid": 0,
+        "failed": 0,
+        "errors": [],
+        "output_csv": "data\\datasets\\catalogue_v3\\target_webpage_schema_v3\\vegan_richa_indian_web_20260717T063422Z.csv",
+        "job_log": "data\\datasets\\catalogue_v3\\target_webpage_schema_v3\\vegan_richa_indian_web_20260717T063422Z.log",
+        "job_started_at": "20260717T063422Z"
+      },
+      "enrichment": {
+        "source": "vegan_richa_indian_web",
+        "selected": 10,
+        "updated": 10,
+        "dry_run": false,
+        "samples": [
+          {
+            "name": "Baked Tawa pulao - Indian Spiced Rice Casserole 1 Pan 1 Step",
+            "source": "vegan_richa_indian_web",
+            "updates": {
+              "difficulty_level": "MEDIUM",
+              "dish_types": [
+                "rice"
+              ],
+              "dish_family": "pulao",
+              "meal_role": "complete_meal",
+              "health_tags": [
+                "GLUTEN_FREE"
+              ],
+              "cost_tier": "BUDGET",
+              "budget_band": "BUDGET",
+              "complexity": "MEDIUM"
+            }
+          },
+          {
+            "name": "Goan Peri Peri Chicken (Indian chili garlic sauce)",
+            "source": "vegan_richa_indian_web",
+            "updates": {
+              "difficulty_level": "HARD",
+              "diet": "non_vegetarian",
+              "diet_tags": [
+                "NON_VEGETARIAN"
+              ],
+              "allergen_tags": [
+                "GLUTEN",
+                "SOY"
+              ],
+              "dish_types": [],
+              "dish_family": null,
+              "meal_role": "protein_side",
+              "health_tags": [
+                "HIGH_PROTEIN"
+              ],
+              "cost_tier": "BUDGET",
+              "budget_band": "BUDGET",
+              "complexity": "HARD",
+              "region": "West"
+            }
+          },
+          {
+            "name": "Vindaloo Curry with Lentils and Potatoes",
+            "source": "vegan_richa_indian_web",
+            "updates": {
+              "difficulty_level": "MEDIUM",
+              "allergen_tags": [
+                "DAIRY"
+              ],
+              "dish_types": [
+                "curry"
+              ],
+              "dish_family": "curry",
+              "meal_role": null,
+              "health_tags": [
+                "HIGH_PROTEIN"
+              ],
+              "efficiency_tags": [
+                "BEGINNER_FRIENDLY"
+              ],
+              "cost_tier": "BUDGET",
+              "budget_band": "BUDGET",
+              "complexity": "MEDIUM",
+              "region": "West"
+            }
+          },
+          {
+            "name": "Malvani Chicken Curry (Western Indian Coconut, Kashmiri Chili, Onion Curry)",
+            "source": "vegan_richa_indian_web",
+            "updates": {
+              "difficulty_level": "HARD",
+              "diet": "non_vegetarian",
+              "diet_tags": [
+                "NON_VEGETARIAN"
+              ],
+              "allergen_tags": [
+                "DAIRY",
+                "SOY"
+              ],
+              "dish_types": [
+                "curry"
+              ],
+              "dish_family": "curry",
+              "meal_role": "protein_side",
+              "health_tags": [
+                "HIGH_PROTEIN",
+                "GLUTEN_FREE"
+              ],
+              "cost_tier": "BUDGET",
+              "budget_band": "BUDGET",
+              "complexity": "HARD",
+              "region": "North"
+            }
+          },
+          {
+            "name": "Spiced Tomato Soup",
+            "source": "vegan_richa_indian_web",
+            "updates": {
+              "difficulty_level": "EASY",
+              "dish_types": [],
+              "dish_family": null,
+              "meal_role": null,
+              "efficiency_tags": [
+                "QUICK",
+                "BEGINNER_FRIENDLY"
+              ],
+              "cost_tier": "BUDGET",
+              "budget_band": "BUDGET",
+              "complexity": "EASY"
+            }
+          }
+        ]
+      },
+      "nutrition": {
+        "skipped": true
+      },
+      "status": "completed",
+      "ended_at": "2026-07-17T06:45:19.955126+00:00"
+    }
+  ]
+}

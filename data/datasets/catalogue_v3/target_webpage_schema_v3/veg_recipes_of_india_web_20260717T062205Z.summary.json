@@ -1,0 +1,12 @@
+{
+  "source_id": "veg_recipes_of_india_web",
+  "source_url": "https://www.vegrecipesofindia.com/",
+  "records_scraped": 12,
+  "inserted": 0,
+  "skipped_duplicate": 12,
+  "updated_existing": 0,
+  "skipped_invalid": 0,
+  "failed": 0,
+  "errors": [],
+  "output_csv": "data\\datasets\\catalogue_v3\\target_webpage_schema_v3\\veg_recipes_of_india_web_20260717T062205Z.csv"
+}

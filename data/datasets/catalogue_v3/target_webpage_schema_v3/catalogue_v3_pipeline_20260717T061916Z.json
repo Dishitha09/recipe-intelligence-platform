@@ -1,0 +1,238 @@
+{
+  "run_started_at": "20260717T061916Z",
+  "dry_run": false,
+  "selected_sources": [
+    "swasthi_recipes_index_web",
+    "veg_recipes_of_india_web",
+    "archanas_kitchen_web",
+    "whiskaffair_indian_state_web",
+    "sailus_food_web",
+    "eat_by_state_web",
+    "vegan_richa_indian_web"
+  ],
+  "totals": {
+    "records_scraped": 16,
+    "inserted": 11,
+    "skipped_duplicate": 5,
+    "updated_existing": 0,
+    "skipped_invalid": 0,
+    "failed": 0,
+    "enriched": 10,
+    "nutrition_updated": 0
+  },
+  "sources": [
+    {
+      "source_id": "swasthi_recipes_index_web",
+      "source_type": "web",
+      "source_group": "target_webpage_schema_v3",
+      "started_at": "2026-07-17T06:19:16.498598+00:00",
+      "scrape": {
+        "source_id": "swasthi_recipes_index_web",
+        "source_url": "https://www.indianhealthyrecipes.com/recipes/",
+        "records_scraped": 16,
+        "inserted": 11,
+        "skipped_duplicate": 5,
+        "updated_existing": 0,
+        "skipped_invalid": 0,
+        "failed": 0,
+        "errors": [],
+        "output_csv": "data\\datasets\\catalogue_v3\\target_webpage_schema_v3\\swasthi_recipes_index_web_20260717T061916Z.csv"
+      },
+      "enrichment": {
+        "source": "swasthi_recipes_index_web",
+        "selected": 10,
+        "updated": 10,
+        "dry_run": false,
+        "samples": [
+          {
+            "name": "Tofu Bhurji Recipe",
+            "source": "swasthi_recipes_index_web",
+            "updates": {
+              "difficulty_level": "MEDIUM",
+              "allergen_tags": [
+                "DAIRY",
+                "GLUTEN",
+                "SOY"
+              ],
+              "dish_types": [],
+              "dish_family": null,
+              "meal_role": null,
+              "health_tags": [
+                "HIGH_PROTEIN"
+              ],
+              "efficiency_tags": [
+                "QUICK"
+              ],
+              "cost_tier": "BUDGET",
+              "budget_band": "BUDGET",
+              "complexity": "MEDIUM"
+            }
+          },
+          {
+            "name": "Shrimp Curry Recipe",
+            "source": "swasthi_recipes_index_web",
+            "updates": {
+              "difficulty_level": "MEDIUM",
+              "diet": "non_vegetarian",
+              "diet_tags": [
+                "NON_VEGETARIAN"
+              ],
+              "allergen_tags": [
+                "DAIRY",
+                "SEAFOOD"
+              ],
+              "dish_types": [
+                "curry"
+              ],
+              "dish_family": "curry",
+              "meal_role": "protein_side",
+              "health_tags": [
+                "HIGH_PROTEIN",
+                "GLUTEN_FREE"
+              ],
+              "efficiency_tags": [
+                "QUICK"
+              ],
+              "cost_tier": "PREMIUM",
+              "budget_band": "PREMIUM",
+              "complexity": "MEDIUM"
+            }
+          },
+          {
+            "name": "Veg Puff Recipe (Bakery Vegetable Puffs)",
+            "source": "swasthi_recipes_index_web",
+            "updates": {
+              "difficulty_level": "MEDIUM",
+              "diet": "egg",
+              "diet_tags": [
+                "EGG"
+              ],
+              "allergen_tags": [
+                "DAIRY",
+                "EGG"
+              ],
+              "dish_types": [],
+              "dish_family": null,
+              "meal_role": null,
+              "health_tags": [
+                "HIGH_PROTEIN"
+              ],
+              "cost_tier": "BUDGET",
+              "budget_band": "BUDGET",
+              "complexity": "MEDIUM"
+            }
+          },
+          {
+            "name": "Palak Tofu (Spinach Tofu)",
+            "source": "swasthi_recipes_index_web",
+            "updates": {
+              "difficulty_level": "MEDIUM",
+              "allergen_tags": [
+                "DAIRY",
+                "NUTS",
+                "SOY"
+              ],
+              "dish_types": [],
+              "dish_family": null,
+              "meal_role": null,
+              "health_tags": [
+                "HIGH_PROTEIN",
+                "GLUTEN_FREE"
+              ],
+              "cost_tier": "PREMIUM",
+              "budget_band": "PREMIUM",
+              "complexity": "MEDIUM",
+              "region": "North"
+            }
+          },
+          {
+            "name": "Shrimp Tikka Masala (Shrimp Masala)",
+            "source": "swasthi_recipes_index_web",
+            "updates": {
+              "difficulty_level": "HARD",
+              "diet": "non_vegetarian",
+              "diet_tags": [
+                "NON_VEGETARIAN"
+              ],
+              "allergen_tags": [
+                "DAIRY",
+                "NUTS",
+                "SEAFOOD"
+              ],
+              "dish_types": [],
+              "dish_family": null,
+              "meal_role": "protein_side",
+              "health_tags": [
+                "HIGH_PROTEIN",
+                "GLUTEN_FREE"
+              ],
+              "cost_tier": "PREMIUM",
+              "budget_band": "PREMIUM",
+              "complexity": "HARD",
+              "region": "North"
+            }
+          }
+        ]
+      },
+      "nutrition": {
+        "skipped": true
+      },
+      "status": "completed",
+      "ended_at": "2026-07-17T06:20:45.215673+00:00"
+    },
+    {
+      "source_id": "veg_recipes_of_india_web",
+      "source_type": "web",
+      "source_group": "target_webpage_schema_v3",
+      "started_at": "2026-07-17T06:20:45.225687+00:00",
+      "status": "failed",
+      "error": "",
+      "ended_at": "2026-07-17T06:20:45.241156+00:00"
+    },
+    {
+      "source_id": "archanas_kitchen_web",
+      "source_type": "web",
+      "source_group": "target_webpage_schema_v3",
+      "started_at": "2026-07-17T06:20:45.244630+00:00",
+      "status": "failed",
+      "error": "",
+      "ended_at": "2026-07-17T06:20:45.260408+00:00"
+    },
+    {
+      "source_id": "whiskaffair_indian_state_web",
+      "source_type": "web",
+      "source_group": "target_webpage_schema_v3",
+      "started_at": "2026-07-17T06:20:45.263467+00:00",
+      "status": "failed",
+      "error": "",
+      "ended_at": "2026-07-17T06:20:45.290868+00:00"
+    },
+    {
+      "source_id": "sailus_food_web",
+      "source_type": "web",
+      "source_group": "target_webpage_schema_v3",
+      "started_at": "2026-07-17T06:20:45.293484+00:00",
+      "status": "failed",
+      "error": "",
+      "ended_at": "2026-07-17T06:20:45.308290+00:00"
+    },
+    {
+      "source_id": "eat_by_state_web",
+      "source_type": "web",
+      "source_group": "target_webpage_schema_v3",
+      "started_at": "2026-07-17T06:20:45.311839+00:00",
+      "status": "failed",
+      "error": "",
+      "ended_at": "2026-07-17T06:20:45.326890+00:00"
+    },
+    {
+      "source_id": "vegan_richa_indian_web",
+      "source_type": "web",
+      "source_group": "target_webpage_schema_v3",
+      "started_at": "2026-07-17T06:20:45.333372+00:00",
+      "status": "failed",
+      "error": "",
+      "ended_at": "2026-07-17T06:20:45.358200+00:00"
+    }
+  ]
+}

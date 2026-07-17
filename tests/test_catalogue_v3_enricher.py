@@ -43,10 +43,10 @@ def test_catalogue_v3_enricher_structures_ingredients_and_tags():
     assert updates["ingredients_json"][0]["name"] == "basmati rice"
     assert updates["ingredients_json"][0]["quantity"] == 2
     assert updates["ingredients_json"][0]["unit"] == "cups"
-    assert updates["ingredients_json"][0]["canonical_unit"] == "cup"
-    assert updates["ingredients_json"][0]["canonical_quantity"] == 2
-    assert updates["ingredients_json"][0]["normalized_text"] == "2 cups basmati rice"
-    assert updates["ingredients_json"][0]["conversion_method"] == "volume_passthrough_without_density"
+    assert updates["ingredients_json"][0]["canonical_unit"] == "g"
+    assert updates["ingredients_json"][0]["canonical_quantity"] == 400
+    assert updates["ingredients_json"][0]["normalized_text"] == "400 g basmati rice"
+    assert updates["ingredients_json"][0]["conversion_method"] == "density_lookup"
     assert updates["diet"] == "egg"
     assert "EGG" in updates["diet_tags"]
     assert "HIGH_PROTEIN" in updates["health_tags"]
@@ -128,8 +128,103 @@ def test_catalogue_v3_enricher_repairs_mojibake_and_normalizes_uom():
     assert ingredient["raw_text"] == "1 1/2 cup rolled oats"
     assert ingredient["quantity"] == 1.5
     assert ingredient["unit"] == "cup"
-    assert ingredient["canonical_unit"] == "cup"
-    assert ingredient["normalized_text"] == "1.5 cup rolled oats"
+    assert ingredient["canonical_unit"] == "g"
+    assert ingredient["canonical_quantity"] == 120
+    assert ingredient["normalized_text"] == "120 g rolled oats"
+
+
+def test_catalogue_v3_enricher_reparses_existing_string_quantity_as_number():
+    row = {
+        "name": "Dal",
+        "description": "Simple dal",
+        "ingredients_json": [
+            {
+                "raw_text": "1/2 teaspoon turmeric powder",
+                "name": "turmeric powder",
+                "quantity": "1/2",
+                "unit": "teaspoon",
+            },
+            {"raw_text": "1/3 cup red lentils"},
+        ],
+        "cook_steps": [{"instruction": "Cook."}],
+        "tags": [],
+        "course": [],
+        "cuisines": ["Indian"],
+        "meal_types": [],
+        "diet_tags": [],
+        "allergen_tags": [],
+        "health_tags": [],
+        "efficiency_tags": [],
+        "dish_types": [],
+        "metadata": {},
+        "servings": 2,
+        "prep_time_min": 5,
+        "cook_time_min": 20,
+        "total_time_min": 25,
+        "difficulty_level": None,
+        "diet": None,
+        "meal_role": None,
+        "dish_family": None,
+        "cost_tier": None,
+        "budget_band": None,
+        "region": None,
+    }
+
+    ingredients = CatalogueV3Enricher().enrich_row(row).updates["ingredients_json"]
+
+    assert ingredients[0]["quantity"] == 0.5
+    assert ingredients[0]["canonical_unit"] == "ml"
+    assert ingredients[0]["canonical_quantity"] == 2.5
+    assert ingredients[0]["normalized_text"] == "2.5 ml turmeric powder"
+    assert ingredients[1]["quantity"] == 0.33
+    assert ingredients[1]["canonical_unit"] == "g"
+    assert ingredients[1]["canonical_quantity"] == 63.33
+    assert ingredients[1]["normalized_text"] == "63.33 g red lentils"
+
+
+def test_catalogue_v3_enricher_repairs_unit_prefixed_legacy_names():
+    row = {
+        "name": "Mushroom Curry",
+        "description": "Mushrooms in masala",
+        "ingredients_json": [
+            {
+                "raw_text": "6 to 8 oz sliced white mushrooms",
+                "name": "oz sliced white mushrooms",
+                "quantity": 7,
+                "unit": "oz",
+            }
+        ],
+        "cook_steps": [{"instruction": "Cook."}],
+        "tags": [],
+        "course": [],
+        "cuisines": ["Indian"],
+        "meal_types": [],
+        "diet_tags": [],
+        "allergen_tags": [],
+        "health_tags": [],
+        "efficiency_tags": [],
+        "dish_types": [],
+        "metadata": {},
+        "servings": 2,
+        "prep_time_min": 5,
+        "cook_time_min": 20,
+        "total_time_min": 25,
+        "difficulty_level": None,
+        "diet": None,
+        "meal_role": None,
+        "dish_family": None,
+        "cost_tier": None,
+        "budget_band": None,
+        "region": None,
+    }
+
+    ingredient = CatalogueV3Enricher().enrich_row(row).updates["ingredients_json"][0]
+
+    assert ingredient["name"] == "white mushrooms"
+    assert ingredient["quantity"] == 7
+    assert ingredient["canonical_unit"] == "g"
+    assert ingredient["canonical_quantity"] == 198.45
+    assert ingredient["normalized_text"] == "198.45 g white mushrooms"
 
 
 def test_catalogue_v3_enricher_does_not_infer_diet_from_source_id():

@@ -29,3 +29,13 @@ def test_ingredient_parser_strips_preparation_noise():
     assert result.quantity == 1
     assert result.unit == "cup"
     assert result.ingredient_name == "coconut"
+
+
+def test_ingredient_parser_recognizes_imperial_weight_units():
+    parser = IngredientParser()
+
+    result = parser.parse("6 to 8 oz sliced white mushrooms")
+
+    assert result.quantity == 7
+    assert result.unit == "oz"
+    assert result.ingredient_name == "white mushrooms"

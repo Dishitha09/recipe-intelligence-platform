@@ -58,3 +58,22 @@ def test_local_fixture_is_marked_production_excluded():
 
     assert fixture["enabled"] is False
     assert fixture["config"]["production_excluded"] is True
+
+
+def test_target_webpage_schema_v3_sources_are_configured():
+    payload = load_config()
+    source_ids = {
+        source["source_id"]
+        for source in payload["sources"]
+        if source["config"].get("source_group") == "target_webpage_schema_v3"
+    }
+
+    assert {
+        "swasthi_recipes_index_web",
+        "archanas_kitchen_web",
+        "whiskaffair_indian_state_web",
+        "sailus_food_web",
+        "eat_by_state_web",
+        "veg_recipes_of_india_web",
+        "vegan_richa_indian_web",
+    }.issubset(source_ids)

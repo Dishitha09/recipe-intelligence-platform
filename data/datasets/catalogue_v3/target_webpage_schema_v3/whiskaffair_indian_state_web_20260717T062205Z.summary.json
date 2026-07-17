@@ -1,0 +1,12 @@
+{
+  "source_id": "whiskaffair_indian_state_web",
+  "source_url": "https://www.whiskaffair.com/category/recipes/indian/",
+  "records_scraped": 16,
+  "inserted": 15,
+  "skipped_duplicate": 1,
+  "updated_existing": 0,
+  "skipped_invalid": 0,
+  "failed": 0,
+  "errors": [],
+  "output_csv": "data\\datasets\\catalogue_v3\\target_webpage_schema_v3\\whiskaffair_indian_state_web_20260717T062205Z.csv"
+}

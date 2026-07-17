@@ -1,0 +1,12 @@
+{
+  "source_id": "vegan_richa_indian_web",
+  "source_url": "https://www.veganricha.com/category/indian-vegan-recipes",
+  "records_scraped": 14,
+  "inserted": 14,
+  "skipped_duplicate": 0,
+  "updated_existing": 0,
+  "skipped_invalid": 0,
+  "failed": 0,
+  "errors": [],
+  "output_csv": "data\\datasets\\catalogue_v3\\target_webpage_schema_v3\\vegan_richa_indian_web_20260717T063422Z.csv"
+}

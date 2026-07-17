@@ -74,6 +74,25 @@
       }
     },
     {
+      "source_id": "swasthi_recipes_index_web",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://www.indianhealthyrecipes.com/recipes/",
+      "enabled": false,
+      "config": {
+        "priority": 2,
+        "source_group": "target_webpage_schema_v3",
+        "expected_volume": 1200,
+        "quality": "high",
+        "parser": "schema_org_recipe_json_ld",
+        "crawl_delay_seconds": 3,
+        "max_depth": 3,
+        "concurrent_requests": 6,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
       "source_id": "scrapy_indianhealthyrecipes",
       "source_type": "web",
       "adapter": "scrapy",
@@ -195,7 +214,7 @@
       "enabled": false,
       "config": {
         "priority": 2,
-        "source_group": "structured_html",
+        "source_group": "target_webpage_schema_v3",
         "expected_volume": 1000,
         "quality": "high",
         "parser": "schema_org_recipe_json_ld",
@@ -214,7 +233,7 @@
       "enabled": false,
       "config": {
         "priority": 3,
-        "source_group": "structured_html",
+        "source_group": "target_webpage_schema_v3",
         "expected_volume": 1200,
         "quality": "high",
         "parser": "schema_org_recipe_json_ld",
@@ -418,6 +437,82 @@
         "priority": 3,
         "source_group": "structured_html",
         "expected_volume": 700,
+        "quality": "medium_high",
+        "parser": "schema_org_recipe_json_ld",
+        "crawl_delay_seconds": 3,
+        "max_depth": 3,
+        "concurrent_requests": 6,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "whiskaffair_indian_state_web",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://www.whiskaffair.com/category/recipes/indian/",
+      "enabled": false,
+      "config": {
+        "priority": 3,
+        "source_group": "target_webpage_schema_v3",
+        "expected_volume": 700,
+        "quality": "medium_high",
+        "parser": "schema_org_recipe_json_ld",
+        "crawl_delay_seconds": 3,
+        "max_depth": 3,
+        "concurrent_requests": 6,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "sailus_food_web",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://www.sailusfood.com/",
+      "enabled": false,
+      "config": {
+        "priority": 4,
+        "source_group": "target_webpage_schema_v3",
+        "expected_volume": 600,
+        "quality": "medium_high",
+        "parser": "schema_org_recipe_json_ld",
+        "crawl_delay_seconds": 3,
+        "max_depth": 3,
+        "concurrent_requests": 6,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "eat_by_state_web",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://www.eatbystate.com/",
+      "enabled": false,
+      "config": {
+        "priority": 5,
+        "source_group": "target_webpage_schema_v3",
+        "expected_volume": 300,
+        "quality": "medium",
+        "parser": "schema_org_recipe_json_ld",
+        "crawl_delay_seconds": 5,
+        "max_depth": 3,
+        "concurrent_requests": 4,
+        "dedup": "normalized_source_url_and_title_hash",
+        "requires_robots_check": true
+      }
+    },
+    {
+      "source_id": "vegan_richa_indian_web",
+      "source_type": "web",
+      "adapter": "scrapy",
+      "location": "https://www.veganricha.com/category/indian-vegan-recipes",
+      "enabled": false,
+      "config": {
+        "priority": 6,
+        "source_group": "target_webpage_schema_v3",
+        "expected_volume": 500,
         "quality": "medium_high",
         "parser": "schema_org_recipe_json_ld",
         "crawl_delay_seconds": 3,
