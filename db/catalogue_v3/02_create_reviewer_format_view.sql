@@ -28,9 +28,6 @@ SELECT
                     ),
                     'quantity',
                     CASE
-                        WHEN ingredient ? 'canonical_quantity'
-                             AND jsonb_typeof(ingredient->'canonical_quantity') = 'number'
-                        THEN ingredient->'canonical_quantity'
                         WHEN ingredient ? 'quantity'
                              AND jsonb_typeof(ingredient->'quantity') = 'number'
                         THEN ingredient->'quantity'
@@ -38,10 +35,27 @@ SELECT
                     END,
                     'unit',
                     CASE
-                        WHEN NULLIF(ingredient->>'canonical_unit', '') IS NOT NULL
-                        THEN to_jsonb(ingredient->>'canonical_unit')
                         WHEN NULLIF(ingredient->>'unit', '') IS NOT NULL
                         THEN to_jsonb(ingredient->>'unit')
+                        ELSE 'null'::jsonb
+                    END,
+                    'normalized_quantity',
+                    CASE
+                        WHEN ingredient ? 'canonical_quantity'
+                             AND jsonb_typeof(ingredient->'canonical_quantity') = 'number'
+                        THEN ingredient->'canonical_quantity'
+                        ELSE 'null'::jsonb
+                    END,
+                    'normalized_unit',
+                    CASE
+                        WHEN NULLIF(ingredient->>'canonical_unit', '') IS NOT NULL
+                        THEN to_jsonb(ingredient->>'canonical_unit')
+                        ELSE 'null'::jsonb
+                    END,
+                    'normalized_text',
+                    CASE
+                        WHEN NULLIF(ingredient->>'normalized_text', '') IS NOT NULL
+                        THEN to_jsonb(ingredient->>'normalized_text')
                         ELSE 'null'::jsonb
                     END,
                     'prep',

@@ -55,7 +55,11 @@ QUALITY_SQL = text(
         count(*) FILTER (
             WHERE ingredient ? 'canonical_unit'
               AND ingredient->>'canonical_unit' IN ('cup', 'tsp', 'tbsp')
-        ) AS non_metric_canonical_unit_rows
+        ) AS non_metric_canonical_unit_rows,
+        count(*) FILTER (
+            WHERE COALESCE(ingredient->>'name', '') ~*
+                '^\\s*(\\d|\\d+/\\d+)'
+        ) AS quantity_prefixed_name_rows
     FROM ingredient_items
     """
 )
@@ -91,6 +95,26 @@ SAMPLES_SQL = text(
 )
 
 
+QUANTITY_PREFIXED_NAME_SAMPLES_SQL = text(
+    """
+    SELECT
+        source,
+        name,
+        ingredient->>'raw_text' AS raw_text,
+        ingredient->>'name' AS ingredient_name,
+        ingredient->>'quantity' AS quantity,
+        ingredient->>'unit' AS unit,
+        ingredient->>'normalized_text' AS normalized_text
+    FROM recipe_catalogue_v3
+    CROSS JOIN LATERAL jsonb_array_elements(ingredients_json) AS ingredient
+    WHERE COALESCE(ingredient->>'name', '') ~*
+        '^\\s*(\\d|\\d+/\\d+)'
+    ORDER BY updated_at DESC, created_at DESC
+    LIMIT :limit
+    """
+)
+
+
 def ingredient_numeric_quality(sample_limit=12):
     with get_catalogue_v3_engine().connect() as conn:
         quality = dict(conn.execute(QUALITY_SQL).mappings().one())
@@ -105,11 +129,19 @@ def ingredient_numeric_quality(sample_limit=12):
                 {"limit": sample_limit},
             ).mappings()
         ]
+        quantity_prefixed_name_samples = [
+            dict(row)
+            for row in conn.execute(
+                QUANTITY_PREFIXED_NAME_SAMPLES_SQL,
+                {"limit": sample_limit},
+            ).mappings()
+        ]
 
     return {
         "quality": quality,
         "canonical_unit_counts": unit_counts,
         "samples": samples,
+        "quantity_prefixed_name_samples": quantity_prefixed_name_samples,
     }
 
 

@@ -227,6 +227,192 @@ def test_catalogue_v3_enricher_repairs_unit_prefixed_legacy_names():
     assert ingredient["normalized_text"] == "198.45 g white mushrooms"
 
 
+def test_catalogue_v3_enricher_repairs_quantity_prefixed_legacy_names():
+    row = {
+        "name": "Besan Curry",
+        "description": "Gram flour curry",
+        "ingredients_json": [
+            {
+                "raw_text": "1/2 cup Gram flour (besan)",
+                "name": "1/2 cup Gram flour (besan)",
+                "quantity": 0.5,
+                "unit": "cup",
+            }
+        ],
+        "cook_steps": [{"instruction": "Cook."}],
+        "tags": [],
+        "course": [],
+        "cuisines": ["Indian"],
+        "meal_types": [],
+        "diet_tags": [],
+        "allergen_tags": [],
+        "health_tags": [],
+        "efficiency_tags": [],
+        "dish_types": [],
+        "metadata": {},
+        "servings": 2,
+        "prep_time_min": 5,
+        "cook_time_min": 20,
+        "total_time_min": 25,
+        "difficulty_level": None,
+        "diet": None,
+        "meal_role": None,
+        "dish_family": None,
+        "cost_tier": None,
+        "budget_band": None,
+        "region": None,
+    }
+
+    ingredient = CatalogueV3Enricher().enrich_row(row).updates["ingredients_json"][0]
+
+    assert ingredient["name"] == "Gram flour"
+    assert ingredient["quantity"] == 0.5
+    assert ingredient["canonical_unit"] == "g"
+    assert ingredient["canonical_quantity"] == 46
+    assert ingredient["normalized_text"] == "46 g Gram flour"
+
+
+def test_catalogue_v3_enricher_prefers_embedded_metric_measure():
+    row = {
+        "name": "Cake",
+        "description": "Cake batter",
+        "ingredients_json": [
+            {
+                "raw_text": "1 cup 180gm maida / plain flour / refined flour",
+                "name": "180gm maida plain flour refined flour",
+                "quantity": 1,
+                "unit": "cup",
+            }
+        ],
+        "cook_steps": [{"instruction": "Mix."}],
+        "tags": [],
+        "course": [],
+        "cuisines": ["Indian"],
+        "meal_types": [],
+        "diet_tags": [],
+        "allergen_tags": [],
+        "health_tags": [],
+        "efficiency_tags": [],
+        "dish_types": [],
+        "metadata": {},
+        "servings": 2,
+        "prep_time_min": 5,
+        "cook_time_min": 20,
+        "total_time_min": 25,
+        "difficulty_level": None,
+        "diet": None,
+        "meal_role": None,
+        "dish_family": None,
+        "cost_tier": None,
+        "budget_band": None,
+        "region": None,
+    }
+
+    ingredient = CatalogueV3Enricher().enrich_row(row).updates["ingredients_json"][0]
+
+    assert ingredient["name"] == "maida plain flour refined flour"
+    assert ingredient["quantity"] == 180
+    assert ingredient["unit"] == "gm"
+    assert ingredient["canonical_unit"] == "g"
+    assert ingredient["canonical_quantity"] == 180
+    assert ingredient["normalized_text"] == "180 g maida plain flour refined flour"
+
+
+def test_catalogue_v3_enricher_strips_compound_leading_measure_from_name():
+    row = {
+        "name": "Roomali Roti",
+        "description": "Soft roti",
+        "ingredients_json": [
+            {
+                "raw_text": "1/2 cup + 3 tablespoons all purpose flour",
+                "name": "3 tablespoons all purpose flour",
+                "quantity": 0.5,
+                "unit": "cup",
+            },
+            {
+                "raw_text": "500 grams 2 blocks cream cheese, softened",
+                "name": "2 blocks cream cheese softened",
+                "quantity": 500,
+                "unit": "grams",
+            },
+        ],
+        "cook_steps": [{"instruction": "Mix."}],
+        "tags": [],
+        "course": [],
+        "cuisines": ["Indian"],
+        "meal_types": [],
+        "diet_tags": [],
+        "allergen_tags": [],
+        "health_tags": [],
+        "efficiency_tags": [],
+        "dish_types": [],
+        "metadata": {},
+        "servings": 2,
+        "prep_time_min": 5,
+        "cook_time_min": 20,
+        "total_time_min": 25,
+        "difficulty_level": None,
+        "diet": None,
+        "meal_role": None,
+        "dish_family": None,
+        "cost_tier": None,
+        "budget_band": None,
+        "region": None,
+    }
+
+    ingredients = CatalogueV3Enricher().enrich_row(row).updates["ingredients_json"]
+
+    assert ingredients[0]["name"] == "all purpose flour"
+    assert ingredients[0]["normalized_text"] == "60 g all purpose flour"
+    assert ingredients[1]["name"] == "cream cheese"
+    assert ingredients[1]["normalized_text"] == "500 g cream cheese"
+
+
+def test_catalogue_v3_enricher_cleans_count_prefixed_names_and_prep():
+    row = {
+        "name": "Poriyal",
+        "description": "Vegetable stir fry",
+        "ingredients_json": [
+            {"raw_text": "5 Drumstick - cut into 3 inch pieces"},
+            {"raw_text": "2 Green Chillies - slit"},
+        ],
+        "cook_steps": [{"instruction": "Cook."}],
+        "tags": [],
+        "course": [],
+        "cuisines": ["Indian"],
+        "meal_types": [],
+        "diet_tags": [],
+        "allergen_tags": [],
+        "health_tags": [],
+        "efficiency_tags": [],
+        "dish_types": [],
+        "metadata": {},
+        "servings": 2,
+        "prep_time_min": 5,
+        "cook_time_min": 20,
+        "total_time_min": 25,
+        "difficulty_level": None,
+        "diet": None,
+        "meal_role": None,
+        "dish_family": None,
+        "cost_tier": None,
+        "budget_band": None,
+        "region": None,
+    }
+
+    ingredients = CatalogueV3Enricher().enrich_row(row).updates["ingredients_json"]
+
+    assert ingredients[0]["name"] == "Drumstick"
+    assert ingredients[0]["quantity"] == 5
+    assert ingredients[0]["canonical_unit"] == "count"
+    assert ingredients[0]["normalized_text"] == "5 count Drumstick"
+    assert ingredients[0]["prep"] == "cut into 3 inch pieces"
+    assert ingredients[1]["name"] == "Green Chillies"
+    assert ingredients[1]["quantity"] == 2
+    assert ingredients[1]["normalized_text"] == "2 count Green Chillies"
+    assert ingredients[1]["prep"] == "slit"
+
+
 def test_catalogue_v3_enricher_does_not_infer_diet_from_source_id():
     row = {
         "name": "Curd Rice Recipe",

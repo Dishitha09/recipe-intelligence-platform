@@ -103,36 +103,61 @@ class CatalogueV3Enricher:
             )
             raw_text = self._clean_text(raw_text)
             parsed = self.ingredient_parser.parse(raw_text)
+            parsed_name = parsed.ingredient_name
+            parsed_quantity = parsed.quantity
+            parsed_unit = parsed.unit
             name = ingredient.get("name") or ingredient.get("item")
             quantity = ingredient.get("quantity")
             unit = ingredient.get("unit")
-            ingredient_name = self._clean_text(name or parsed.ingredient_name)
+            embedded_metric = self._embedded_metric_measure(
+                parsed_name,
+                parsed_unit,
+            )
+
+            if embedded_metric:
+                parsed_quantity = embedded_metric["quantity"]
+                parsed_unit = embedded_metric["unit"]
+                parsed_name = embedded_metric["name"]
+                quantity = parsed_quantity
+                unit = parsed_unit
+
+            parsed_name = self._strip_leading_measure_from_name(parsed_name)
+            parsed_name, parsed_prep = self._split_item_prep(parsed_name)
+            ingredient_name = self._clean_text(name or parsed_name)
 
             if self._should_use_parsed_name(
                 ingredient_name,
-                parsed.ingredient_name,
-                parsed.unit,
+                parsed_name,
+                parsed_unit,
+                raw_text,
             ):
-                ingredient_name = self._clean_text(parsed.ingredient_name)
+                ingredient_name = self._clean_text(parsed_name)
 
+            ingredient_name, name_prep = self._split_item_prep(ingredient_name)
             ingredient.setdefault("raw_text", raw_text)
             ingredient.setdefault("source_position", index)
             ingredient["raw_text"] = raw_text
             ingredient["name"] = ingredient_name
 
+            if not ingredient.get("prep") and not ingredient.get("preparation"):
+                prep = parsed_prep or name_prep
+
+                if prep:
+                    ingredient["prep"] = prep
+
             if quantity is None:
-                quantity = parsed.quantity
+                quantity = parsed_quantity
             else:
                 quantity = self._numeric_quantity(quantity)
 
             if quantity is None:
-                quantity = parsed.quantity
+                quantity = parsed_quantity
 
             quantity_for_normalization = quantity
             quantity = self._round_quantity(quantity)
 
             if unit is None:
-                unit = parsed.unit
+                unit = parsed_unit
 
             ingredient["quantity"] = quantity
             ingredient["unit"] = unit
@@ -267,11 +292,96 @@ class CatalogueV3Enricher:
 
         return self.uom_normalizer.parse_quantity(quantity)
 
-    def _should_use_parsed_name(self, existing_name, parsed_name, parsed_unit):
+    def _embedded_metric_measure(self, parsed_name, parsed_unit):
+        household_units = {
+            "cup",
+            "cups",
+            "teaspoon",
+            "teaspoons",
+            "tablespoon",
+            "tablespoons",
+            "tbsp",
+            "tsp",
+        }
+
+        metric_units = {
+            "g",
+            "gm",
+            "gram",
+            "grams",
+            "kg",
+            "kilogram",
+            "kilograms",
+            "mg",
+            "milligram",
+            "milligrams",
+            "ml",
+            "milliliter",
+            "milliliters",
+            "millilitre",
+            "millilitres",
+            "l",
+            "liter",
+            "liters",
+            "litre",
+            "litres",
+        }
+
+        if str(parsed_unit or "").lower() not in household_units:
+            return None
+
+        embedded = self.ingredient_parser.parse(parsed_name or "")
+
+        if embedded.quantity is None:
+            return None
+
+        if str(embedded.unit or "").lower() not in metric_units:
+            return None
+
+        if not embedded.ingredient_name or embedded.ingredient_name == parsed_name:
+            return None
+
+        return {
+            "quantity": embedded.quantity,
+            "unit": embedded.unit,
+            "name": embedded.ingredient_name,
+        }
+
+    def _strip_leading_measure_from_name(self, value):
+        cleaned = self._clean_text(value)
+
+        for _ in range(3):
+            parsed = self.ingredient_parser.parse(cleaned)
+            parsed_name = self._clean_text(parsed.ingredient_name)
+
+            if parsed.quantity is None or not parsed_name:
+                break
+
+            if parsed_name == cleaned:
+                break
+
+            cleaned = parsed_name
+
+        return cleaned
+
+    def _split_item_prep(self, value):
+        text = self._clean_text(value)
+
+        if " - " not in text:
+            return text, None
+
+        item, prep = text.split(" - ", 1)
+
+        return self._clean_text(item), self._clean_text(prep) or None
+
+    def _should_use_parsed_name(self, existing_name, parsed_name, parsed_unit, raw_text):
         if not parsed_name:
             return False
 
         if not existing_name:
+            return True
+
+        if self._starts_with_quantity_or_unit(existing_name):
             return True
 
         if not parsed_unit:
@@ -280,7 +390,30 @@ class CatalogueV3Enricher:
         existing = existing_name.lower().strip()
         unit = str(parsed_unit).lower().strip()
 
-        return existing == unit or existing.startswith(f"{unit} ")
+        if existing == unit or existing.startswith(f"{unit} "):
+            return True
+
+        if existing_name == raw_text and parsed_name != raw_text:
+            return True
+
+        return False
+
+    def _starts_with_quantity_or_unit(self, value):
+        return bool(
+            re.match(
+                (
+                    r"^\s*(?:\d+(?:-\d+/\d+)?(?:\.\d+)?|\d+/\d+|"
+                    r"\d+\s+\d+/\d+|\d+\s+to\s+\d+(?:\.\d+)?)\s*"
+                    r"(?:cups?|teaspoons?|tablespoons?|tbsp|tsp|grams?|gram|"
+                    r"g|gm|mg|kg|ml|l|liters?|litres?|milligrams?|"
+                    r"milliliters?|millilitres?|ounces?|ounce|oz|"
+                    r"pounds?|pound|lb|lbs|cloves?|pieces?|packets?|"
+                    r"blocks?|slices?|sprigs?|inch|inches)?\b"
+                ),
+                str(value or ""),
+                flags=re.I,
+            )
+        )
 
     def _round_quantity(self, quantity):
         if quantity is None:

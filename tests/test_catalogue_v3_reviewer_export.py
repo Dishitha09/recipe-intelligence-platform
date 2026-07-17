@@ -3,7 +3,7 @@ import json
 from scripts.export_catalogue_v3_reviewer_format import _export_row
 
 
-def test_reviewer_export_uses_metric_ingredient_shape():
+def test_reviewer_export_includes_source_and_normalized_measurements():
     row = {
         "name": "Egg Pulao",
         "course": ["main"],
@@ -38,14 +38,20 @@ def test_reviewer_export_uses_metric_ingredient_shape():
     assert ingredients == [
         {
             "item": "Basmati rice",
-            "quantity": 400,
-            "unit": "g",
+            "quantity": 2,
+            "unit": "cups",
+            "normalized_quantity": 400,
+            "normalized_unit": "g",
+            "normalized_text": None,
             "prep": "soaked",
         },
         {
             "item": "oil",
-            "quantity": 45,
-            "unit": "ml",
+            "quantity": 3,
+            "unit": "tbsp",
+            "normalized_quantity": 45,
+            "normalized_unit": "ml",
+            "normalized_text": None,
             "prep": None,
         },
     ]

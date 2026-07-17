@@ -189,20 +189,19 @@ def _reviewer_ingredients(ingredients):
             item or ingredient.get("raw_text"),
             ingredient.get("prep") or ingredient.get("preparation"),
         )
-        quantity = ingredient.get("canonical_quantity")
-        unit = ingredient.get("canonical_unit")
-
-        if quantity is None:
-            quantity = ingredient.get("quantity")
-
-        if not unit:
-            unit = None
+        quantity = ingredient.get("quantity")
+        unit = ingredient.get("unit") or None
+        normalized_quantity = ingredient.get("canonical_quantity")
+        normalized_unit = ingredient.get("canonical_unit") or None
 
         reviewer_items.append(
             {
                 "item": item,
                 "quantity": _number(quantity),
                 "unit": unit,
+                "normalized_quantity": _number(normalized_quantity),
+                "normalized_unit": normalized_unit,
+                "normalized_text": ingredient.get("normalized_text"),
                 "prep": prep,
             }
         )
