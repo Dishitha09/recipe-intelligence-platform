@@ -1,6 +1,6 @@
 import hashlib
 import os
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from decimal import Decimal
 from typing import Any
 
@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from sqlalchemy import text
 
+from services.database.catalogue_v3_connection import get_catalogue_v3_engine
 from services.database.connection import engine
 from services.observability.prometheus import build_prometheus_metrics
 
@@ -549,6 +550,48 @@ def home():
     }
 
 
+@app.get("/health")
+def health():
+    return {
+        "status": "ok",
+        "service": "recipe-intelligence-api",
+        "checked_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@app.get("/ready")
+def ready():
+    checks = {}
+
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        checks["operational_db"] = "ok"
+    except Exception as exc:
+        checks["operational_db"] = f"failed: {exc}"
+
+    try:
+        with get_catalogue_v3_engine().connect() as conn:
+            conn.execute(text("SELECT 1"))
+        checks["catalogue_v3_db"] = "ok"
+    except Exception as exc:
+        checks["catalogue_v3_db"] = f"failed: {exc}"
+
+    if all(value == "ok" for value in checks.values()):
+        return {
+            "status": "ready",
+            "checks": checks,
+        }
+
+    raise HTTPException(
+        status_code=503,
+        detail={
+            "status": "not_ready",
+            "checks": checks,
+        },
+    )
+
+
 @app.get("/metrics")
 def metrics():
     return Response(
@@ -562,6 +605,20 @@ def write_back_alias(request: AliasWriteBackRequest):
     from services.database.ingredient_repository import IngredientRepository
 
     return IngredientRepository().write_back_alias(
+        canonical_name=request.canonical_name,
+        alias_name=request.alias_name,
+        language=request.language,
+        source=request.source,
+    )
+
+
+@app.post("/catalogue-v3/ingredients/aliases")
+def write_back_catalogue_v3_alias(request: AliasWriteBackRequest):
+    from services.database.catalogue_v3_curator_repository import (
+        CatalogueV3CuratorRepository,
+    )
+
+    return CatalogueV3CuratorRepository().write_back_alias(
         canonical_name=request.canonical_name,
         alias_name=request.alias_name,
         language=request.language,

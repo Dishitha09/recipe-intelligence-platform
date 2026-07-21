@@ -1,0 +1,350 @@
+{
+  "status": "completed",
+  "started_at": "2026-07-21T04:19:05.446524+00:00",
+  "ended_at": "2026-07-21T04:19:12.539476+00:00",
+  "dry_run": true,
+  "pipeline": {
+    "run_started_at": "20260721T041905Z",
+    "dry_run": true,
+    "selected_sources": [
+      "swasthi_recipes_index_web"
+    ],
+    "totals": {
+      "records_scraped": 0,
+      "inserted": 0,
+      "skipped_duplicate": 0,
+      "updated_existing": 0,
+      "skipped_invalid": 0,
+      "failed": 0,
+      "enriched": 0,
+      "nutrition_updated": 0
+    },
+    "sources": [
+      {
+        "source_id": "swasthi_recipes_index_web",
+        "source_type": "web",
+        "source_group": "target_webpage_schema_v3",
+        "started_at": "2026-07-21T04:19:05.449225+00:00",
+        "scrape": {
+          "source_id": "swasthi_recipes_index_web",
+          "records_scraped": 0,
+          "inserted": 0,
+          "skipped_duplicate": 0,
+          "updated_existing": 0,
+          "skipped_invalid": 0,
+          "failed": 0,
+          "errors": [],
+          "skipped": true
+        },
+        "enrichment": {
+          "source": "swasthi_recipes_index_web",
+          "selected": 1,
+          "updated": 0,
+          "dry_run": true,
+          "samples": [
+            {
+              "name": "Tofu Bhurji Recipe",
+              "source": "swasthi_recipes_index_web",
+              "updates": {
+                "difficulty_level": "MEDIUM",
+                "allergen_tags": [
+                  "DAIRY",
+                  "GLUTEN",
+                  "SOY"
+                ],
+                "dish_types": [],
+                "dish_family": null,
+                "meal_role": null,
+                "health_tags": [
+                  "HIGH_PROTEIN"
+                ],
+                "efficiency_tags": [
+                  "QUICK"
+                ],
+                "cost_tier": "BUDGET",
+                "budget_band": "BUDGET",
+                "complexity": "MEDIUM"
+              }
+            }
+          ]
+        },
+        "nutrition": {
+          "skipped": true
+        },
+        "status": "completed",
+        "ended_at": "2026-07-21T04:19:05.597772+00:00"
+      }
+    ],
+    "summary_path": "data\\datasets\\catalogue_v3\\automated_runs\\catalogue_v3_pipeline_20260721T041905Z.json"
+  },
+  "ingredient_resolution": {
+    "recipes_selected": 6563,
+    "ingredient_rows": 83665,
+    "resolved_rows": 82054,
+    "unresolved_rows": 1611,
+    "ingredient_resolution_rate": 0.9807,
+    "tier_counts": {
+      "exact_alias": 82054,
+      "unresolved": 1611
+    },
+    "method_counts": {
+      "database_alias": 82054,
+      "unresolved": 1611
+    },
+    "updated_recipes": 0,
+    "dry_run": true,
+    "passes_ps3_kpi": true,
+    "unresolved_samples": [
+      {
+        "recipe_id": "7f2d44bd-47a4-442e-a53c-5f64d0eb57f5",
+        "raw_name": "Sorrel Leaves",
+        "normalized_name": "sorrel leaves"
+      },
+      {
+        "recipe_id": "f5ad2943-5c14-4a26-9705-a8b4f63cf986",
+        "raw_name": "Coriander (Dhania) Leaves",
+        "normalized_name": "coriander dhania leaves"
+      },
+      {
+        "recipe_id": "fcc21c07-1f91-4548-8fce-087fb2b03444",
+        "raw_name": "Coriander (Dhania) Leaves",
+        "normalized_name": "coriander dhania leaves"
+      },
+      {
+        "recipe_id": "8a849336-0013-4828-832e-384f38d4441d",
+        "raw_name": "Nutralite Garlic & Oregano Spread",
+        "normalized_name": "nutralite garlic & oregano spread"
+      },
+      {
+        "recipe_id": "26fb8fa8-eabc-44c4-81df-7844a1cff00e",
+        "raw_name": "Coriander (Dhania) Leaves",
+        "normalized_name": "coriander dhania leaves"
+      },
+      {
+        "recipe_id": "8cb2a17d-9923-4b7f-b14c-a25620b7e328",
+        "raw_name": "Mooli/ Mullangi (Radish)",
+        "normalized_name": "mooli mullangi radish"
+      },
+      {
+        "recipe_id": "8cb2a17d-9923-4b7f-b14c-a25620b7e328",
+        "raw_name": "Coriander (Dhania) Leaves",
+        "normalized_name": "coriander dhania leaves"
+      },
+      {
+        "recipe_id": "f44f68e5-3ed1-469a-a4cc-6c71c93a73c8",
+        "raw_name": "Coriander (Dhania) Leaves",
+        "normalized_name": "coriander dhania leaves"
+      },
+      {
+        "recipe_id": "f44f68e5-3ed1-469a-a4cc-6c71c93a73c8",
+        "raw_name": "Fresh cream",
+        "normalized_name": "fresh cream"
+      },
+      {
+        "recipe_id": "ab394425-5fcf-4c23-b248-2a5ea7089cf5",
+        "raw_name": "or 4 Green Chillies",
+        "normalized_name": "or 4 green chillies"
+      },
+      {
+        "recipe_id": "25aa4c33-8e6d-413a-8ebc-20f5b1b656a8",
+        "raw_name": "Fresh Herbs",
+        "normalized_name": "fresh herbs"
+      },
+      {
+        "recipe_id": "5794ebf9-b9e8-4260-bcb2-558d815c98c0",
+        "raw_name": "Coriander (Dhania) Leaves",
+        "normalized_name": "coriander dhania leaves"
+      },
+      {
+        "recipe_id": "43db4d06-67b0-4bca-8a86-6083706b1946",
+        "raw_name": "Coriander (Dhania) Leaves",
+        "normalized_name": "coriander dhania leaves"
+      },
+      {
+        "recipe_id": "b5430e70-8bd2-498e-859b-cde59ef34716",
+        "raw_name": "Coriander (Dhania) Leaves",
+        "normalized_name": "coriander dhania leaves"
+      },
+      {
+        "recipe_id": "8917b3b7-2a63-489c-ae4f-95c3e67250d5",
+        "raw_name": "Coriander (Dhania) Leaves",
+        "normalized_name": "coriander dhania leaves"
+      },
+      {
+        "recipe_id": "ba826672-2cfa-4c08-8bf6-d1e0c66f4f43",
+        "raw_name": "Coriander (Dhania) Leaves",
+        "normalized_name": "coriander dhania leaves"
+      },
+      {
+        "recipe_id": "480e6bd4-53d2-4616-8929-483d7a868fe5",
+        "raw_name": "Cumin powder (Jeera)",
+        "normalized_name": "cumin powder jeera"
+      },
+      {
+        "recipe_id": "7d01d9c9-476e-46af-b528-f9ea2e0c2beb",
+        "raw_name": "Black Salt (Kala Namak)",
+        "normalized_name": "black salt kala namak"
+      },
+      {
+        "recipe_id": "52a28d9c-50c8-47db-89a5-68133da3e8a0",
+        "raw_name": "Coriander (Dhania) Leaves",
+        "normalized_name": "coriander dhania leaves"
+      },
+      {
+        "recipe_id": "b2a8d291-5c21-4458-8e95-45d0851aba8b",
+        "raw_name": "Coriander (Dhania) Leaves",
+        "normalized_name": "coriander dhania leaves"
+      }
+    ]
+  },
+  "validation": {
+    "selected": 6563,
+    "dry_run": true,
+    "status_counts": {
+      "ACCEPTED": 6050,
+      "REVIEW": 504,
+      "REJECTED": 9
+    },
+    "failure_counts": {
+      "V08": 5473,
+      "V11": 1791,
+      "V05": 502,
+      "V10": 382,
+      "V02": 9,
+      "V04": 4
+    },
+    "validation_acceptance_rate": 0.9218,
+    "accepted_critical_failures": 0,
+    "persisted": {},
+    "samples": [
+      {
+        "recipe_id": "3fc54025-d03c-414d-87b3-d41c14de54e0",
+        "name": "And fish soup recipe - Bengali style fish in tomato gravy",
+        "status": "REVIEW",
+        "failures": [
+          "V05",
+          "V08"
+        ]
+      },
+      {
+        "recipe_id": "8dad59a1-ca92-4a62-9b36-82a1f83c52d6",
+        "name": "Kesar Mango Lassi Recipe - Saffron Mango Lassi Recipe",
+        "status": "REVIEW",
+        "failures": [
+          "V05",
+          "V08"
+        ]
+      },
+      {
+        "recipe_id": "8a849336-0013-4828-832e-384f38d4441d",
+        "name": "Cheesy Garlic Broccoli Nuggets Recipe",
+        "status": "REVIEW",
+        "failures": [
+          "V05",
+          "V08"
+        ]
+      },
+      {
+        "recipe_id": "b628a02c-9cb9-4383-a518-718c8ffd39ad",
+        "name": "Peanut Pudding Recipe - Salt Pudding / Firm Mod Modak",
+        "status": "REVIEW",
+        "failures": [
+          "V05",
+          "V08"
+        ]
+      },
+      {
+        "recipe_id": "da6150ae-54b3-410a-a596-f60ef635786c",
+        "name": "Murgh Malaiwala Recipe - Chicken In Rich Creamy Gravy",
+        "status": "REVIEW",
+        "failures": [
+          "V05",
+          "V08",
+          "V11"
+        ]
+      },
+      {
+        "recipe_id": "bf66c398-dfed-4b73-a815-fc133e503cf1",
+        "name": "Paal Kesari Recipe - South Indian Style Milk Kesari",
+        "status": "REVIEW",
+        "failures": [
+          "V05",
+          "V11"
+        ]
+      },
+      {
+        "recipe_id": "211f0541-94b0-4931-a888-21bb945d4458",
+        "name": "Maharashtrian Style Semolina and Yogurt Cake Recipe",
+        "status": "REVIEW",
+        "failures": [
+          "V05"
+        ]
+      },
+      {
+        "recipe_id": "ba826672-2cfa-4c08-8bf6-d1e0c66f4f43",
+        "name": "And fish soup recipe - Bengali fish curry",
+        "status": "REVIEW",
+        "failures": [
+          "V05",
+          "V08"
+        ]
+      },
+      {
+        "recipe_id": "00bad1ed-fb9f-4b91-b9d0-15c690cd6358",
+        "name": "Hyderabad Soy Biryani Recipe With Vegetables & Palak",
+        "status": "REVIEW",
+        "failures": [
+          "V05",
+          "V08"
+        ]
+      },
+      {
+        "recipe_id": "4ed552ca-9754-40a7-b157-959e79357368",
+        "name": "Rock Toast Recipe - Semolina Bread Toast",
+        "status": "REVIEW",
+        "failures": [
+          "V05",
+          "V08"
+        ]
+      }
+    ],
+    "passes_ps5_kpi": true
+  },
+  "kpi": {
+    "database": "recipe_catalogue_v3",
+    "summary": {
+      "recipes": 6563,
+      "recipes_with_ingredients": 6563,
+      "recipes_with_steps": 6563,
+      "ingredient_rows": 83665,
+      "master_ingredients": 18205,
+      "ingredient_aliases": 1191,
+      "ingredient_embeddings": 18205,
+      "ingredient_resolution_reports": 83856
+    },
+    "validation": {
+      "validated_recipes": 6563,
+      "accepted": 6050,
+      "review": 504,
+      "rejected": 9,
+      "accepted_critical_failures": 0,
+      "validation_acceptance_rate": 0.9218,
+      "passes_ps5_kpi": true
+    },
+    "ingredient_resolution": {
+      "reported_ingredient_rows": 83665,
+      "resolved_rows": 82054,
+      "unresolved_rows": 1611,
+      "exact_alias_rows": 82054,
+      "vector_rows": 0,
+      "llm_rows": 0,
+      "ingredient_resolution_rate": 0.9807,
+      "passes_ps3_kpi": true,
+      "llm_escalation_rate": 0.0
+    },
+    "embedding_coverage": {
+      "ingredient_embedding_coverage": 1.0,
+      "passes_embedding_coverage": true
+    }
+  }
+}

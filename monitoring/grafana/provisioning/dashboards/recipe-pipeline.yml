@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: Recipe Pipeline
+    orgId: 1
+    folder: ShopConnect
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards

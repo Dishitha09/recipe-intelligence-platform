@@ -171,6 +171,13 @@ def test_metrics_endpoint_returns_prometheus_text(monkeypatch):
     assert "records_ingested_total 10" in response.text
 
 
+def test_health_endpoint_returns_alive_status():
+    response = client.get("/health")
+
+    assert response.status_code == 200
+    assert response.json()["status"] == "ok"
+
+
 def test_alias_write_back_endpoint(monkeypatch):
     from services.database.ingredient_repository import IngredientRepository
 
@@ -208,3 +215,46 @@ def test_alias_write_back_endpoint(monkeypatch):
     assert response.status_code == 200
     assert response.json()["canonical_name"] == "dry_mango_powder"
     assert response.json()["alias_name"] == "amchoor"
+
+
+def test_catalogue_v3_alias_write_back_endpoint(monkeypatch):
+    from services.database.catalogue_v3_curator_repository import (
+        CatalogueV3CuratorRepository,
+    )
+
+    def fake_write_back_alias(
+        self,
+        canonical_name,
+        alias_name,
+        language=None,
+        source="curator",
+    ):
+        return {
+            "ingredient_id": 10,
+            "canonical_name": canonical_name,
+            "alias_name": alias_name,
+            "language": language,
+            "source": source,
+            "next_run_resolution_tier": "exact_alias",
+        }
+
+    monkeypatch.setattr(
+        CatalogueV3CuratorRepository,
+        "write_back_alias",
+        fake_write_back_alias,
+    )
+
+    response = client.post(
+        "/catalogue-v3/ingredients/aliases",
+        json={
+            "canonical_name": "dry_mango_powder",
+            "alias_name": "amchoor",
+            "language": "hi",
+            "source": "curator",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["canonical_name"] == "dry_mango_powder"
+    assert response.json()["alias_name"] == "amchoor"
+    assert response.json()["next_run_resolution_tier"] == "exact_alias"

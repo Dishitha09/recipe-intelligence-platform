@@ -1,29 +1,73 @@
 services:
-
   postgres:
-
     image: pgvector/pgvector:pg16
-
     container_name: recipe_postgres
-
-    restart: always
-
+    restart: unless-stopped
     environment:
-
       POSTGRES_USER: admin
-
       POSTGRES_PASSWORD: admin
-
       POSTGRES_DB: recipe_platform
-
     ports:
-
       - "5433:5432"
-
     volumes:
-
       - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d recipe_platform"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    container_name: recipe_api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg2://admin:admin@postgres:5432/recipe_platform
+      CATALOGUE_V3_DATABASE_URL: postgresql+psycopg2://admin:admin@postgres:5432/recipe_catalogue_v3
+      SQLALCHEMY_ECHO: "false"
+      CORS_ORIGINS: http://localhost:5173,http://localhost:3000
+      RECIPE_PIPELINE_USER_AGENT: RecipeIntelligencePlatform/1.0
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: recipe_prometheus
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    container_name: recipe_grafana
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
 
 volumes:
-
   postgres_data:
+  grafana_data:

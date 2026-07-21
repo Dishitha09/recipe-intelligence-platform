@@ -1,0 +1,55 @@
+{
+  "uid": "shopconnect-recipe-pipeline",
+  "title": "ShopConnect Recipe Pipeline Overview",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "tags": ["shopconnect", "recipe-pipeline"],
+  "timezone": "browser",
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Recipes Ingested",
+      "gridPos": {"h": 6, "w": 6, "x": 0, "y": 0},
+      "targets": [{"expr": "records_ingested_total", "refId": "A"}]
+    },
+    {
+      "id": 2,
+      "type": "gauge",
+      "title": "Validation Acceptance Rate",
+      "gridPos": {"h": 6, "w": 6, "x": 6, "y": 0},
+      "fieldConfig": {"defaults": {"min": 0, "max": 1, "thresholds": {"steps": [{"color": "red", "value": null}, {"color": "yellow", "value": 0.85}, {"color": "green", "value": 0.9}]}}},
+      "targets": [{"expr": "validation_acceptance_rate", "refId": "A"}]
+    },
+    {
+      "id": 3,
+      "type": "gauge",
+      "title": "Ingredient Resolution Rate",
+      "gridPos": {"h": 6, "w": 6, "x": 12, "y": 0},
+      "fieldConfig": {"defaults": {"min": 0, "max": 1, "thresholds": {"steps": [{"color": "red", "value": null}, {"color": "yellow", "value": 0.94}, {"color": "green", "value": 0.97}]}}},
+      "targets": [{"expr": "ingredient_resolution_rate", "refId": "A"}]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Dead Letter Rate",
+      "gridPos": {"h": 6, "w": 6, "x": 18, "y": 0},
+      "targets": [{"expr": "dead_letter_rate", "refId": "A"}]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Pipeline P99 Latency",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 6},
+      "targets": [{"expr": "pipeline_e2e_latency_p99", "refId": "A"}]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "LLM Calls Per Batch",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 6},
+      "targets": [{"expr": "llm_calls_per_batch", "refId": "A"}]
+    }
+  ]
+}

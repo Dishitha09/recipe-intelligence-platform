@@ -20,6 +20,8 @@ class ValidationAlertDispatcher:
         http_client=None,
     ):
         self.webhook_url = webhook_url or os.getenv("SLACK_WEBHOOK_URL")
+        self.pagerduty_routing_key = os.getenv("PAGERDUTY_ROUTING_KEY")
+        self.pagerduty_severity = os.getenv("PAGERDUTY_SEVERITY", "critical")
         self.threshold = int(
             threshold
             if threshold is not None
@@ -33,7 +35,7 @@ class ValidationAlertDispatcher:
         self.http_client = http_client or requests
 
     def maybe_alert(self):
-        if not self.webhook_url:
+        if not self.webhook_url and not self.pagerduty_routing_key:
             return False
 
         failure_count = self._critical_failure_count()
@@ -52,6 +54,7 @@ class ValidationAlertDispatcher:
             "checked_at": datetime.now(timezone.utc).isoformat(),
         }
         self._post(payload)
+        self._post_pagerduty(payload)
 
         return True
 
@@ -74,9 +77,35 @@ class ValidationAlertDispatcher:
 
     @transient_retry
     def _post(self, payload):
+        if not self.webhook_url:
+            return None
+
         response = self.http_client.post(
             self.webhook_url,
             json=payload,
+            timeout=10,
+        )
+        response.raise_for_status()
+        return response
+
+    @transient_retry
+    def _post_pagerduty(self, payload):
+        if not self.pagerduty_routing_key:
+            return None
+
+        response = self.http_client.post(
+            "https://events.pagerduty.com/v2/enqueue",
+            json={
+                "routing_key": self.pagerduty_routing_key,
+                "event_action": "trigger",
+                "dedup_key": "recipe-pipeline-critical-validation-failures",
+                "payload": {
+                    "summary": payload["text"],
+                    "severity": self.pagerduty_severity,
+                    "source": "recipe-intelligence-platform",
+                    "custom_details": payload,
+                },
+            },
             timeout=10,
         )
         response.raise_for_status()
