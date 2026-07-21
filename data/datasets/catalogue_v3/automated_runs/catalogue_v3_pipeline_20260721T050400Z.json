@@ -1,0 +1,100 @@
+{
+  "run_started_at": "20260721T050400Z",
+  "dry_run": false,
+  "selected_sources": [
+    "swasthi_recipes_index_web"
+  ],
+  "totals": {
+    "records_scraped": 6,
+    "inserted": 1,
+    "skipped_duplicate": 5,
+    "updated_existing": 0,
+    "skipped_invalid": 0,
+    "failed": 0,
+    "enriched": 1,
+    "nutrition_updated": 1
+  },
+  "sources": [
+    {
+      "source_id": "swasthi_recipes_index_web",
+      "source_type": "web",
+      "source_group": "target_webpage_schema_v3",
+      "started_at": "2026-07-21T05:04:00.340447+00:00",
+      "scrape": {
+        "source_id": "swasthi_recipes_index_web",
+        "source_url": "https://www.indianhealthyrecipes.com/recipes/",
+        "records_scraped": 6,
+        "inserted": 1,
+        "skipped_duplicate": 5,
+        "updated_existing": 0,
+        "skipped_invalid": 0,
+        "failed": 0,
+        "errors": [],
+        "output_csv": "data\\datasets\\catalogue_v3\\automated_runs\\swasthi_recipes_index_web_20260721T050400Z.csv",
+        "job_log": "data\\datasets\\catalogue_v3\\automated_runs\\swasthi_recipes_index_web_20260721T050400Z.log",
+        "job_started_at": "20260721T050400Z"
+      },
+      "enrichment": {
+        "source": "swasthi_recipes_index_web",
+        "selected": 1,
+        "updated": 1,
+        "dry_run": false,
+        "samples": [
+          {
+            "name": "Tofu Bhurji Recipe",
+            "source": "swasthi_recipes_index_web",
+            "updates": {
+              "difficulty_level": "MEDIUM",
+              "allergen_tags": [
+                "DAIRY",
+                "GLUTEN",
+                "SOY"
+              ],
+              "dish_types": [],
+              "dish_family": null,
+              "meal_role": null,
+              "health_tags": [
+                "HIGH_PROTEIN"
+              ],
+              "efficiency_tags": [
+                "QUICK"
+              ],
+              "cost_tier": "BUDGET",
+              "budget_band": "BUDGET",
+              "complexity": "MEDIUM"
+            }
+          }
+        ]
+      },
+      "nutrition": {
+        "selected": 1,
+        "updated": 1,
+        "without_nutrition": 0,
+        "failed": 0,
+        "dry_run": false,
+        "samples": [
+          {
+            "name": "Handvo Recipe (Baked & Stovetop)",
+            "source_url": "https://www.indianhealthyrecipes.com/handvo/",
+            "nutrition_keys": [
+              "calories",
+              "carbohydrateContent",
+              "cholesterolContent",
+              "fatContent",
+              "fiberContent",
+              "proteinContent",
+              "saturatedFatContent",
+              "servingSize",
+              "sodiumContent",
+              "sugarContent",
+              "transFatContent",
+              "unsaturatedFatContent"
+            ]
+          }
+        ]
+      },
+      "status": "completed",
+      "ended_at": "2026-07-21T05:04:36.502549+00:00"
+    }
+  ]
+}

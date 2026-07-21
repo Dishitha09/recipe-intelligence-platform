@@ -13,6 +13,23 @@ BEGIN
 
         );
 
+        WITH duplicate_embeddings AS (
+            SELECT
+                embedding_id,
+                row_number() OVER (
+                    PARTITION BY recipe_id
+                    ORDER BY created_at DESC, embedding_id DESC
+                ) AS duplicate_rank
+            FROM recipe_embeddings
+            WHERE recipe_id IS NOT NULL
+        )
+        DELETE FROM recipe_embeddings
+        WHERE embedding_id IN (
+            SELECT embedding_id
+            FROM duplicate_embeddings
+            WHERE duplicate_rank > 1
+        );
+
         CREATE UNIQUE INDEX IF NOT EXISTS ux_recipe_embeddings_recipe_id
         ON recipe_embeddings(recipe_id);
 

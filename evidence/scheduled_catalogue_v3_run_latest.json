@@ -1,46 +1,49 @@
 {
   "status": "completed",
-  "started_at": "2026-07-21T04:19:05.446524+00:00",
-  "ended_at": "2026-07-21T04:19:12.539476+00:00",
-  "dry_run": true,
+  "started_at": "2026-07-21T05:04:00.095056+00:00",
+  "ended_at": "2026-07-21T05:06:07.513047+00:00",
+  "dry_run": false,
   "pipeline": {
-    "run_started_at": "20260721T041905Z",
-    "dry_run": true,
+    "run_started_at": "20260721T050400Z",
+    "dry_run": false,
     "selected_sources": [
       "swasthi_recipes_index_web"
     ],
     "totals": {
-      "records_scraped": 0,
-      "inserted": 0,
-      "skipped_duplicate": 0,
+      "records_scraped": 6,
+      "inserted": 1,
+      "skipped_duplicate": 5,
       "updated_existing": 0,
       "skipped_invalid": 0,
       "failed": 0,
-      "enriched": 0,
-      "nutrition_updated": 0
+      "enriched": 1,
+      "nutrition_updated": 1
     },
     "sources": [
       {
         "source_id": "swasthi_recipes_index_web",
         "source_type": "web",
         "source_group": "target_webpage_schema_v3",
-        "started_at": "2026-07-21T04:19:05.449225+00:00",
+        "started_at": "2026-07-21T05:04:00.340447+00:00",
         "scrape": {
           "source_id": "swasthi_recipes_index_web",
-          "records_scraped": 0,
-          "inserted": 0,
-          "skipped_duplicate": 0,
+          "source_url": "https://www.indianhealthyrecipes.com/recipes/",
+          "records_scraped": 6,
+          "inserted": 1,
+          "skipped_duplicate": 5,
           "updated_existing": 0,
           "skipped_invalid": 0,
           "failed": 0,
           "errors": [],
-          "skipped": true
+          "output_csv": "data\\datasets\\catalogue_v3\\automated_runs\\swasthi_recipes_index_web_20260721T050400Z.csv",
+          "job_log": "data\\datasets\\catalogue_v3\\automated_runs\\swasthi_recipes_index_web_20260721T050400Z.log",
+          "job_started_at": "20260721T050400Z"
         },
         "enrichment": {
           "source": "swasthi_recipes_index_web",
           "selected": 1,
-          "updated": 0,
-          "dry_run": true,
+          "updated": 1,
+          "dry_run": false,
           "samples": [
             {
               "name": "Tofu Bhurji Recipe",
@@ -69,30 +72,55 @@
           ]
         },
         "nutrition": {
-          "skipped": true
+          "selected": 1,
+          "updated": 1,
+          "without_nutrition": 0,
+          "failed": 0,
+          "dry_run": false,
+          "samples": [
+            {
+              "name": "Handvo Recipe (Baked & Stovetop)",
+              "source_url": "https://www.indianhealthyrecipes.com/handvo/",
+              "nutrition_keys": [
+                "calories",
+                "carbohydrateContent",
+                "cholesterolContent",
+                "fatContent",
+                "fiberContent",
+                "proteinContent",
+                "saturatedFatContent",
+                "servingSize",
+                "sodiumContent",
+                "sugarContent",
+                "transFatContent",
+                "unsaturatedFatContent"
+              ]
+            }
+          ]
         },
         "status": "completed",
-        "ended_at": "2026-07-21T04:19:05.597772+00:00"
+        "ended_at": "2026-07-21T05:04:36.502549+00:00"
       }
     ],
-    "summary_path": "data\\datasets\\catalogue_v3\\automated_runs\\catalogue_v3_pipeline_20260721T041905Z.json"
+    "summary_path": "data\\datasets\\catalogue_v3\\automated_runs\\catalogue_v3_pipeline_20260721T050400Z.json"
   },
   "ingredient_resolution": {
-    "recipes_selected": 6563,
-    "ingredient_rows": 83665,
-    "resolved_rows": 82054,
-    "unresolved_rows": 1611,
-    "ingredient_resolution_rate": 0.9807,
+    "recipes_selected": 6571,
+    "ingredient_rows": 83731,
+    "resolved_rows": 82764,
+    "unresolved_rows": 967,
+    "ingredient_resolution_rate": 0.9885,
     "tier_counts": {
-      "exact_alias": 82054,
-      "unresolved": 1611
+      "exact_alias": 82764,
+      "unresolved": 967
     },
     "method_counts": {
-      "database_alias": 82054,
-      "unresolved": 1611
+      "database_alias": 82763,
+      "unresolved": 967,
+      "alias_catalogue_writeback": 1
     },
-    "updated_recipes": 0,
-    "dry_run": true,
+    "updated_recipes": 662,
+    "dry_run": false,
     "passes_ps3_kpi": true,
     "unresolved_samples": [
       {
@@ -101,44 +129,9 @@
         "normalized_name": "sorrel leaves"
       },
       {
-        "recipe_id": "f5ad2943-5c14-4a26-9705-a8b4f63cf986",
-        "raw_name": "Coriander (Dhania) Leaves",
-        "normalized_name": "coriander dhania leaves"
-      },
-      {
-        "recipe_id": "fcc21c07-1f91-4548-8fce-087fb2b03444",
-        "raw_name": "Coriander (Dhania) Leaves",
-        "normalized_name": "coriander dhania leaves"
-      },
-      {
         "recipe_id": "8a849336-0013-4828-832e-384f38d4441d",
         "raw_name": "Nutralite Garlic & Oregano Spread",
         "normalized_name": "nutralite garlic & oregano spread"
-      },
-      {
-        "recipe_id": "26fb8fa8-eabc-44c4-81df-7844a1cff00e",
-        "raw_name": "Coriander (Dhania) Leaves",
-        "normalized_name": "coriander dhania leaves"
-      },
-      {
-        "recipe_id": "8cb2a17d-9923-4b7f-b14c-a25620b7e328",
-        "raw_name": "Mooli/ Mullangi (Radish)",
-        "normalized_name": "mooli mullangi radish"
-      },
-      {
-        "recipe_id": "8cb2a17d-9923-4b7f-b14c-a25620b7e328",
-        "raw_name": "Coriander (Dhania) Leaves",
-        "normalized_name": "coriander dhania leaves"
-      },
-      {
-        "recipe_id": "f44f68e5-3ed1-469a-a4cc-6c71c93a73c8",
-        "raw_name": "Coriander (Dhania) Leaves",
-        "normalized_name": "coriander dhania leaves"
-      },
-      {
-        "recipe_id": "f44f68e5-3ed1-469a-a4cc-6c71c93a73c8",
-        "raw_name": "Fresh cream",
-        "normalized_name": "fresh cream"
       },
       {
         "recipe_id": "ab394425-5fcf-4c23-b248-2a5ea7089cf5",
@@ -151,71 +144,110 @@
         "normalized_name": "fresh herbs"
       },
       {
-        "recipe_id": "5794ebf9-b9e8-4260-bcb2-558d815c98c0",
-        "raw_name": "Coriander (Dhania) Leaves",
-        "normalized_name": "coriander dhania leaves"
+        "recipe_id": "e453ad7b-dafc-4efa-b1aa-61c1ee18f2e5",
+        "raw_name": "Edible Silver Foil/Leaf (Chandi Ka Vark)",
+        "normalized_name": "edible silver foil leaf chandi ka vark"
       },
       {
-        "recipe_id": "43db4d06-67b0-4bca-8a86-6083706b1946",
-        "raw_name": "Coriander (Dhania) Leaves",
-        "normalized_name": "coriander dhania leaves"
+        "recipe_id": "be756ba7-dd82-4be0-934e-7f7b48eeaea9",
+        "raw_name": "Tender coconut meat",
+        "normalized_name": "tender coconut meat"
       },
       {
-        "recipe_id": "b5430e70-8bd2-498e-859b-cde59ef34716",
-        "raw_name": "Coriander (Dhania) Leaves",
-        "normalized_name": "coriander dhania leaves"
+        "recipe_id": "9c08754e-62eb-411c-8479-a6813f04e1b2",
+        "raw_name": "or 2 Yellow food colour",
+        "normalized_name": "or 2 yellow food colour"
       },
       {
-        "recipe_id": "8917b3b7-2a63-489c-ae4f-95c3e67250d5",
-        "raw_name": "Coriander (Dhania) Leaves",
-        "normalized_name": "coriander dhania leaves"
+        "recipe_id": "f6e83672-3da4-4efe-8072-88c4264a2abb",
+        "raw_name": "Malabar Spinach Leaves",
+        "normalized_name": "malabar spinach leaves"
       },
       {
-        "recipe_id": "ba826672-2cfa-4c08-8bf6-d1e0c66f4f43",
-        "raw_name": "Coriander (Dhania) Leaves",
-        "normalized_name": "coriander dhania leaves"
+        "recipe_id": "cf2d5ea0-90fa-49d3-b377-a980886901f7",
+        "raw_name": "Sesame (Gingelly) Oil",
+        "normalized_name": "sesame gingelly oil"
       },
       {
-        "recipe_id": "480e6bd4-53d2-4616-8929-483d7a868fe5",
-        "raw_name": "Cumin powder (Jeera)",
-        "normalized_name": "cumin powder jeera"
+        "recipe_id": "428afa91-4ed7-4b6f-b205-0553c024c517",
+        "raw_name": "Red baby radish",
+        "normalized_name": "red baby radish"
       },
       {
-        "recipe_id": "7d01d9c9-476e-46af-b528-f9ea2e0c2beb",
-        "raw_name": "Black Salt (Kala Namak)",
-        "normalized_name": "black salt kala namak"
+        "recipe_id": "284b1661-d09a-4a19-baba-33d4618165f4",
+        "raw_name": "or 2 Green Chillies -",
+        "normalized_name": "or 2 green chillies"
       },
       {
-        "recipe_id": "52a28d9c-50c8-47db-89a5-68133da3e8a0",
-        "raw_name": "Coriander (Dhania) Leaves",
-        "normalized_name": "coriander dhania leaves"
+        "recipe_id": "7da9aa8b-6274-486d-995c-6b60f872a2da",
+        "raw_name": "Gilka",
+        "normalized_name": "gilka"
       },
       {
-        "recipe_id": "b2a8d291-5c21-4458-8e95-45d0851aba8b",
-        "raw_name": "Coriander (Dhania) Leaves",
-        "normalized_name": "coriander dhania leaves"
+        "recipe_id": "9e82ef5a-875d-4ccd-bf29-a7359030a578",
+        "raw_name": "Drumstick Leaves (Moringa/Murungai Keerai)",
+        "normalized_name": "drumstick leaves moringa murungai keerai"
+      },
+      {
+        "recipe_id": "68d8c631-0965-48bc-ba2c-9da4b7b90e03",
+        "raw_name": "Cinnamon Powder (Dalchini)",
+        "normalized_name": "cinnamon powder dalchini"
+      },
+      {
+        "recipe_id": "6524497d-0154-4056-a8ec-b497fa954a1b",
+        "raw_name": "Green Chawli Beans",
+        "normalized_name": "green chawli beans"
+      },
+      {
+        "recipe_id": "0c358370-b4e8-430b-ab11-516f8d09a38c",
+        "raw_name": "Double Beans",
+        "normalized_name": "double beans"
+      },
+      {
+        "recipe_id": "0c358370-b4e8-430b-ab11-516f8d09a38c",
+        "raw_name": "Carrot (Gajjar)",
+        "normalized_name": "carrot gajjar"
+      },
+      {
+        "recipe_id": "0c358370-b4e8-430b-ab11-516f8d09a38c",
+        "raw_name": "Green beans (French Beans)",
+        "normalized_name": "green beans french beans"
+      },
+      {
+        "recipe_id": "694b68c2-6503-444e-8b31-7732cf49e6bc",
+        "raw_name": "Few sprig Coriander (Dhania) Leaves",
+        "normalized_name": "few sprig coriander dhania leaves"
+      },
+      {
+        "recipe_id": "a78ce9fd-1fcc-4b10-8cb8-6d11af066164",
+        "raw_name": "SSP Asafoetida (Hing)",
+        "normalized_name": "ssp asafoetida hing"
       }
     ]
   },
   "validation": {
-    "selected": 6563,
-    "dry_run": true,
+    "selected": 6571,
+    "dry_run": false,
     "status_counts": {
-      "ACCEPTED": 6050,
+      "ACCEPTED": 6058,
       "REVIEW": 504,
       "REJECTED": 9
     },
     "failure_counts": {
-      "V08": 5473,
-      "V11": 1791,
+      "V08": 5475,
+      "V11": 1797,
       "V05": 502,
       "V10": 382,
       "V02": 9,
       "V04": 4
     },
-    "validation_acceptance_rate": 0.9218,
+    "validation_acceptance_rate": 0.9219,
     "accepted_critical_failures": 0,
-    "persisted": {},
+    "persisted": {
+      "validation_reports": 6571,
+      "review_queue": 504,
+      "dead_letter_queue": 9
+    },
     "samples": [
       {
         "recipe_id": "3fc54025-d03c-414d-87b3-d41c14de54e0",
@@ -313,32 +345,32 @@
   "kpi": {
     "database": "recipe_catalogue_v3",
     "summary": {
-      "recipes": 6563,
-      "recipes_with_ingredients": 6563,
-      "recipes_with_steps": 6563,
-      "ingredient_rows": 83665,
-      "master_ingredients": 18205,
-      "ingredient_aliases": 1191,
-      "ingredient_embeddings": 18205,
-      "ingredient_resolution_reports": 83856
+      "recipes": 6571,
+      "recipes_with_ingredients": 6571,
+      "recipes_with_steps": 6571,
+      "ingredient_rows": 83731,
+      "master_ingredients": 18207,
+      "ingredient_aliases": 1197,
+      "ingredient_embeddings": 18207,
+      "ingredient_resolution_reports": 84582
     },
     "validation": {
-      "validated_recipes": 6563,
-      "accepted": 6050,
+      "validated_recipes": 6571,
+      "accepted": 6058,
       "review": 504,
       "rejected": 9,
       "accepted_critical_failures": 0,
-      "validation_acceptance_rate": 0.9218,
+      "validation_acceptance_rate": 0.9219,
       "passes_ps5_kpi": true
     },
     "ingredient_resolution": {
-      "reported_ingredient_rows": 83665,
-      "resolved_rows": 82054,
-      "unresolved_rows": 1611,
-      "exact_alias_rows": 82054,
+      "reported_ingredient_rows": 83731,
+      "resolved_rows": 82764,
+      "unresolved_rows": 967,
+      "exact_alias_rows": 82764,
       "vector_rows": 0,
       "llm_rows": 0,
-      "ingredient_resolution_rate": 0.9807,
+      "ingredient_resolution_rate": 0.9885,
       "passes_ps3_kpi": true,
       "llm_escalation_rate": 0.0
     },

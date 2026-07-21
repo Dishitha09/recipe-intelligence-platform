@@ -1,0 +1,14 @@
+.git
+.pytest_cache
+__pycache__
+*.pyc
+.venv
+venv
+env
+.env
+backups
+output
+*.zip
+data/datasets/catalogue_v3/*.partial.csv
+data/datasets/catalogue_v3/automated_runs/*.log
+data/datasets/catalogue_v3/automated_runs/*.partial.csv

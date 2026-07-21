@@ -1,0 +1,12 @@
+{
+  "source_id": "swasthi_recipes_index_web",
+  "source_url": "https://www.indianhealthyrecipes.com/recipes/",
+  "records_scraped": 6,
+  "inserted": 1,
+  "skipped_duplicate": 5,
+  "updated_existing": 0,
+  "skipped_invalid": 0,
+  "failed": 0,
+  "errors": [],
+  "output_csv": "data\\datasets\\catalogue_v3\\automated_runs\\swasthi_recipes_index_web_20260721T050400Z.csv"
+}

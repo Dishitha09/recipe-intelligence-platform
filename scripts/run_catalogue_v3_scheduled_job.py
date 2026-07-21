@@ -33,6 +33,7 @@ def run_scheduled_job(args):
             max_items=args.max_items,
             max_pages=args.max_pages,
             max_depth=args.max_depth,
+            source_timeout_seconds=args.source_timeout_seconds,
             output_dir=Path(args.pipeline_output_dir),
             dry_run=args.dry_run,
             skip_scrape=args.skip_scrape,
@@ -85,6 +86,7 @@ def build_parser():
     parser.add_argument("--max-items", type=int, default=100)
     parser.add_argument("--max-pages", type=int, default=250)
     parser.add_argument("--max-depth", type=int, default=3)
+    parser.add_argument("--source-timeout-seconds", type=int, default=420)
     parser.add_argument("--validation-limit", type=int, default=100000)
     parser.add_argument("--pipeline-output-dir", default="data/datasets/catalogue_v3/automated_runs")
     parser.add_argument("--output-dir", default="evidence")

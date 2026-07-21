@@ -1,0 +1,126 @@
+{
+  "generated_at": "2026-07-21T04:26:22.233129+00:00",
+  "database": "recipe_catalogue_v3",
+  "workflow": "review correction -> alias write-back -> catalogue update -> next run Tier 1",
+  "before_unresolved_ingredient_mentions": 1611,
+  "after_unresolved_ingredient_mentions": 951,
+  "catalogue_rows_updated": 645,
+  "corrections": [
+    {
+      "canonical_name": "coriander_leaves",
+      "alias_name": "coriander dhania leaves",
+      "language": "en",
+      "write_back": {
+        "ingredient_id": 109,
+        "canonical_name": "coriander_leaves",
+        "alias_name": "coriander dhania leaves",
+        "language": "en",
+        "source": "curator_workflow_proof",
+        "corrected_by": "production-proof",
+        "next_run_resolution_tier": "exact_alias",
+        "next_run_resolution_method": "database_alias"
+      },
+      "verification": {
+        "ingredient_id": 109,
+        "canonical_name": "coriander_leaves",
+        "alias_name": "coriander dhania leaves",
+        "resolution_tier": "exact_alias",
+        "resolution_method": "database_alias"
+      },
+      "passes_tier1_next_run": true
+    },
+    {
+      "canonical_name": "radish",
+      "alias_name": "mooli mullangi radish",
+      "language": "en",
+      "write_back": {
+        "ingredient_id": 327,
+        "canonical_name": "radish",
+        "alias_name": "mooli mullangi radish",
+        "language": "en",
+        "source": "curator_workflow_proof",
+        "corrected_by": "production-proof",
+        "next_run_resolution_tier": "exact_alias",
+        "next_run_resolution_method": "database_alias"
+      },
+      "verification": {
+        "ingredient_id": 327,
+        "canonical_name": "radish",
+        "alias_name": "mooli mullangi radish",
+        "resolution_tier": "exact_alias",
+        "resolution_method": "database_alias"
+      },
+      "passes_tier1_next_run": true
+    },
+    {
+      "canonical_name": "fresh_cream",
+      "alias_name": "fresh cream",
+      "language": "en",
+      "write_back": {
+        "ingredient_id": 56140,
+        "canonical_name": "fresh_cream",
+        "alias_name": "fresh cream",
+        "language": "en",
+        "source": "curator_workflow_proof",
+        "corrected_by": "production-proof",
+        "next_run_resolution_tier": "exact_alias",
+        "next_run_resolution_method": "database_alias"
+      },
+      "verification": {
+        "ingredient_id": 56140,
+        "canonical_name": "fresh_cream",
+        "alias_name": "fresh cream",
+        "resolution_tier": "exact_alias",
+        "resolution_method": "database_alias"
+      },
+      "passes_tier1_next_run": true
+    },
+    {
+      "canonical_name": "cumin_powder",
+      "alias_name": "cumin powder jeera",
+      "language": "en",
+      "write_back": {
+        "ingredient_id": 56141,
+        "canonical_name": "cumin_powder",
+        "alias_name": "cumin powder jeera",
+        "language": "en",
+        "source": "curator_workflow_proof",
+        "corrected_by": "production-proof",
+        "next_run_resolution_tier": "exact_alias",
+        "next_run_resolution_method": "database_alias"
+      },
+      "verification": {
+        "ingredient_id": 56141,
+        "canonical_name": "cumin_powder",
+        "alias_name": "cumin powder jeera",
+        "resolution_tier": "exact_alias",
+        "resolution_method": "database_alias"
+      },
+      "passes_tier1_next_run": true
+    },
+    {
+      "canonical_name": "black_salt",
+      "alias_name": "black salt kala namak",
+      "language": "en",
+      "write_back": {
+        "ingredient_id": 46,
+        "canonical_name": "black_salt",
+        "alias_name": "black salt kala namak",
+        "language": "en",
+        "source": "curator_workflow_proof",
+        "corrected_by": "production-proof",
+        "next_run_resolution_tier": "exact_alias",
+        "next_run_resolution_method": "database_alias"
+      },
+      "verification": {
+        "ingredient_id": 46,
+        "canonical_name": "black_salt",
+        "alias_name": "black salt kala namak",
+        "resolution_tier": "exact_alias",
+        "resolution_method": "database_alias"
+      },
+      "passes_tier1_next_run": true
+    }
+  ],
+  "passes_curator_workflow": true
+}

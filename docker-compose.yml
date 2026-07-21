@@ -32,7 +32,7 @@ services:
       CORS_ORIGINS: http://localhost:5173,http://localhost:3000
       RECIPE_PIPELINE_USER_AGENT: RecipeIntelligencePlatform/1.0
     ports:
-      - "8000:8000"
+      - "${API_HOST_PORT:-8001}:8000"
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:8000/health"]
       interval: 30s

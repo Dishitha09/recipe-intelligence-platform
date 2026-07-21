@@ -1,0 +1,219 @@
+{
+  "generated_at": "2026-07-21T05:07:52.530594+00:00",
+  "database": "recipe_catalogue_v3",
+  "total_recipes": 6571,
+  "source_type_counts": {
+    "audio": 1,
+    "csv_manual": 2,
+    "dataset": 1747,
+    "image_ocr": 1,
+    "pdf": 1,
+    "plain_text": 1,
+    "web": 4817,
+    "youtube": 1
+  },
+  "required_source_types": [
+    "web",
+    "youtube",
+    "dataset",
+    "pdf",
+    "audio",
+    "image_ocr",
+    "plain_text",
+    "csv_manual"
+  ],
+  "covered_source_types": [
+    "web",
+    "youtube",
+    "dataset",
+    "pdf",
+    "audio",
+    "image_ocr",
+    "plain_text",
+    "csv_manual"
+  ],
+  "missing_source_types": [],
+  "passes_multisource_presence": true,
+  "sources": {
+    "Anupam007/indian-recipe-dataset": {
+      "source_type": "dataset",
+      "recipe_count": 1747,
+      "with_ingredients": 1747,
+      "with_steps": 1747,
+      "with_image": 1747,
+      "with_servings": 1747,
+      "english_rows": 1747
+    },
+    "audio_transcript_sidecar": {
+      "source_type": "audio",
+      "recipe_count": 1,
+      "with_ingredients": 1,
+      "with_steps": 1,
+      "with_image": 0,
+      "with_servings": 1,
+      "english_rows": 1
+    },
+    "csv_manual_upload": {
+      "source_type": "csv_manual",
+      "recipe_count": 2,
+      "with_ingredients": 2,
+      "with_steps": 2,
+      "with_image": 0,
+      "with_servings": 2,
+      "english_rows": 2
+    },
+    "eat_by_state_web": {
+      "source_type": "web",
+      "recipe_count": 14,
+      "with_ingredients": 14,
+      "with_steps": 14,
+      "with_image": 14,
+      "with_servings": 14,
+      "english_rows": 14
+    },
+    "hebbars_kitchen_web": {
+      "source_type": "web",
+      "recipe_count": 151,
+      "with_ingredients": 151,
+      "with_steps": 151,
+      "with_image": 151,
+      "with_servings": 151,
+      "english_rows": 151
+    },
+    "image_ocr_sidecar": {
+      "source_type": "image_ocr",
+      "recipe_count": 1,
+      "with_ingredients": 1,
+      "with_steps": 1,
+      "with_image": 1,
+      "with_servings": 1,
+      "english_rows": 1
+    },
+    "indianhealthyrecipes_chicken_web": {
+      "source_type": "web",
+      "recipe_count": 83,
+      "with_ingredients": 83,
+      "with_steps": 83,
+      "with_image": 83,
+      "with_servings": 83,
+      "english_rows": 83
+    },
+    "indianhealthyrecipes_egg_web": {
+      "source_type": "web",
+      "recipe_count": 110,
+      "with_ingredients": 110,
+      "with_steps": 110,
+      "with_image": 110,
+      "with_servings": 110,
+      "english_rows": 110
+    },
+    "indianhealthyrecipes_vegan_web": {
+      "source_type": "web",
+      "recipe_count": 24,
+      "with_ingredients": 24,
+      "with_steps": 24,
+      "with_image": 24,
+      "with_servings": 24,
+      "english_rows": 24
+    },
+    "nileshiq/Indian-Food": {
+      "source_type": "web",
+      "recipe_count": 3654,
+      "with_ingredients": 3654,
+      "with_steps": 3654,
+      "with_image": 1864,
+      "with_servings": 3654,
+      "english_rows": 3654
+    },
+    "pdf_cookbook_sidecar": {
+      "source_type": "pdf",
+      "recipe_count": 1,
+      "with_ingredients": 1,
+      "with_steps": 1,
+      "with_image": 0,
+      "with_servings": 1,
+      "english_rows": 1
+    },
+    "plain_text_sidecar": {
+      "source_type": "plain_text",
+      "recipe_count": 1,
+      "with_ingredients": 1,
+      "with_steps": 1,
+      "with_image": 0,
+      "with_servings": 1,
+      "english_rows": 1
+    },
+    "sailus_food_web": {
+      "source_type": "web",
+      "recipe_count": 8,
+      "with_ingredients": 8,
+      "with_steps": 8,
+      "with_image": 8,
+      "with_servings": 8,
+      "english_rows": 8
+    },
+    "scrapy_indianhealthyrecipes": {
+      "source_type": "web",
+      "recipe_count": 68,
+      "with_ingredients": 68,
+      "with_steps": 68,
+      "with_image": 68,
+      "with_servings": 68,
+      "english_rows": 68
+    },
+    "swasthi_recipes_index_web": {
+      "source_type": "web",
+      "recipe_count": 12,
+      "with_ingredients": 12,
+      "with_steps": 12,
+      "with_image": 12,
+      "with_servings": 12,
+      "english_rows": 12
+    },
+    "veg_recipes_of_india_web": {
+      "source_type": "web",
+      "recipe_count": 605,
+      "with_ingredients": 605,
+      "with_steps": 605,
+      "with_image": 605,
+      "with_servings": 605,
+      "english_rows": 605
+    },
+    "vegan_richa_indian_web": {
+      "source_type": "web",
+      "recipe_count": 14,
+      "with_ingredients": 14,
+      "with_steps": 14,
+      "with_image": 14,
+      "with_servings": 14,
+      "english_rows": 14
+    },
+    "whiskaffair_indian_state_web": {
+      "source_type": "web",
+      "recipe_count": 20,
+      "with_ingredients": 20,
+      "with_steps": 20,
+      "with_image": 20,
+      "with_servings": 20,
+      "english_rows": 20
+    },
+    "whiskaffair_web": {
+      "source_type": "web",
+      "recipe_count": 54,
+      "with_ingredients": 54,
+      "with_steps": 54,
+      "with_image": 53,
+      "with_servings": 54,
+      "english_rows": 54
+    },
+    "youtube_transcript_sidecar": {
+      "source_type": "youtube",
+      "recipe_count": 1,
+      "with_ingredients": 1,
+      "with_steps": 1,
+      "with_image": 0,
+      "with_servings": 1,
+      "english_rows": 1
+    }
+  }
+}
