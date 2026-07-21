@@ -173,9 +173,10 @@ def test_catalogue_v3_enricher_reparses_existing_string_quantity_as_number():
     ingredients = CatalogueV3Enricher().enrich_row(row).updates["ingredients_json"]
 
     assert ingredients[0]["quantity"] == 0.5
-    assert ingredients[0]["canonical_unit"] == "ml"
-    assert ingredients[0]["canonical_quantity"] == 2.5
-    assert ingredients[0]["normalized_text"] == "2.5 ml turmeric powder"
+    assert ingredients[0]["canonical_unit"] == "g"
+    assert ingredients[0]["canonical_quantity"] == 1.25
+    assert ingredients[0]["conversion_method"] == "estimated_density_lookup"
+    assert ingredients[0]["normalized_text"] == "1.25 g turmeric powder"
     assert ingredients[1]["quantity"] == 0.33
     assert ingredients[1]["canonical_unit"] == "g"
     assert ingredients[1]["canonical_quantity"] == 63.33

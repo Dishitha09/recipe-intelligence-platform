@@ -2,6 +2,7 @@ import re
 from fractions import Fraction
 
 from services.enrichment.uom.density_table import DENSITY
+from services.enrichment.uom.ingredient_type import is_liquid
 
 
 CANONICAL_UNITS = {"g", "ml", "tsp", "tbsp", "cup", "count"}
@@ -13,11 +14,14 @@ LIQUIDS = {
     "cream",
     "curd drink",
     "ghee",
+    "clarified_butter",
     "milk",
     "oil",
     "vinegar",
     "water",
 }
+
+GENERIC_SOLID_DENSITY_G_PER_CUP = 120.0
 
 
 class UOMNormalizer:
@@ -242,7 +246,7 @@ class UOMNormalizer:
             normalized_volume_unit, ml_factor = self.volume_units[raw_unit]
             ml = quantity * ml_factor
 
-            if ingredient_key in LIQUIDS:
+            if ingredient_key in LIQUIDS or is_liquid(ingredient_key):
                 return self._result(
                     ingredient_name,
                     quantity,
@@ -270,16 +274,18 @@ class UOMNormalizer:
                     conversion_factor=round(grams / quantity, 4),
                 )
 
+            grams_per_ml = GENERIC_SOLID_DENSITY_G_PER_CUP / 240.0
+            grams = ml * grams_per_ml
             return self._result(
                 ingredient_name,
                 quantity,
                 normalized_volume_unit,
-                round(ml, 2),
-                "ml",
-                "metric_volume_without_density",
-                0.75,
-                conversion_factor=ml_factor,
-                flags=["density_missing"],
+                round(grams, 2),
+                "g",
+                "estimated_density_lookup",
+                0.7,
+                conversion_factor=round(grams / quantity, 4),
+                flags=["density_estimated"],
             )
 
         return self._result(

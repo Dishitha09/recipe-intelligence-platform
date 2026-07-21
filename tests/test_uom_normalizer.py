@@ -62,16 +62,16 @@ def test_missing_unit_with_quantity_is_inferred_as_count():
     assert result["conversion_method"] == "count_inferred"
 
 
-def test_solid_volume_without_density_passes_through_without_conflict():
+def test_solid_volume_without_density_uses_estimated_density():
     uom = UOMNormalizer()
 
     result = uom.normalize("unknown spice", "1", "tsp")
 
-    assert result["canonical_quantity"] == 5
-    assert result["canonical_unit"] == "ml"
-    assert result["conversion_method"] == "metric_volume_without_density"
+    assert result["canonical_quantity"] == 2.5
+    assert result["canonical_unit"] == "g"
+    assert result["conversion_method"] == "estimated_density_lookup"
     assert "uom_conflict" not in result["enrichment_flags"]
-    assert "density_missing" in result["enrichment_flags"]
+    assert "density_estimated" in result["enrichment_flags"]
 
 
 def test_descriptor_density_alias_converts_to_grams():
@@ -88,3 +88,4 @@ def test_common_dairy_liquids_are_classified_as_liquid():
     assert is_liquid("buttermilk") is True
     assert is_liquid("cream") is True
     assert is_liquid("plain yogurt") is True
+    assert is_liquid("sunflower_oil") is True

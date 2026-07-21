@@ -281,7 +281,8 @@ class ValidationEngine:
             if (
                 ingredient.canonical_unit == "ml"
                 and not is_liquid(canonical_name)
-                and ingredient.conversion_method != "density_lookup"
+                and ingredient.conversion_method
+                not in {"density_lookup", "estimated_density_lookup"}
             ):
                 conflicts.append(
                     {
