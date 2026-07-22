@@ -1,10 +1,11 @@
 import hashlib
+import hmac
 import os
 from datetime import date, datetime, timezone
 from decimal import Decimal
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, Query, Response
+from fastapi import Depends, FastAPI, Header, HTTPException, Query, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from sqlalchemy import text
@@ -37,6 +38,29 @@ app.add_middleware(
 )
 
 rag = None
+
+
+def require_admin_token(
+    x_admin_token: str | None = Header(default=None, alias="X-Admin-Token"),
+):
+    expected_token = os.getenv("API_ADMIN_TOKEN")
+
+    if not expected_token:
+        raise HTTPException(
+            status_code=503,
+            detail="Admin API token is not configured.",
+        )
+
+    if not x_admin_token or not hmac.compare_digest(
+        x_admin_token,
+        expected_token,
+    ):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or missing admin API token.",
+        )
+
+    return True
 
 
 def get_rag():
@@ -567,15 +591,15 @@ def ready():
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
         checks["operational_db"] = "ok"
-    except Exception as exc:
-        checks["operational_db"] = f"failed: {exc}"
+    except Exception:
+        checks["operational_db"] = "failed"
 
     try:
         with get_catalogue_v3_engine().connect() as conn:
             conn.execute(text("SELECT 1"))
         checks["catalogue_v3_db"] = "ok"
-    except Exception as exc:
-        checks["catalogue_v3_db"] = f"failed: {exc}"
+    except Exception:
+        checks["catalogue_v3_db"] = "failed"
 
     if all(value == "ok" for value in checks.values()):
         return {
@@ -600,7 +624,10 @@ def metrics():
     )
 
 
-@app.post("/ingredients/aliases")
+@app.post(
+    "/ingredients/aliases",
+    dependencies=[Depends(require_admin_token)],
+)
 def write_back_alias(request: AliasWriteBackRequest):
     from services.database.ingredient_repository import IngredientRepository
 
@@ -612,7 +639,10 @@ def write_back_alias(request: AliasWriteBackRequest):
     )
 
 
-@app.post("/catalogue-v3/ingredients/aliases")
+@app.post(
+    "/catalogue-v3/ingredients/aliases",
+    dependencies=[Depends(require_admin_token)],
+)
 def write_back_catalogue_v3_alias(request: AliasWriteBackRequest):
     from services.database.catalogue_v3_curator_repository import (
         CatalogueV3CuratorRepository,
@@ -674,7 +704,10 @@ def recipe_reviews(recipe_id: int):
     }
 
 
-@app.post("/recipes/{recipe_id}/reviews")
+@app.post(
+    "/recipes/{recipe_id}/reviews",
+    dependencies=[Depends(require_admin_token)],
+)
 def add_recipe_review(recipe_id: int, request: ReviewCreateRequest):
     review = create_review_in_db(recipe_id, request)
 
@@ -699,7 +732,7 @@ def trending(limit: int = Query(default=25, ge=1, le=100)):
     return get_trending_from_db(limit=limit)
 
 
-@app.post("/ask")
+@app.post("/ask", dependencies=[Depends(require_admin_token)])
 def ask_recipe(request: QueryRequest):
     answer = get_rag().answer(
         request.question

@@ -5,6 +5,8 @@ from services.api import main
 
 client = TestClient(main.app)
 
+ADMIN_HEADERS = {"X-Admin-Token": "test-admin-token"}
+
 
 def test_recipe_listing_endpoint_passes_filters(monkeypatch):
     captured = {}
@@ -121,6 +123,8 @@ def test_recipe_detail_endpoint_returns_steps_and_source(monkeypatch):
 
 
 def test_add_review_endpoint_returns_updated_summary(monkeypatch):
+    monkeypatch.setenv("API_ADMIN_TOKEN", "test-admin-token")
+
     monkeypatch.setattr(
         main,
         "create_review_in_db",
@@ -144,6 +148,7 @@ def test_add_review_endpoint_returns_updated_summary(monkeypatch):
 
     response = client.post(
         "/recipes/7/reviews",
+        headers=ADMIN_HEADERS,
         json={
             "user_name": "Dishitha",
             "rating": 5,
@@ -179,6 +184,8 @@ def test_health_endpoint_returns_alive_status():
 
 
 def test_alias_write_back_endpoint(monkeypatch):
+    monkeypatch.setenv("API_ADMIN_TOKEN", "test-admin-token")
+
     from services.database.ingredient_repository import IngredientRepository
 
     def fake_write_back_alias(
@@ -204,6 +211,7 @@ def test_alias_write_back_endpoint(monkeypatch):
 
     response = client.post(
         "/ingredients/aliases",
+        headers=ADMIN_HEADERS,
         json={
             "canonical_name": "dry_mango_powder",
             "alias_name": "amchoor",
@@ -218,6 +226,8 @@ def test_alias_write_back_endpoint(monkeypatch):
 
 
 def test_catalogue_v3_alias_write_back_endpoint(monkeypatch):
+    monkeypatch.setenv("API_ADMIN_TOKEN", "test-admin-token")
+
     from services.database.catalogue_v3_curator_repository import (
         CatalogueV3CuratorRepository,
     )
@@ -246,6 +256,7 @@ def test_catalogue_v3_alias_write_back_endpoint(monkeypatch):
 
     response = client.post(
         "/catalogue-v3/ingredients/aliases",
+        headers=ADMIN_HEADERS,
         json={
             "canonical_name": "dry_mango_powder",
             "alias_name": "amchoor",

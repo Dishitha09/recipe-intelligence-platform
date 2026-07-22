@@ -4,16 +4,16 @@ services:
     container_name: recipe_postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: recipe_platform
+      POSTGRES_USER: ${POSTGRES_USER:-recipe_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_DB: ${POSTGRES_DB:-recipe_platform}
     ports:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d recipe_platform"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-recipe_admin} -d ${POSTGRES_DB:-recipe_platform}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -26,15 +26,16 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql+psycopg2://admin:admin@postgres:5432/recipe_platform
-      CATALOGUE_V3_DATABASE_URL: postgresql+psycopg2://admin:admin@postgres:5432/recipe_catalogue_v3
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-recipe_admin}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-recipe_platform}
+      CATALOGUE_V3_DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-recipe_admin}:${POSTGRES_PASSWORD}@postgres:5432/${CATALOGUE_V3_DB:-recipe_catalogue_v3}
       SQLALCHEMY_ECHO: "false"
       CORS_ORIGINS: http://localhost:5173,http://localhost:3000
       RECIPE_PIPELINE_USER_AGENT: RecipeIntelligencePlatform/1.0
+      API_ADMIN_TOKEN: ${API_ADMIN_TOKEN:?API_ADMIN_TOKEN is required}
     ports:
       - "${API_HOST_PORT:-8001}:8000"
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:8000/health"]
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/ready"]
       interval: 30s
       timeout: 10s
       retries: 3
