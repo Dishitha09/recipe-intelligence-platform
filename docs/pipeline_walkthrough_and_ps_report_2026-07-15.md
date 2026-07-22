@@ -507,7 +507,6 @@ FastAPI endpoint tests
 Remaining:
 
 ```text
-Add Grafana dashboard JSON or screenshots.
 Document production deployment metrics and alert thresholds.
 ```
 

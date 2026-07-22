@@ -675,5 +675,5 @@ Remaining scale work:
 * Enable more live sources one by one after robots/access checks.
 * Add domain-specific parsers for Times Food, NDTV, Sanjeev Kapoor, Indian Express, and regional blogs.
 * Run controlled batches to 500, then 1000-5000 accepted recipes.
-* Add Grafana dashboard panels on top of the Prometheus metrics endpoint.
+* Add optional visualization on top of the Prometheus metrics endpoint if a UI is needed later.
 * Build a curator UI on top of alias/UOM correction APIs.

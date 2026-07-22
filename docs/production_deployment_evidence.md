@@ -15,7 +15,6 @@ Services:
 - PostgreSQL with pgvector: `localhost:5433`
 - FastAPI: `http://localhost:8001` by default
 - Prometheus: `http://localhost:9090`
-- Grafana: `http://localhost:3001`
 
 Health checks:
 
@@ -36,22 +35,7 @@ python -m scripts.sync_catalogue_v3_master_ingredients
 python -m scripts.backfill_catalogue_v3_ingredient_embeddings
 ```
 
-## Grafana Evidence
-
-The dashboard is provisioned from:
-
-```text
-monitoring/grafana/dashboards/recipe-pipeline-overview.json
-```
-
-It displays:
-
-- recipes ingested
-- validation acceptance rate
-- ingredient resolution rate
-- dead-letter rate
-- pipeline p99 latency
-- LLM calls per batch
+## Prometheus Evidence
 
 Prometheus scrape config:
 

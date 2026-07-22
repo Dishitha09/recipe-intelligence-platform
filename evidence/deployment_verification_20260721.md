@@ -2,14 +2,13 @@
 
 ## Verified
 
-- `docker compose config` completed successfully and rendered the full stack:
-  PostgreSQL with pgvector, FastAPI, Prometheus, and Grafana.
+- `docker compose config` completed successfully and rendered the runtime stack:
+  PostgreSQL with pgvector, FastAPI, and Prometheus.
 - `docker compose build api --progress plain` completed successfully.
 - `docker compose up -d` completed successfully after moving the host API
   port to `8001`.
-- `docker compose ps` showed all services running:
-  `recipe_postgres`, `recipe_api`, `recipe_prometheus`, and
-  `recipe_grafana`.
+- `docker compose ps` showed the runtime services running:
+  `recipe_postgres`, `recipe_api`, and `recipe_prometheus`.
 - `http://localhost:8001/health` returned `status=ok`.
 - `http://localhost:8001/ready` returned `status=ready` with both database
   checks passing.
@@ -17,7 +16,6 @@
   including `records_ingested_total`, `ingredient_resolution_rate`,
   `validation_acceptance_rate`, and `dead_letter_rate`.
 - `http://localhost:9090/-/healthy` returned `Prometheus Server is Healthy.`
-- `http://localhost:3001/api/health` returned Grafana `database=ok`.
 - `python -m scripts.backup_catalogue_v3 --dry-run` completed and produced
   the expected `pg_dump` command.
 - `python -m scripts.run_catalogue_v3_scheduled_job --source-id swasthi_recipes_index_web --allow-disabled --skip-scrape --skip-nutrition --dry-run --no-track-runs --max-items 1 --validation-limit 100000`
@@ -56,6 +54,5 @@ curl http://localhost:8001/health
 curl http://localhost:8001/ready
 curl http://localhost:8001/metrics
 curl http://localhost:9090/-/healthy
-curl http://localhost:3001/api/health
 docker compose ps
 ```
